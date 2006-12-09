@@ -227,15 +227,17 @@ function overlap-sprite {
 #------------------------------------------------------------------------------
 # Draw a set of sprites on the playfield
 #
-# TODO: only draw sprites that are alive and on the playfield
+# TODO: only draw sprites that are on the playfield
 #
 function draw-sprites {
   param(
       $playfield = $(throw "you must supply a playfield"),
       $sprites = $(throw "you must supply a sprite array, sprites")
       )
-  $sprites | foreach {
+  $sprites | where { $_.alive} | foreach {
     draw-sprite -playfield $playfield -sprite $_
   }
 }
+
+
 
