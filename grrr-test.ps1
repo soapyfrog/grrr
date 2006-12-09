@@ -8,70 +8,52 @@ if ($global:___globcheck___ -eq 2) { write-error "This should not be source in g
 
 cls
 
-# load module
+# load modules
 . .\psunit.ps1
 . .\grrr.ps1
 
 
-#-------------------------------------------------------
-# Test creation of images, drawing
+
+#----------------------------------------------------------------
+# Tests various modes of creating a playfield
 #
-function test-create-image {
-  $img = create-image -frames ("<#>","/ \"),("<#>","| |") 
-  assert-equal "width" 3 $img.width
-  assert-equal "height" 2 $img.height
-  assert-equal "numframes" 2 $img.numframes
+function test-create-playfield {
+  $pf = create-playfield -width 30 -height 20 
+  assert-equal "vx" 0 $pf.vcoord.X
+  assert-equal "vy" 0 $pf.vcoord.Y
+  assert-equal "vr" (30-1) $pf.vrect.Right
+  assert-equal "vb" (20-1) $pf.vrect.Bottom
+  assert-equal "background" "black" $pf.fillcell.BackgroundColor
+
+  $pf = create-playfield -width 30 -height 20 -x 5 -y 6 -colour "red"
+  assert-equal "vx" 5 $pf.vcoord.X
+  assert-equal "vy" 6 $pf.vcoord.Y
+  assert-equal "vr" (5+30-1) $pf.vrect.Right
+  assert-equal "vb" (6+20-1) $pf.vrect.Bottom
+  assert-equal "background" "red" $pf.fillcell.BackgroundColor
 }
 
 
-#-------------------------------------------------------
-# Test creation of sprites, drawing
+#----------------------------------------------------------------
+# this is more of a visual test, so really only tests syntax 
+# TODO: put checks in to verify colours on screen
 #
-function test-create-sprite {
-
-# create a sprite and verify its properties
-  $image = create-image -frames ("<#>","/ \"),("<#>","| |") 
-  $b = create-sprite -x 5 -y 10 -img $image
-
-  assert-equal "x" 5 $b.x
-  assert-equal "y" 10 $b.y
-
-# create a collection of sprites
-
-  $sprites = @()
-  0..4 | foreach {
-    [int]$y = 15 + $_ * 3
-    0..4 | foreach {
-      [int]$x = 5 * $_
-      $b = create-sprite -x $x -y $y -img $image
-      $sprites += $b
-    }
-  }
-
-# do some ops on the collection
-  $toprow = ( $sprites | where { $_.y -lt 16 } ).count
-  assert-equal "should be 5 sprites in top row" 5 $toprow
-
-
-# animate the collection
-  1..5 | foreach {
-    [int]$f = $_ / 4
-    $sprites | foreach { update-sprite -dx 1 -dy 0 -frame $f $_ }
-  }
-
-}
-
-#-------------------------------------------------------
-# test sprite overlapping (collision detection)
-function test-overlap-sprite {
- $image = create-image -frames ("UVW","XYZ"),("UVW","XYZ")
- $b1 = create-sprite -x 10 -y 20 -img $image
- $b2 = create-sprite -x 10 -y 20 -img $image
- assert-true "should overlap" (overlap-sprite $b1 $b2)
- $b2 = create-sprite -x 12 -y 22 -img $image
- assert-false "should not overlap" (overlap-sprite $b1 $b2)
+function test-clear-playfield {
+  # create playfield over to the right
+  $pf = create-playfield -x 70 -y 0 -width 30 -height 20 -colour "red"
+  clear-playfield $pf
+  flush-playfield $pf
+  $pf = create-playfield -x 72 -y 2 -width 30 -height 20 # default colour
+  clear-playfield $pf
+  flush-playfield $pf
+  $pf = create-playfield -x 74 -y 4 -width 30 -height 20 -colour "green"
+  clear-playfield $pf
+  flush-playfield $pf
 }
 
 
+
+
+#----------------------------------------------------------------
 # hand over to unit test framework
 run-tests

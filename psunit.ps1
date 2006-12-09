@@ -6,7 +6,8 @@ function run-tests {
   ls function:test* | foreach {
     write-host -noNewLine "--- Running: $_ ..."
     $dur = measure-command { & $_ }
-    write-host " done in $dur"
+    $ms = $dur.TotalMilliseconds
+    write-host " done in $ms ms"
   }
   echo "--- Tests complete ---"
 }

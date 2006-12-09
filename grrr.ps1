@@ -1,7 +1,9 @@
 #-------------------------------------------------------
 # grrr.ps1 
 #
-# Support for sprites 
+# A source-able PowerShell module to handle playfields,
+# sprites, tiles, scrolling, eventing and other stuff
+# that can be useful in writing games.
 #
 # To use this in a script:
 # . grrr.ps1
@@ -12,122 +14,80 @@
 
 
 
-
-
-#-------------------------------------------------------
-# Create a sprite image
-# A sprite image has width and height (a number of lines)
-# and a colour
-# It is used by a sprite
+#-----------------------------------------------------
+# Creates a play field.
 #
-# If frames is: ("ABC","DEF"),("123","456")
-# this will produce a 3x2 image that is ABC for first frame then 123
-#                                       DEF                      456
+# A play field is rectangular piece of console in the
+# visible window, with a backing buffer of the same
+# size outside the visible window.
 #
-# -frames     an array of array of string (described above)
-# -fg         foreground colour (default "white")
-# -bg         background colour (default "black")
+# Drawing is always done in the backing buffer, then
+# flushed to the visual buffer to give the illusion
+# of instant rendering.
 #
-function create-image {
-  param(  [object[]] $frames, [string]$fg, [string]$bg ) # TODO should make frames a 3-rank string array
+# See clear-playfield, flush-playfield, etc.
+#
+# The console should be set up appropriately before
+# calling this (ie number of rows/cols, windows size
+# and position).
+#
+# TODO: this semi-assumes that the visual part of the 
+# console is at the top - likely in most uses, but
+# perhaps should not do so.
+#
+function create-playfield {
+  param(
+      [int]$width,[int]$height,     # width and height of the buffer
+      [int]$x,[int]$y,              # top left of the visual part
+      [string]$colour               # background colour (default black)
+      )
+  if ($colour -eq ""){$colour="black"}
 
-  if ($fg -eq "") { $fg = "white" }
-  if ($bg -eq "") { $bg = "black" }
-  $numframes = [int]$frames.length
-  $width = $frames[0][0].length
-  $height = [int]$frames[0].length
-
-  # create a buffercellarray for each frame
-  $bcaa = [object[,]]@()
-  for ([int]$i = 0; $i -lt $frames.length; $i++) {
-    $bca = $host.ui.RawUI.NewBufferCellArray( $frames[$i], $fg, $bg )
-    $bcaa += 1  # += doesn't work when adding subarrays
-    $bcaa[-1] = $bca
-  }
-
-  # create a buffercellarray for a blank
-  [string]$blank = " " * $width
-  [string[]]$blankarray = @()
-  for ($i=0; $i -lt $height; $i++ ) {
-    $blankarray += $blank 
-  }
-  $ebca = $host.ui.RawUI.NewBufferCellArray( $blankarray, $fg, $bg )
+  # back buffer goes at the bottom of the console buffer
+  # TODO: need to handle different back buffers
+  [int]$by = ($host.ui.rawui.BufferSize.Height - $height)
 
   return @{
-    "frames"    = $bcaa     # array of buffercell arrays
-    "width"     = $width
-    "height"    = $height
-    "eraser"    = $ebca     # eraser bca
-    "numframes" = $numframes
+    # vcoord and vrect are for the visual bit
+    "vcoord" = new-object Management.Automation.Host.Coordinates -argumentList $x,$y
+    "vrect"  = new-object Management.Automation.Host.Rectangle -argumentList $x,$y,($x+$width-1),($y+$height-1)
+    # bcoord and brect are for the back buffer bit
+    "bcoord" = new-object Management.Automation.Host.Coordinates -argumentList $x,$by
+    "brect"  = new-object Management.Automation.Host.Rectangle -argumentList $x,$by,($x+$width-1),($by+$height-1)
+
+    # default background fill cell
+    "fillcell" = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$colour,"Complete" 
+    "xx" = 3
   }
 }
 
-
-#-------------------------------------------------------
-# create a basic sprite 
-# takes x,y coords and an image
+#-----------------------------------------------------
+# Clears the back buffer of the playfield
 #
-# the img bit is an object returned by create-image
-# Takes lots of params - probably best to use them named so you can pick and choose:
+# To see the results, flush-playfield
 #
-# -x -y -z    Initial position. z is used for layering
-# -img        An image created by create-image
-#
-function create-sprite {
-  param([int]$x, [int]$y, [object]$img)
-  return @{
-    "x"       = $x
-    "y"       = $y
-    "z"       = [int]0
-    "img"     = $img
-    "oldx"    = [int]-1                 # used to remember where it was last drawn
-    "oldy"    = [int]-1
-  }
+function clear-playfield {
+  param(
+      $playfield,               # playfield to affect
+      [string]$colour           # optional colour - if ommitted, uses playfield default
+      )
+  if ($colour -eq "") { $fillcell = $playfield.fillcell }
+  else { $fillcell = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$colour,"Complete" }
+  $host.ui.rawui.SetBufferContents($playfield.brect,$fillcell)
 }
 
 
-#-------------------------------------------------------
-# render the specified sprite in its specified position
-# optionally moved dx,dy first
-# frame is used to show which anim frame to use
-# erases it from any previous position
+#-----------------------------------------------------
+# Flushes a play field to visual buffer
 #
-# -sprite   sprite to update
-# -dx       amount to move x before updating (default 0)
-# -dy       amount to move y before updating (default 0)
-# -frame    which frame to draw (default 0)
+# This copies the content of the back buffer to the
+# visual buffer
 #
-function update-sprite ($sprite,[int]$dx,[int]$dy,[int]$frame) {
-  [int]$f = $frame % $sprite.img.numframes
-  $ui = $host.UI.RawUI
-  # move if dx/dy given
-  $sprite.x += $dx
-  $sprite.y += $dy
-  # erase old pos (if any)
-  if ($sprite.oldx -ge 0) {
-    [int]$y = $sprite.oldy
-    $coord = new-object Management.Automation.Host.Coordinates -argumentList $sprite.oldx,$sprite.oldy
-    $ui.SetBufferContents($coord, $sprite.img.eraser)
-  }
-  # draw in new position
-  $coord = new-object Management.Automation.Host.Coordinates -argumentList $sprite.x,$sprite.y
-  $ui.SetBufferContents($coord,$sprite.img.frames[$f])
-  # update old with current
-  $sprite.oldx = $sprite.x
-  $sprite.oldy = $sprite.y
+function flush-playfield {
+  param(
+      $playfield                # playfield to affect
+      )
+  $blitcells = $host.ui.rawui.GetBufferContents($playfield.brect)
+  $host.ui.rawui.SetBufferContents($playfield.vcoord,$blitcells)
 }
 
-
-#-------------------------------------------------------
-# returns $true if the two sprites overlap else $false
-#
-# -s1   first sprite
-# -s2   second sprite
-#
-function overlap-sprite ($s1,$s2) {
-  [int]$s1right = $s1.x + $s1.img.width - 1
-  [int]$s2right = $s2.x + $s2.img.width - 1
-  [int]$s1bottom = $s1.y + $s1.img.height - 1
-  [int]$s2bottom = $s2.y + $s2.img.height - 1
-  return ! ($s2.x -gt $s1right -or $s2right -lt $s1.x -or $s2.y -gt $s1bottom -or $s2bottom -lt $s1.y )
-}
