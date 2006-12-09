@@ -9,7 +9,7 @@ if ($global:___globcheck___ -eq 2) { write-error "This should not be source in g
 cls
 
 # load module
-. .\unittest.ps1
+. .\psunit.ps1
 . .\grrr.ps1
 
 
@@ -50,7 +50,7 @@ function test-create-sprite {
 
 # do some ops on the collection
   $toprow = ( $sprites | where { $_.y -lt 16 } ).count
-  if ($toprow -ne 5 ) { write-error "number in top row is wrong: $toprow should be 5" }
+  assert-equal "should be 5 sprites in top row" 5 $toprow
 
 
 # animate the collection
