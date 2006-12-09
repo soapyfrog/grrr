@@ -57,7 +57,6 @@ function create-playfield {
 
     # default background fill cell
     "fillcell" = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$bg,"Complete" 
-    "xx" = 3
   }
 }
 
@@ -148,16 +147,21 @@ function draw-image {
 # A sprite is set of animated images frames with a position (x,y) a depth
 # and assorted other meta data, such as liveness.
 #
+# All the script blocks take the sprite as the first param ($args[0]).
+#
 function create-sprite {
   param(
     [object[]]$images = $(throw "you must supply an array of images"),
     [int]$x = 0,                  # initial x position
     [int]$y = 0,                  # initial y position
     [int]$z = 0,                  # initial z position
-    [boolean]$alive = $true       # initial live status (won't be drawn if not alive)
+    [boolean]$alive = $true,      # initial live status (won't be drawn if not alive)
+    [scriptblock]$didinit=$null,  # optional block to be called after initialising
+    [scriptblock]$willdraw=$null, # optional block to be called before drawing
+    [scriptblock]$diddraw=$null   # optional block to be called before drawing
     )
   
-  return @{
+  $sprite = @{
     "images"      = $images
     "x"           = $x
     "y"           = $y
@@ -165,7 +169,13 @@ function create-sprite {
     "alive"       = $alive
     "numframes"   = ($images.count)
     "fseq"        = 0               # frame sequence
+    # script blocks used to control sprite
+    "didinit"     = $didinit
+    "willdraw"    = $willdraw
+    "diddraw"     = $diddraw
   }
+  if ($didinit) { & $didinit $sprite }
+  return $sprite
 }
 
 
@@ -179,22 +189,17 @@ function draw-sprite {
   param(
       $playfield = $(throw "you must supply a playfield"),
       $sprite = $(throw "you must supply a sprite"),
-      [int]$frame = -1,     # which frame to draw (default is auto)
-      [int]$dx = 0,         # amount to add to x value before drawing
-      [int]$dy = 0,         # amount to add to y value before drawing
-      [int]$dz = 0          # amount to add to z value before drawing
+      [int]$frame = -1     # which frame to draw (default is auto)
       )
+  if ($sprite.willdraw) { &($sprite.willdraw) $sprite }
   if ($frame -eq -1) {
     $sprite.fsec = (($sprite.fsec+1) % ($sprite.numframes))
   }
   else {
     $sprite.fsec = ($frame % ($sprite.numframes))
   }
-  # only update values if non-zero - prob quicker
-  if ($dx) { $sprite.x += $dx }
-  if ($dy) { $sprite.y += $dy }
-  if ($dz) { $sprite.z += $dz }
   draw-image $playfield ($sprite.images[$sprite.fsec]) $sprite.x $sprite.y
+  if ($sprite.postdraw) { &($sprite.postdraw) $sprite }
 }
 
     
@@ -218,4 +223,19 @@ function overlap-sprite {
   return ! ($s2.x -ge $s1right -or $s2right -lt $s1.x -or $s2.y -ge $s1bottom -or $s2bottom -lt $s1.y ) 
 }
 
+
+#------------------------------------------------------------------------------
+# Draw a set of sprites on the playfield
+#
+# TODO: only draw sprites that are alive and on the playfield
+#
+function draw-sprites {
+  param(
+      $playfield = $(throw "you must supply a playfield"),
+      $sprites = $(throw "you must supply a sprite array, sprites")
+      )
+  $sprites | foreach {
+    draw-sprite -playfield $playfield -sprite $_
+  }
+}
 

@@ -3,7 +3,7 @@
 
 $global:___globcheck___=1
 $local:___globcheck___=2
-if ($global:___globcheck___ -eq 2) {throw "This should not be source in global scope"}
+if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global scope"}
 
 
 cls
@@ -104,11 +104,11 @@ function test-draw-sprite {
   $pf = create-playfield -x 70 -y 36 -width 20 -height 20 -bg "black"
 
   $img = create-image "ABC","DEF" -bg "red" -fg "yellow"
-  $spr = create-sprite @($img) -x 1 -y 1 
+  $spr = create-sprite @($img) -x 1 -y 1 -willdraw { $s=$args[0]; $s.x++; $s.y++ }
 
   1..8 | foreach {
     clear-playfield $pf
-    draw-sprite $pf $spr -dx 1 -dy 1
+    draw-sprite $pf $spr 
     flush-playfield $pf 
     sleep -millis 100
   }
