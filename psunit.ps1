@@ -5,7 +5,8 @@ function run-tests {
   echo "--- Starting tests ---"
   ls function:test* | foreach {
     write-host -noNewLine "--- Running: $_ ..."
-    $dur = measure-command { & $_ }
+    #$dur = measure-command { & $_ }
+    & $_
     $ms = $dur.TotalMilliseconds
     write-host " done in $ms ms"
   }
@@ -19,7 +20,7 @@ function run-tests {
 #
 function assert-equal ($msg, $expected, $actual) {
   if ($expected -ne $actual) {
-    write-error "$msg : expected $expected, got $actual"
+    throw "$msg : expected $expected, got $actual"
   }
 }
 

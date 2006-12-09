@@ -40,7 +40,7 @@ function create-playfield {
       [int]$width=80,               # width of playfield
       [int]$height=25,              # height of playfield
       [int]$x,[int]$y,              # top left of the visual part
-      [string]$colour="black"       # background colour (default black)
+      [string]$bg="black"           # background colour (default black)
       )
 
   # back buffer goes at the bottom of the console buffer
@@ -56,7 +56,7 @@ function create-playfield {
     "brect"  = new-object Management.Automation.Host.Rectangle -argumentList $x,$by,($x+$width-1),($by+$height-1)
 
     # default background fill cell
-    "fillcell" = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$colour,"Complete" 
+    "fillcell" = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$bg,"Complete" 
     "xx" = 3
   }
 }
@@ -69,10 +69,10 @@ function create-playfield {
 function clear-playfield {
   param(
       $playfield = $(throw "you must supply a playfield"),
-      [string]$colour           # optional colour - if ommitted, uses playfield default
+      [string]$bg           # optional colour - if ommitted, uses playfield default
       )
-  if ($colour -eq "") { $fillcell = $playfield.fillcell }
-  else { $fillcell = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$colour,"Complete" }
+  if ($bg -eq "") { $fillcell = $playfield.fillcell }
+  else { $fillcell = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$bg,"Complete" }
   $host.ui.rawui.SetBufferContents($playfield.brect,$fillcell)
 }
 
@@ -173,6 +173,8 @@ function create-sprite {
 # Draw a sprite in the back buffer of the play field, using the next
 # frame of animation, or the specified frame.
 #
+# TODO: deal with alive, and states
+#
 function draw-sprite {
   param(
       $playfield = $(throw "you must supply a playfield"),
@@ -183,17 +185,36 @@ function draw-sprite {
       [int]$dz = 0          # amount to add to z value before drawing
       )
   if ($frame -eq -1) {
-    $f = (($sprite.fsec++) % ($sprite.numframes))
+    $sprite.fsec = (($sprite.fsec+1) % ($sprite.numframes))
   }
   else {
-    $f = ($frame % ($sprite.numframes))
+    $sprite.fsec = ($frame % ($sprite.numframes))
   }
   # only update values if non-zero - prob quicker
   if ($dx) { $sprite.x += $dx }
   if ($dy) { $sprite.y += $dy }
   if ($dz) { $sprite.z += $dz }
-  draw-image $playfield ($sprite.images[$f]) $sprite.x $sprite.y
+  draw-image $playfield ($sprite.images[$sprite.fsec]) $sprite.x $sprite.y
 }
 
     
+#------------------------------------------------------------------------------
+# Determine if two sprites are overlapping
+#
+# Returns $true if they are, $false if not.
+#
+function overlap-sprite {
+  param(
+    $s1 = $(throw "you must supply sprite s1"),
+    $s2 = $(throw "you must supply sprite s2")
+    )
+  # TODO: this is fairly efficient except for all the derefs :(
+  $s1image = $s1.images[$s1.fseq]
+  $s2image = $s2.images[$s2.fseq]
+  [int]$s1right = $s1.x + $s1image.width 
+  [int]$s2right = $s2.x + $s2image.width 
+  [int]$s1bottom = $s1.y + $s1image.height 
+  [int]$s2bottom = $s2.y + $s2image.height 
+  return ! ($s2.x -ge $s1right -or $s2right -lt $s1.x -or $s2.y -ge $s1bottom -or $s2bottom -lt $s1.y ) 
+}
 

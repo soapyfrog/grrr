@@ -3,7 +3,7 @@
 
 $global:___globcheck___=1
 $local:___globcheck___=2
-if ($global:___globcheck___ -eq 2) { write-error "This should not be source in global scope"; return }
+if ($global:___globcheck___ -eq 2) {throw "This should not be source in global scope"}
 
 
 cls
@@ -25,7 +25,7 @@ function test-create-playfield {
   assert-equal "vb" (20-1) $pf.vrect.Bottom
   assert-equal "background" "black" $pf.fillcell.BackgroundColor
 
-  $pf = create-playfield -width 30 -height 20 -x 5 -y 6 -colour "red"
+  $pf = create-playfield -width 30 -height 20 -x 5 -y 6 -bg "red"
   assert-equal "vx" 5 $pf.vcoord.X
   assert-equal "vy" 6 $pf.vcoord.Y
   assert-equal "vr" (5+30-1) $pf.vrect.Right
@@ -40,13 +40,13 @@ function test-create-playfield {
 #
 function test-clear-playfield {
   # create playfield over to the right
-  $pf = create-playfield -x 70 -y 30 -width 30 -height 20 -colour "red"
+  $pf = create-playfield -x 70 -y 30 -width 30 -height 20 -bg "red"
   clear-playfield $pf
   flush-playfield $pf
   $pf = create-playfield -x 72 -y 32 -width 30 -height 20 # default colour
   clear-playfield $pf
   flush-playfield $pf
-  $pf = create-playfield -x 74 -y 34 -width 30 -height 20 -colour "green"
+  $pf = create-playfield -x 74 -y 34 -width 30 -height 20 -bg "green"
   clear-playfield $pf
   flush-playfield $pf
 }
@@ -67,7 +67,7 @@ function test-create-image {
 # test drawing of an image
 #
 function test-draw-image {
-  $pf = create-playfield -x 50 -y 36 -width 16 -height 20 -colour "darkgray"
+  $pf = create-playfield -x 50 -y 36 -width 16 -height 20 -bg "darkgray"
   clear-playfield $pf
 
   $img = create-image "hello","world!"
@@ -78,12 +78,32 @@ function test-draw-image {
 }
 
 #----------------------------------------------------------------
+# test sprite overlapping
+#
+function test-overlap-sprite {
+  $img = create-image "ABC","DEF" # 3x2 image
+  $s1 = create-sprite @($img) -x 1 -y 1 
+  $s2 = create-sprite @($img) -x 1 -y 1 
+  assert-true "full overlap" (overlap-sprite $s1 $s2)
+
+  $s2 = create-sprite @($img) -x 3 -y 1 
+  assert-true "partial x overlap" (overlap-sprite $s1 $s2)
+
+  $s2 = create-sprite @($img) -x 1 -y 2 
+  assert-true "partial y overlap" (overlap-sprite $s1 $s2)
+
+  $s2 = create-sprite @($img) -x 4 -y 1 
+  assert-false "no overlap" (overlap-sprite $s1 $s2)
+
+}
+
+#----------------------------------------------------------------
 # test drawing of a sprite
 #
 function test-draw-sprite {
-  $pf = create-playfield -x 70 -y 36 -width 20 -height 20 -colour "black"
+  $pf = create-playfield -x 70 -y 36 -width 20 -height 20 -bg "black"
 
-  $img = create-image "ABC","DEF"
+  $img = create-image "ABC","DEF" -bg "red" -fg "yellow"
   $spr = create-sprite @($img) -x 1 -y 1 
 
   1..8 | foreach {
@@ -93,6 +113,7 @@ function test-draw-sprite {
     sleep -millis 100
   }
 }
+
 
 
 #----------------------------------------------------------------
