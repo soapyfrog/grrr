@@ -40,18 +40,40 @@ function test-create-playfield {
 #
 function test-clear-playfield {
   # create playfield over to the right
-  $pf = create-playfield -x 70 -y 0 -width 30 -height 20 -colour "red"
+  $pf = create-playfield -x 70 -y 30 -width 30 -height 20 -colour "red"
   clear-playfield $pf
   flush-playfield $pf
-  $pf = create-playfield -x 72 -y 2 -width 30 -height 20 # default colour
+  $pf = create-playfield -x 72 -y 32 -width 30 -height 20 # default colour
   clear-playfield $pf
   flush-playfield $pf
-  $pf = create-playfield -x 74 -y 4 -width 30 -height 20 -colour "green"
+  $pf = create-playfield -x 74 -y 34 -width 30 -height 20 -colour "green"
   clear-playfield $pf
   flush-playfield $pf
 }
 
 
+#----------------------------------------------------------------
+# test creation of an image
+#
+function test-create-image {
+  $img = create-image "ABC","DEF" 
+  assert-equal "width" 3 $img.width
+  assert-equal "height" 2 $img.height
+}
+
+#----------------------------------------------------------------
+# test drawing of an image
+#
+function test-draw-image {
+  $pf = create-playfield -x 70 -y 36 -width 30 -height 20 -colour "darkgray"
+  clear-playfield $pf
+
+  $img = create-image "hello","world"
+  draw-image $pf $img 0 0
+  draw-image $pf $img 5 4
+
+  flush-playfield $pf 
+}
 
 
 #----------------------------------------------------------------
