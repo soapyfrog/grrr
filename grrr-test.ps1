@@ -110,10 +110,32 @@ function test-draw-sprite {
     clear-playfield $pf
     draw-sprite $pf $spr 
     flush-playfield $pf 
-    sleep -millis 100
+    sleep -millis 40
   }
 }
 
+
+#----------------------------------------------------------------
+# test drawing a tilemap
+#
+function test-draw-tilemap {
+
+  $pf = create-playfield -x 10 -y 36 -width 20 -height 20 -bg "black"
+  $imgA = create-image "ABC","XYZ" -bg "darkgreen" -fg "black"
+  $imgB = create-image "ABC","XYZ" -bg "darkmagenta" -fg "white"
+
+  $lines = "AB  AB   BA",
+           "AAA AAB AAA",
+           "AAAAAAAAAAA"
+  $tilemap = create-tilemap -lines $lines -imagemap @{"A"=$imgA;"B"=$imgB} 3 2 
+
+  0..10 | foreach {
+    clear-playfield $pf
+    draw-tilemap $pf $tilemap -offsetx $_ -offsety 0 -x 0 -y 0 -w 20 -h 20
+    flush-playfield $pf
+    sleep -millis 40
+  }
+}
 
 
 

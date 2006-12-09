@@ -241,3 +241,68 @@ function draw-sprites {
 
 
 
+#------------------------------------------------------------------------------
+# Create a tilemap - used for drawing large tile-based maps from a char based
+# mapping to images.
+#
+function create-tilemap {
+  param(
+    [string[]] $lines = $(throw "lines missing: array of strings"),
+    $imagemap = $(throw "imagemap missing: hash of char to image"),
+    [int]$tilewidth = 3,
+    [int]$tileheight = 2
+  ) 
+ 
+  return @{
+    "lines"     = $lines
+    "imagemap"  = $imagemap
+    "tileheight"= $tileheight
+    "tilewidth" = $tilewidth
+  }
+}
+
+#------------------------------------------------------------------------------
+# Draw the tilemap into the playfield with specified cell offset.
+#
+function draw-tilemap {
+  param(
+      $playfield = $(throw "you must supply a playfield"),
+      $tilemap = $(throw "you must supply a tilemap"),
+      $offsetx = 0,         # x offset into the tilemap
+      $offsety = 0,         # y offset into the tilemap
+      $x = 0, $y = 0,       # x,y pos in playfield to draw
+      $w = 0, $h = 0        # width, height to draw in playfield (default is available width)
+    )
+
+  # dx,dy is the negative offset in the playfield to start drawing the tile
+  [int]$dx = ($offsetx % $tilemap.tilewidth)
+  [int]$dy = ($offsety % $tilemap.tileheight)
+  
+  # tx,ty is the index into the tile character map
+  [int]$tx = [Math]::Floor($offsetx / $tilemap.tilewidth)
+  [int]$ty = [Math]::Floor($offsety / $tilemap.tileheight)
+  [int]$txsaved = $tx
+  [int]$xsaved = $x
+  [int]$wsaved = $w
+  # draw the tiles
+  while ($h -ge 0) {
+    while ($w -ge -3 ) {
+      if ($ty -lt $tilemap.lines.length) {
+        if ($tx -lt $tilemap.lines[$ty].length) {
+          [string]$ch = $tilemap.lines[$ty][$tx]
+          $img = $tilemap.imagemap[$ch]
+          if ($img) { draw-image $playfield $img ($x-$dx) ($y-$dy) }
+        }
+      }
+      $tx++
+      $w -= $tilemap.tilewidth
+      $x += $tilemap.tilewidth
+    }
+    $tx = $txsaved
+    $x = $xsaved
+    $w = $wsaved
+    $ty++
+    $h -= $tilemap.tileheight
+    $y += $tilemap.tileheight
+  }
+}
