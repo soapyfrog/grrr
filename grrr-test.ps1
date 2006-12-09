@@ -59,20 +59,39 @@ function test-create-image {
   $img = create-image "ABC","DEF" 
   assert-equal "width" 3 $img.width
   assert-equal "height" 2 $img.height
+  $img = create-image "short","verylong" 
+  assert-equal "uneven width" ("verylong".length) $img.width
 }
 
 #----------------------------------------------------------------
 # test drawing of an image
 #
 function test-draw-image {
-  $pf = create-playfield -x 70 -y 36 -width 30 -height 20 -colour "darkgray"
+  $pf = create-playfield -x 50 -y 36 -width 16 -height 20 -colour "darkgray"
   clear-playfield $pf
 
-  $img = create-image "hello","world"
+  $img = create-image "hello","world!"
   draw-image $pf $img 0 0
   draw-image $pf $img 5 4
 
   flush-playfield $pf 
+}
+
+#----------------------------------------------------------------
+# test drawing of a sprite
+#
+function test-draw-sprite {
+  $pf = create-playfield -x 70 -y 36 -width 20 -height 20 -colour "black"
+
+  $img = create-image "ABC","DEF"
+  $spr = create-sprite @($img) -x 1 -y 1 
+
+  1..8 | foreach {
+    clear-playfield $pf
+    draw-sprite $pf $spr -dx 1 -dy 1
+    flush-playfield $pf 
+    sleep -millis 100
+  }
 }
 
 
