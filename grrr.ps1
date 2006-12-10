@@ -45,15 +45,16 @@ function create-playfield {
 
   # back buffer goes at the bottom of the console buffer
   # TODO: need to handle different back buffers
-  [int]$by = ($host.ui.rawui.BufferSize.Height - $height)
+  [int]$by = ($host.ui.rawui.BufferSize.Height - $height - 10) # 10 to give room for tile printing
+  [int]$bx = 10
 
   return @{
     # vcoord and vrect are for the visual bit
     "vcoord" = new-object Management.Automation.Host.Coordinates -argumentList $x,$y
     "vrect"  = new-object Management.Automation.Host.Rectangle -argumentList $x,$y,($x+$width-1),($y+$height-1)
     # bcoord and brect are for the back buffer bit
-    "bcoord" = new-object Management.Automation.Host.Coordinates -argumentList $x,$by
-    "brect"  = new-object Management.Automation.Host.Rectangle -argumentList $x,$by,($x+$width-1),($by+$height-1)
+    "bcoord" = new-object Management.Automation.Host.Coordinates -argumentList $bx,$by
+    "brect"  = new-object Management.Automation.Host.Rectangle -argumentList $bx,$by,($bx+$width-1),($by+$height-1)
 
     # default background fill cell
     "fillcell" = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$bg,"Complete" 
@@ -258,6 +259,8 @@ function create-tilemap {
     "imagemap"  = $imagemap
     "tileheight"= $tileheight
     "tilewidth" = $tilewidth
+    "mapheight" = $lines.length
+    "mapwidth"  = $lines[0].length
   }
 }
 
