@@ -274,35 +274,42 @@ function draw-tilemap {
       $w = 0, $h = 0        # width, height to draw in playfield (default is available width)
     )
 
-  # dx,dy is the negative offset in the playfield to start drawing the tile
-  [int]$dx = ($offsetx % $tilemap.tilewidth)
-  [int]$dy = ($offsety % $tilemap.tileheight)
+  # tw,th is an optimisation to avoid requerying the hash
+  [int]$tw = $tilemap.tilewidth
+  [int]$th = $tilemap.tileheight
+  # other optimisations
+  [int]$numlines=$tilemap.lines.length
+
+  # make a negative offset in the playfield to start drawing tiles
+  $x -= ($offsetx % $tw)
+  $y -= ($offsety % $th)
   
   # tx,ty is the index into the tile character map
-  [int]$tx = [Math]::Floor($offsetx / $tilemap.tilewidth)
-  [int]$ty = [Math]::Floor($offsety / $tilemap.tileheight)
+  [int]$tx = [Math]::Floor($offsetx / $tw)
+  [int]$ty = [Math]::Floor($offsety / $th)
+
+  # these vars get reset after the inner loop, so we save them here
   [int]$txsaved = $tx
   [int]$xsaved = $x
-  [int]$wsaved = $w
+
+  # boundary x/y
+  [int]$bx = $x + $w + $tw
+  [int]$by = $y + $h + $th
+
   # draw the tiles
-  while ($h -ge 0) {
-    while ($w -ge -3 ) {
-      if ($ty -lt $tilemap.lines.length) {
-        if ($tx -lt $tilemap.lines[$ty].length) {
-          [string]$ch = $tilemap.lines[$ty][$tx]
-          $img = $tilemap.imagemap[$ch]
-          if ($img) { draw-image $playfield $img ($x-$dx) ($y-$dy) }
-        }
-      }
+  while ($y -lt $by -and $ty -lt $numlines) {
+    $line = $tilemap.lines[$ty]
+    while ($x -lt $bx -and $tx -lt $line.length) {
+      [string]$ch = $line[$tx]
+      $img = $tilemap.imagemap[$ch]
+      if ($img) { draw-image $playfield $img $x $y }
       $tx++
-      $w -= $tilemap.tilewidth
-      $x += $tilemap.tilewidth
+      $x += $tw
     }
+    $ty++
+    $y += $th
+    #reset outer loop vars
     $tx = $txsaved
     $x = $xsaved
-    $w = $wsaved
-    $ty++
-    $h -= $tilemap.tileheight
-    $y += $tilemap.tileheight
   }
 }
