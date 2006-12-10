@@ -27,9 +27,13 @@
 #------------------------------------------------------------------------------
 # Creates a play field.
 #
-# A play field is rectangular piece of console in the
-# visible window, with a backing buffer of the same
-# size outside the visible window.
+# A play field is rectangular viewport in the visible
+# part of the console (usually) with a backing buffer
+# away from the visible part of the console.
+#
+# The backing buffer can be bigger than the viewport,
+# and the viewport can be set to show a sub part of the
+# buffer.
 #
 # Drawing is always done in the backing buffer, then
 # flushed to the visual buffer to give the illusion
@@ -47,24 +51,46 @@
 #
 function create-playfield {
   param(
-      [int]$width=80,               # width of playfield
-      [int]$height=25,              # height of playfield
-      [int]$x,[int]$y,              # top left of the visual part
-      [string]$bg="black"           # background colour (default black)
+      [int]$width=80,               # width of playfield 
+      [int]$height=25,              # height of playfield 
+      [int]$x=0,[int]$y=0,          # top left of the viewport
+      [string]$bg="black",          # background colour (default black)
+      [int]$vpwidth,                # width of viewport (default same as width)
+      [int]$vpheight,               # height of viewport (default same as height)
+      [int]$vpx=0,                  # viewport x offset into backbuf
+      [int]$vpy=0                   # viewport y offset into backbuf
       )
+
+  if ($vpwidth -eq 0) { $vpwidth = $width }
+  if ($vpheight -eq 0) { $vpheight = $height }
+
+  # hack value to permit writing to the buffer lazily without worrying about 
+  # going out of bounds
+  [int]$private:margin = 10   
 
   # back buffer goes at the bottom of the console buffer
   # TODO: need to handle different back buffers
-  [int]$by = ($host.ui.rawui.BufferSize.Height - $height - 10) # 10 to give room for tile printing
-  [int]$bx = 10
+  [int]$by = ($host.ui.rawui.BufferSize.Height - $height - $margin)
+  [int]$bx = $margin
 
   return @{
-    # vcoord and vrect are for the visual bit
-    "vcoord" = new-object Management.Automation.Host.Coordinates -argumentList $x,$y
-    "vrect"  = new-object Management.Automation.Host.Rectangle -argumentList $x,$y,($x+$width-1),($y+$height-1)
-    # bcoord and brect are for the back buffer bit
-    "bcoord" = new-object Management.Automation.Host.Coordinates -argumentList $bx,$by
-    "brect"  = new-object Management.Automation.Host.Rectangle -argumentList $bx,$by,($bx+$width-1),($by+$height-1)
+    # vpcoord and vprect are for the visual viewport
+    "vpcoord" = new-object Management.Automation.Host.Coordinates -argumentList $x,$y
+    "vprect"  = new-object Management.Automation.Host.Rectangle -argumentList $x,$y,($x+$vpwidth-1),($y+$vpheight-1)
+
+    # pfcoord and pfrect are for the whole back buffer
+    "pfcoord" = new-object Management.Automation.Host.Coordinates -argumentList $bx,$by
+    "pfrect"  = new-object Management.Automation.Host.Rectangle -argumentList $bx,$by,($bx+$width-1),($by+$height-1)
+
+    # vpbcoord and vpbrect are for the back buffer section for just the viewport
+    "vpbcoord"= new-object Management.Automation.Host.Coordinates -argumentList ($bx+$vpx),($by+$vpy)
+    "vpbrect" = new-object Management.Automation.Host.Rectangle -argumentList ($bx+$vpx),($by+$vpy),($bx+$vpx+$vpwidth-1),($by+$vpy+$vpheight-1)
+
+    # somewhat redundant, but for convenience
+    "vpx"     = $vpx
+    "vpy"     = $vpy
+    "vpwidth" = $vpwidth
+    "vpheight"= $vpheight
 
     # default background fill cell
     "fillcell" = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$bg,"Complete" 
@@ -83,7 +109,7 @@ function clear-playfield {
       )
   if ($bg -eq "") { $fillcell = $playfield.fillcell }
   else { $fillcell = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$bg,"Complete" }
-  $host.ui.rawui.SetBufferContents($playfield.brect,$fillcell)
+  $host.ui.rawui.SetBufferContents($playfield.pfrect,$fillcell)
 }
 
 
@@ -97,11 +123,36 @@ function flush-playfield {
   param(
       $playfield = $(throw "you must supply a playfield")
       )
-  $blitcells = $host.ui.rawui.GetBufferContents($playfield.brect)
-  $host.ui.rawui.SetBufferContents($playfield.vcoord,$blitcells)
+  $blitcells = $host.ui.rawui.GetBufferContents($playfield.vpbrect)
+  $host.ui.rawui.SetBufferContents($playfield.vpcoord,$blitcells)
 }
 
+#------------------------------------------------------------------------------
+# Reposition the viewport for the playfield.
+#
+# Updates the internals - makes no attempt to validate anything as
+# PowerShell is soooooo f-ing slow, it's just not worth it.
+#
+# You need to call flush-playfield to see the result.
+#
+function set-playfield-viewport {
+  param(
+    $playfield = $(throw "you must supply a playfield"),
+    $vpx = 0,       # new x offset into playfield for viewport
+    $vpy = 0        # new y offset into playfield for viewport
+    )
 
+  $x = $vpx + $playfield.pfcoord.X
+  $y = $vpy + $playfield.pfcoord.Y
+  $vpwidth = $playfield.vpwidth
+  $vpheight = $playfield.vpheight
+  
+  $playfield.vpbcoord = new-object Management.Automation.Host.Coordinates -argumentList $x,$y
+  $playfield.vpbrect = new-object Management.Automation.Host.Rectangle -argumentList $x,$y,($x+$vpwidth-1),($y+$vpheight-1)
+
+  $playfield.vpx = $vpx
+  $playfield.vpy = $vpy
+}
 
 #------------------------------------------------------------------------------
 # Create an image
@@ -146,7 +197,7 @@ function draw-image {
       [int]$x,
       [int]$y
       )
-  $coord = new-object Management.Automation.Host.Coordinates -argumentList ($playfield.bcoord.X+$x),($playfield.bcoord.Y+$y)  
+  $coord = new-object Management.Automation.Host.Coordinates -argumentList ($playfield.pfcoord.X+$x),($playfield.pfcoord.Y+$y)  
   $host.ui.rawui.SetBufferContents($coord,$image.bca)
   
 }
@@ -320,6 +371,7 @@ function draw-tilemap {
   $y -= ($offsety % $th)
   
   # tx,ty is the index into the tile character map
+  # (needs Floor as ps has no integer division)
   [int]$tx = [Math]::Floor($offsetx / $tw)
   [int]$ty = [Math]::Floor($offsety / $th)
 
@@ -378,6 +430,7 @@ function create-spritehandlers-for-motionpath {
       "e*" { $delta=1,0 ; break} 
       "w*" { $delta=-1,0 ; break} 
       "h*" { $delta=0,0 ; break} 
+      default { throw "Illegal path command: $_" }
     }
     if ($delta) {
       [int]$n=1

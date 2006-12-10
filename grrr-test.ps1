@@ -30,18 +30,20 @@ cls
 #
 function test-create-playfield {
   $pf = create-playfield -width 30 -height 20 
-  assert-equal "vx" 0 $pf.vcoord.X
-  assert-equal "vy" 0 $pf.vcoord.Y
-  assert-equal "vr" (30-1) $pf.vrect.Right
-  assert-equal "vb" (20-1) $pf.vrect.Bottom
+  assert-equal "vx" 0 $pf.vpcoord.X
+  assert-equal "vy" 0 $pf.vpcoord.Y
+  assert-equal "vr" (30-1) $pf.vprect.Right
+  assert-equal "vb" (20-1) $pf.vprect.Bottom
   assert-equal "background" "black" $pf.fillcell.BackgroundColor
 
   $pf = create-playfield -width 30 -height 20 -x 5 -y 6 -bg "red"
-  assert-equal "vx" 5 $pf.vcoord.X
-  assert-equal "vy" 6 $pf.vcoord.Y
-  assert-equal "vr" (5+30-1) $pf.vrect.Right
-  assert-equal "vb" (6+20-1) $pf.vrect.Bottom
+  assert-equal "vx" 5 $pf.vpcoord.X
+  assert-equal "vy" 6 $pf.vpcoord.Y
+  assert-equal "vr" (5+30-1) $pf.vprect.Right
+  assert-equal "vb" (6+20-1) $pf.vprect.Bottom
   assert-equal "background" "red" $pf.fillcell.BackgroundColor
+
+  # TODO: tests for the viewport being different
 }
 
 
@@ -156,6 +158,32 @@ function test-create-spritehandlers-for-motionpath {
   $h = create-spritehandlers-for-motionpath "e4 s3 w1 n3"
   assert-true "numdeltas" 11 $h.numdeltas
 }
+
+#----------------------------------------------------------------
+# test creating a large playfield with smaller viewport
+#
+function test-set-playfield-viewport {
+  # create a 36x20 playfield with a 18x10 viewport
+  $pf = create-playfield -x 20 -y 25 -width 36 -height 20 -bg "black" -vpwidth 18 -vpheight 10
+  clear-playfield $pf
+  # fill playfield with graphics
+  $c=0
+  for ($y=0; $y -lt 20; $y++) {
+    for ($x=0; $x -lt 36; $x+=6) {
+      $s = [string]::Format("{0:0#}:{0:0#} ",$y,$x)
+      $img = create-image @($s) -bg ($c++ % 7) -fg ($c % 7 + 9)
+      draw-image $pf $img $x $y
+    }
+  }
+  for ($i=0; $i -lt 7; $i++) {
+    set-playfield-viewport $pf $i $i
+    flush-playfield $pf
+    sleep -millis 40
+  }
+
+}
+
+
 
 #----------------------------------------------------------------
 # hand over to unit test framework
