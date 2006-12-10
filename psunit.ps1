@@ -1,3 +1,14 @@
+#------------------------------------------------------------------------------
+# Copyright 2006 Adrian Milliner (adrian dot milliner at soapyfrog dot com)
+#
+# This work is licenced under the Creative Commons 
+# Attribution-NonCommercial-ShareAlike 2.5 License. 
+# To view a copy of this licence, visit 
+# http://creativecommons.org/licenses/by-nc-sa/2.5/ 
+# or send a letter to 
+# Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
+#------------------------------------------------------------------------------
+
 # --------------------------
 # run the test suite
 #
@@ -50,4 +61,5 @@ function assert-false ($msg, $val) {
     write-error "$msg : value was true"
   }
 }
+
 
