@@ -267,6 +267,9 @@ function create-tilemap {
 #------------------------------------------------------------------------------
 # Draw the tilemap into the playfield with specified cell offset.
 #
+# The map is drawn into x,y,w,h with offset offsetx,offsety into the map.
+# This offset is a char offset, not a tile offset.
+#
 function draw-tilemap {
   param(
       $playfield = $(throw "you must supply a playfield"),
@@ -300,9 +303,9 @@ function draw-tilemap {
   [int]$by = $y + $h + $th
 
   # draw the tiles
-  while ($y -lt $by -and $ty -lt $numlines) {
+  while ($y -le $by -and $ty -lt $numlines) {
     $line = $tilemap.lines[$ty]
-    while ($x -lt $bx -and $tx -lt $line.length) {
+    while ($x -le $bx -and $tx -lt $line.length) {
       [string]$ch = $line[$tx]
       $img = $tilemap.imagemap[$ch]
       if ($img) { draw-image $playfield $img $x $y }

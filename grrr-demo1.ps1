@@ -13,7 +13,7 @@ cls
 
 
 function main {
-  $pf = create-playfield -x 0 -y 2 -width 80 -height 50 -bg "black"
+  $pf = create-playfield -x 0 -y 2 -width 78 -height 48 -bg "black"
   $imga1 = create-image "<#>","/ \" -fg "yellow" -bg "black"
   $imga2 = create-image "<#>","| |" -fg "yellow" -bg "black"
 
