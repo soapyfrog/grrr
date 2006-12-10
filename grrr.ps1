@@ -167,9 +167,7 @@ function create-sprite {
     [int]$y = 0,                  # initial y position
     [int]$z = 0,                  # initial z position
     [boolean]$alive = $true,      # initial live status (won't be drawn if not alive)
-    [scriptblock]$didinit=$null,  # optional block to be called after initialising
-    [scriptblock]$willdraw=$null, # optional block to be called before drawing
-    [scriptblock]$diddraw=$null   # optional block to be called before drawing
+    $handlers = $null             # created by create-spritehandlers (and family)
     )
   
   $sprite = @{
@@ -180,13 +178,33 @@ function create-sprite {
     "alive"       = $alive
     "numframes"   = ($images.count)
     "fseq"        = 0               # frame sequence
+    "handlers"    = $handlers
+  }
+  if ($handlers -and $handlers.didinit) { & $handlers.didinit $sprite }
+  return $sprite
+}
+
+#------------------------------------------------------------------------------
+# Create a sprite handlers.
+#
+# Sprite handlers are script blocks that are invoked at certain points
+# in the sprite lifecycle. When executed, the sprite itself is passed
+# as the first param ($args[0])
+#
+# See specialist forms for this method, eg create-motion-spritehandlers
+#
+function create-spritehandlers {
+  param(
+    [scriptblock]$didinit = $null,   # called after a sprite has been created
+    [scriptblock]$willdraw = $null,  # called before a sprite is drawn
+    [scriptblock]$diddraw = $null    # called after a sprite is drawn
+  )
+  return @{
     # script blocks used to control sprite
     "didinit"     = $didinit
     "willdraw"    = $willdraw
     "diddraw"     = $diddraw
   }
-  if ($didinit) { & $didinit $sprite }
-  return $sprite
 }
 
 
@@ -202,7 +220,8 @@ function draw-sprite {
       $sprite = $(throw "you must supply a sprite"),
       [int]$frame = -1     # which frame to draw (default is auto)
       )
-  if ($sprite.willdraw) { &($sprite.willdraw) $sprite }
+  $private:h = $sprite.handlers
+  if ($h -and $h.willdraw) { &($h.willdraw) $sprite }
   if ($frame -eq -1) {
     $sprite.fsec = (($sprite.fsec+1) % ($sprite.numframes))
   }
@@ -210,7 +229,7 @@ function draw-sprite {
     $sprite.fsec = ($frame % ($sprite.numframes))
   }
   draw-image $playfield ($sprite.images[$sprite.fsec]) $sprite.x $sprite.y
-  if ($sprite.postdraw) { &($sprite.postdraw) $sprite }
+  if ($h -and $h.diddraw) { &($h.diddraw) $sprite }
 }
 
     
@@ -329,3 +348,63 @@ function draw-tilemap {
     $x = $xsaved
   }
 }
+
+
+#------------------------------------------------------------------------------
+# Create spritehandlers for a given motion path.
+#
+# Path is in the form: (direction[amount] )+
+#
+# Eg:  "n5 e h3 s5 w"
+# meaning north 5, east 1, hold for 3 south 5, west 1
+#
+# The motion is repeated.
+#
+function create-spritehandlers-for-motionpath {
+  param(
+    [string]$mpath = $(throw "you must supply a motion path")
+    )
+  $deltas = @()
+  $mpath.split(" ") | foreach {
+    $delta = $null
+    $off = 1
+    switch -wildcard ($_) {
+      "ne*" { $delta=1,-1 ; $off=2; break } 
+      "se*" { $delta=1,1 ; $off=2; break } 
+      "sw*" { $delta=-1,1 ; $off=2; break } 
+      "nw*" { $delta=-1,-1 ; $off=2; break } 
+      "n*" { $delta=0,-1 ; break} 
+      "s*" { $delta=0,1 ; break} 
+      "e*" { $delta=1,0 ; break} 
+      "w*" { $delta=-1,0 ; break} 
+      "h*" { $delta=0,0 ; break} 
+    }
+    if ($delta) {
+      [int]$n=1
+      if ($_.length -ge $off) { $n = [int]$_.substring($off) }
+      1..$n | foreach { $deltas += 1; $deltas[-1] = $delta }
+    }
+  }
+  # put state in the sprite with this
+  [scriptblock]$didinit = {
+    $s = $args[0]
+    $s.curdelta = 0
+  }
+  # use sprite state with this
+  [scriptblock]$willdraw = {
+        $s = $args[0]
+        $h = $s.handlers
+        $d = $h.deltas[$s.curdelta]
+        $s.curdelta = (($s.curdelta + 1) % $h.numdeltas)
+        $s.x += $d[0]
+        $s.y += $d[1]
+  }
+  # handlers should not have any statethemselves... so all this is readonly(ish)
+  return @{
+    "deltas"      = $deltas
+    "numdeltas"   = $deltas.length
+    "didinit"     = $didinit
+    "willdraw"    = $willdraw
+  }
+}
+

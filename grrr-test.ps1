@@ -115,7 +115,8 @@ function test-draw-sprite {
   $pf = create-playfield -x 70 -y 36 -width 20 -height 20 -bg "black"
 
   $img = create-image "ABC","DEF" -bg "red" -fg "yellow"
-  $spr = create-sprite @($img) -x 1 -y 1 -willdraw { $s=$args[0]; $s.x++; $s.y++ }
+  $h = create-spritehandlers -willdraw { $s=$args[0]; $s.x++; $s.y++ }
+  $spr = create-sprite @($img) -x 1 -y 1 -handlers $h
 
   1..8 | foreach {
     clear-playfield $pf
@@ -148,8 +149,14 @@ function test-draw-tilemap {
   }
 }
 
-
+#----------------------------------------------------------------
+# test creating a motion path sprite handler
+#
+function test-create-spritehandlers-for-motionpath {
+  $h = create-spritehandlers-for-motionpath "e4 s3 w1 n3"
+  assert-true "numdeltas" 11 $h.numdeltas
+}
 
 #----------------------------------------------------------------
 # hand over to unit test framework
-run-tests
+#run-tests

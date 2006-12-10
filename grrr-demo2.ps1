@@ -64,8 +64,9 @@ function main {
   $thrustimg2 = create-image @("=") -fg "red" -bg "black"
   $rocketimg = create-image " o  ","D#>-" -fg "white" -bg "black"
 
-  $thrustsprite = create-sprite -images $thrustimg1,$thrustimg2 -x 4 -y 9
-  $rocketsprite = create-sprite -images @($rocketimg) -x 5 -y 8
+  $h = create-spritehandlers-for-motionpath "h3 n5 h3 s5"  # not stateful, so can share
+  $thrustsprite = create-sprite -images $thrustimg1,$thrustimg2 -x 4 -y 9 -handlers $h
+  $rocketsprite = create-sprite -images @($rocketimg) -x 5 -y 8 -handlers $h
 
   $sprites = $thrustsprite,$rocketsprite
 

@@ -31,27 +31,26 @@ function main {
 
   # an array of sprites
   $sprites = @()
-  # script block to do post init
-  $didinit = { $args[0].dx = 1 }
-  # the script block to decide how to move the alien
-  $willdraw = {
-    $s = $args[0]
-    if ($s.x -gt 60) { $s.y++; $s.dx=-1 }
-    elseif ($s.x -lt 1) { $s.y--; $s.dx=1 }
-    $s.x += $s.dx
-  }
+  # motion behaviour handlers - a somewhat manual approach - see below for alternative
+  $handlers = create-spritehandlers -didinit {  $args[0].dx = 1 } -willdraw {
+            $s = $args[0]
+            if ($s.x -gt 60) { $s.y++; $s.dx=-1 }
+            elseif ($s.x -lt 1) { $s.y--; $s.dx=1 }
+            $s.x += $s.dx
+          }
   # build a load of them
   0..15 | foreach {
     [int]$n=$_
     $x = [Math]::Floor($n / 4) * 7 + 2
     $y = ($n % 4) * 4 + 3
-    $sa = create-sprite -images @($imga1,$imga2) -x $x -y $y -didinit $didinit -willdraw $willdraw
+    $sa = create-sprite -images @($imga1,$imga2) -x $x -y $y -handlers $handlers
     $sprites += $sa
   }
 
   # create another one with different behaviour
   $imgb = create-image "/\","\/" -fg "red" -bg "black"
-  $spr = create-sprite -images @($imgb) -x 10 -y 42 
+  $h = create-spritehandlers-for-motionpath "e20 ne6 n20 ne4 e4 se4 s4 sw4 w8 s12 sw6 w20 h5"
+  $spr = create-sprite -images @($imgb) -x 10 -y 42 -handlers $h
   $sprites += $spr
 
   # game loop
