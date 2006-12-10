@@ -159,4 +159,4 @@ function test-create-spritehandlers-for-motionpath {
 
 #----------------------------------------------------------------
 # hand over to unit test framework
-#run-tests
+run-tests
