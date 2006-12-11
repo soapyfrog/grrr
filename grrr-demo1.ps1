@@ -19,6 +19,7 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 
 
 cls
+echo "Sprites with manual (yellow) and path based (red) movement."
 
 # load modules
 . .\grrr.ps1
@@ -34,14 +35,14 @@ function main {
   # motion behaviour handlers - a somewhat manual approach - see below for alternative
   $handlers = create-spritehandlers -didinit {  $args[0].dx = 1 } -willdraw {
             $s = $args[0]
-            if ($s.x -gt 60) { $s.y++; $s.dx=-1 }
-            elseif ($s.x -lt 1) { $s.y--; $s.dx=1 }
+            if ($s.x -gt 72) { $s.y++; $s.dx=-1 }
+            elseif ($s.x -lt 4) { $s.y--; $s.dx=1 }
             $s.x += $s.dx
           }
   # build a load of them
   0..15 | foreach {
     [int]$n=$_
-    $x = [Math]::Floor($n / 4) * 7 + 2
+    $x = [Math]::Floor($n / 4) * 7 + 4
     $y = ($n % 4) * 4 + 3
     $sa = create-sprite -images @($imga1,$imga2) -x $x -y $y -handlers $handlers
     $sprites += $sa

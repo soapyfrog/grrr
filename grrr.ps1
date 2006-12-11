@@ -25,6 +25,13 @@
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
+# some functions to aide in creating std console objects
+# not used much internally, as it's another thing to slow the whole thing down 
+function new-coord($x,$y) { return new-object Management.Automation.Host.Coordinates -argumentList $x,$y }
+function new-rect($left,$top,$right,$bottom) { return new-object Management.Automation.Host.Rectangle -argumentList $left,$top,$right,$bottom }
+function new-size($w,$h) { return new-object Management.Automation.Host.Size -argumentList $w,$h }
+
+#------------------------------------------------------------------------------
 # Creates a play field.
 #
 # A play field is rectangular viewport in the visible
@@ -289,7 +296,7 @@ function draw-sprite {
 #
 # Returns $true if they are, $false if not.
 #
-function overlap-sprite {
+function overlap-sprite? {
   param(
     $s1 = $(throw "you must supply sprite s1"),
     $s2 = $(throw "you must supply sprite s2")
@@ -380,13 +387,14 @@ function draw-tilemap {
   [int]$xsaved = $x
 
   # boundary x/y
-  [int]$bx = $x + $w + $tw
+  [int]$bx = $x + $w + $tw 
   [int]$by = $y + $h + $th
 
   # draw the tiles
-  while ($y -le $by -and $ty -lt $numlines) {
+  while ($y -lt $by -and $ty -lt $numlines) {
     $line = $tilemap.lines[$ty]
-    while ($x -le $bx -and $tx -lt $line.length) {
+    $linelen = $line.length
+    while ($x -lt $bx -and $tx -lt $linelen) {
       [string]$ch = $line[$tx]
       $img = $tilemap.imagemap[$ch]
       if ($img) { draw-image $playfield $img $x $y }
@@ -417,6 +425,7 @@ function create-spritehandlers-for-motionpath {
     [string]$mpath = $(throw "you must supply a motion path")
     )
   $deltas = @()
+  # split by space and parse the commands - crude but effective
   $mpath.split(" ") | foreach {
     $delta = $null
     $off = 1
@@ -438,12 +447,12 @@ function create-spritehandlers-for-motionpath {
       1..$n | foreach { $deltas += 1; $deltas[-1] = $delta }
     }
   }
-  # put state in the sprite with this
+  # didinit handler is used to place state in the sprite instance (curdelta)
   [scriptblock]$didinit = {
     $s = $args[0]
     $s.curdelta = 0
   }
-  # use sprite state with this
+  # willdraw handler is used to update the x,y with each delta in turn
   [scriptblock]$willdraw = {
         $s = $args[0]
         $h = $s.handlers
