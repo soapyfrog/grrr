@@ -9,7 +9,7 @@
 # Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
 #------------------------------------------------------------------------------
 
-# $id$
+# $Id$
 
 # --------------------------
 # run the test suite
