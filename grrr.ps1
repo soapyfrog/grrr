@@ -11,7 +11,7 @@
 
 
 #------------------------------------------------------------------------------
-# grrr.ps1 
+# $id$
 #
 # A source-able PowerShell module to handle playfields,
 # sprites, tiles, scrolling, eventing and other stuff
