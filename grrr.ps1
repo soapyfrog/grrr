@@ -11,7 +11,7 @@
 
 
 #------------------------------------------------------------------------------
-# $id$
+# $Id$
 #
 # A source-able PowerShell module to handle playfields,
 # sprites, tiles, scrolling, eventing and other stuff

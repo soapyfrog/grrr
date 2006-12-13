@@ -9,7 +9,7 @@
 # Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
 #------------------------------------------------------------------------------
 
-# $id$
+# $Id$
 
 # demo1 for grrr.ps1
 # run this as a script - do not 'source' it with '.'
