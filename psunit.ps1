@@ -15,14 +15,14 @@
 # run the test suite
 #
 function run-tests {
-  echo "--- Starting tests ---"
+  write-host "--- Starting tests ---"
   ls function:test* | foreach {
-    write-host -noNewLine "--- Running: $_ ..."
+    write-host -noNewLine "Running `"$_`" ... "
     $dur = measure-command { & $_ }
     $ms = $dur.TotalMilliseconds
     write-host " done in $ms ms"
   }
-  echo "--- Tests complete ---"
+  write-host "--- Tests complete ---"
 }
 
 

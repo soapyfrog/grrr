@@ -24,12 +24,41 @@
 #
 #------------------------------------------------------------------------------
 
+
 #------------------------------------------------------------------------------
 # some functions to aide in creating std console objects
 # not used much internally, as it's another thing to slow the whole thing down 
 function new-coord($x,$y) { return new-object Management.Automation.Host.Coordinates -argumentList $x,$y }
 function new-rect($left,$top,$right,$bottom) { return new-object Management.Automation.Host.Rectangle -argumentList $left,$top,$right,$bottom }
 function new-size($w,$h) { return new-object Management.Automation.Host.Size -argumentList $w,$h }
+
+#------------------------------------------------------------------------------
+# Globals
+[int]$script:__nextbufline  = 100    # should really set this properl with init-console
+
+#------------------------------------------------------------------------------
+# Initialise the console to be a certain visible width/height with 
+# specified bufferspace for backing buffers.
+#
+# Buffers are not reclaimed when not used, so you can use this to
+# reinitialise the console for new work
+#
+function init-console {
+  param(
+    [int]$width       = 120,    # width of console window
+    [int]$height      = 50,     # height of console window
+    [int]$bufwidth    = 200,    # width of buffer
+    [int]$bufheight   = 1000    # height of buffer
+  )
+  # clear console and resize it
+  clear-host
+  $ui=$host.ui.rawui
+  $ui.BufferSize = new-size $bufwidth $bufheight
+  $ui.WindowSize = new-size $width $height
+
+  # start allocating buffers from just below visible window
+  $script:__nextbufline=$height+1
+}
 
 #------------------------------------------------------------------------------
 # Creates a play field.
@@ -68,6 +97,7 @@ function create-playfield {
       [int]$vpy=0                   # viewport y offset into backbuf
       )
 
+  # if unspecified, make the viewport width/height the same as the
   if ($vpwidth -eq 0) { $vpwidth = $width }
   if ($vpheight -eq 0) { $vpheight = $height }
 
@@ -75,9 +105,9 @@ function create-playfield {
   # going out of bounds
   [int]$private:margin = 10   
 
-  # back buffer goes at the bottom of the console buffer
-  # TODO: need to handle different back buffers
-  [int]$by = ($host.ui.rawui.BufferSize.Height - $height - $margin)
+  # back buffer goes at next free position - no error checking
+  [int]$by = $script:__nextbufline
+  $script:__nextbufline += ($height + $margin)
   [int]$bx = $margin
 
   return @{

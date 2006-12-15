@@ -18,13 +18,14 @@ $global:___globcheck___=1
 $local:___globcheck___=2
 if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global scope"}
 
-
-cls
+$ErrorActionPreference="Stop" # endless errors annoy me
 
 # load modules
 . .\psunit.ps1
 . .\grrr.ps1
 
+# init console
+init-console -w 120 -h 50 
 
 
 #----------------------------------------------------------------

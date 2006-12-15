@@ -19,11 +19,12 @@ $local:___globcheck___=2
 if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global scope"}
 
 
-cls
-echo "This is waaaay too slow :-("
 
 # load modules
 . .\grrr.ps1
+
+init-console 120 50
+write-host "This is waaaay too slow :-("
 
 #--------------------------------------------------------------------
 # Parallelax scrolling demo

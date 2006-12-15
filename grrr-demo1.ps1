@@ -19,11 +19,11 @@ $local:___globcheck___=2
 if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global scope"}
 
 
-cls
-echo "Sprites with manual (yellow) and path based (red) movement."
-
 # load modules
 . .\grrr.ps1
+
+init-console 120 50
+write-host "Sprites with manual (yellow) and path based (red) movement."
 
 
 function main {
