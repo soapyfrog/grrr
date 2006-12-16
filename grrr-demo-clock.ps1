@@ -22,29 +22,52 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 # load modules
 . .\grrr.ps1
 
-init-console 80 50
 
 
 function main {
-  $pf = create-playfield -x 0 -y 0 -width 80 -height 50 -bg "black"
+  $w=80; $h=50
+  init-console $w $h
+  $pf = create-playfield -x 0 -y 0 -width $w -height $h -bg "black"
+  $secsImg = create-image @("**","**") -bg "black" -fg "red"
+  $minsImg = create-image @("**","**") -bg "black" -fg "yellow"
+  $hrsImg = create-image @("**","**") -bg "black" -fg "green"
 
   $pi = [Math]::Pi
   $pd2 = $pi/2
   $twopi = 2*$pi
 
-  $secsRadius = 36
+  $midx = $w/2
+  $midy = $h/2
+
+  $secsRadiusX = $midx * 0.9
+  $secsRadiusY = $midy * 0.9
+  $minsRadiusX = $secsRadiusX*0.9
+  $minsRadiusY = $secsRadiusY*0.9
+  $hrsRadiusX = $secsRadiusX*0.5
+  $hrsRadiusY = $secsRadiusY*0.5
 
   while ($true) {
     clear-playfield $pf
     $n = get-date
 
-    $secsAngle = $twopi * ($n.Seconds / 60) - $pd2
-    $secsX = $secsRadius * [Math]::Cos($secsAngle)
-    $secsY = $secsRadius * [Math]::Sin($secsAngle)
+    $hrsAngle = $twopi * (($n.Hour % 12 + ($n.Minute/60)) / 12 ) - $pd2
+    $hrsX = $hrsRadiusX * [Math]::Cos($hrsAngle)
+    $hrsY = $hrsRadiusY * [Math]::Sin($hrsAngle)
+    draw-line $pf $midx $midy ($midx+$hrsX) ($midy+$hrsY) $hrsImg
 
-    draw-line $pf 40 25 (40+$secsX) (25+$secsY) "yellow" "black"
+    $minsAngle = $twopi * ($n.Minute / 60) - $pd2
+    $minsX = $minsRadiusX * [Math]::Cos($minsAngle)
+    $minsY = $minsRadiusY * [Math]::Sin($minsAngle)
+    draw-line $pf $midx $midy ($midx+$minsX) ($midy+$minsY) $minsImg
+
+    $secsAngle = $twopi * ($n.Second / 60) - $pd2
+    $secsX = $secsRadiusX * [Math]::Cos($secsAngle)
+    $secsY = $secsRadiusY * [Math]::Sin($secsAngle)
+    draw-line $pf $midx $midy ($midx+$secsX) ($midy+$secsY) $secsImg
+
     flush-playfield $pf
-    sleep -millis 500
+
+    sleep -millis 1000
   }
 }
 

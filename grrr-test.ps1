@@ -191,22 +191,23 @@ function test-set-playfield-viewport {
 function test-draw-line {
   $pf = create-playfield -x 40 -y 25 -width 36 -height 20 -bg "black" 
   clear-playfield $pf
+  $img = create-image @("O") -bg "black" -fg "yellow"
 
   # simple horizontal and vertical lines
-  draw-line $pf 0 0 35 0 "red" "black"
-  draw-line $pf 0 1 0 19 "yellow" "black"
+  draw-line $pf 0 0 35 0 $img
+  draw-line $pf 0 1 0 19 $img
 
   # pure diaganals
-  draw-line $pf 20 10 25 15 "white" "black"
-  draw-line $pf 25 10 20 15 "white" "black"
+  draw-line $pf 20 10 25 15 $img
+  draw-line $pf 25 10 20 15 $img
 
   # mostly horizontal
-  draw-line $pf 2 2 30 5 "magenta" "black"
-  draw-line $pf 2 5 30 2 "cyan" "black"
+  draw-line $pf 2 2 30 5 $img
+  draw-line $pf 2 5 30 2 $img
  
   # mostly vertical
-  draw-line $pf 10 8 14 19 "magenta" "black"
-  draw-line $pf 14 8 10 19 "cyan" "black"
+  draw-line $pf 10 8 14 19 $img
+  draw-line $pf 14 8 10 19 $img
 
   flush-playfield $pf
 }

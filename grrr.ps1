@@ -26,10 +26,19 @@
 
 
 #------------------------------------------------------------------------------
-# some functions to aide in creating std console objects
-# not used much internally, as it's another thing to slow the whole thing down 
+# Create a Coord
 function new-coord($x,$y) { return new-object Management.Automation.Host.Coordinates -argumentList $x,$y }
-function new-rect($left,$top,$right,$bottom) { return new-object Management.Automation.Host.Rectangle -argumentList $left,$top,$right,$bottom }
+
+#------------------------------------------------------------------------------
+# Create a Rectangle
+function new-rect($left,$top,$right,$bottom) {
+  if ($left -gt $right) { $left,$right = $right,$left }
+  if ($top -gt $bottom) { $top,$bottom = $bottom,$top }
+  return new-object Management.Automation.Host.Rectangle -argumentList $left,$top,$right,$bottom 
+}
+
+#------------------------------------------------------------------------------
+# Create a Size
 function new-size($w,$h) { return new-object Management.Automation.Host.Size -argumentList $w,$h }
 
 #------------------------------------------------------------------------------
@@ -511,21 +520,14 @@ function draw-line {
     $pf = $(throw "you must supply a playfield"),
     [int]$x1,$y1,
     [int]$x2,$y2,
-    [string]$fg = "white",
-    [string]$bg = "black"
+    $img = $(throw "you must supply an image")
   )
-  $c = $pf.pfcoord
-  # check for simple cases
-  [boolean]$vert = ($x1 -eq $x2)
-  if ($vert -or $y1 -eq $y2) {
-    if ($vert) { $ch = '|'} else {$ch='-'}
-    $cell = new-object Management.Automation.Host.BufferCell -argumentList $ch,$fg,$bg,"Complete"
-    $r = new-rect ($c.X+$x1) ($c.Y+$y1) ($c.X+$x2) ($c.Y+$y2)
-    $host.ui.rawui.SetBufferContents($r,$cell)
-    return
-  }
+  # pin the numbers to the floor
+  $x1 = [Math]::Floor($x1)
+  $x2 = [Math]::Floor($x2)
+  $y1 = [Math]::Floor($y1)
+  $y2 = [Math]::Floor($y2)
 
-  # not so simple..
   [int]$dx = $x2-$x1
   [int]$dy = $y2-$y1
 
@@ -533,27 +535,28 @@ function draw-line {
   [int]$ady = [Math]::Abs($dy)
 
   if ($adx -gt $ady) {
+    $len =$adx
     [int]$ix = $dx/$adx
-    $iy = $dy/$adx
+    if ($adx -eq 0) { $iy=0} else {$iy = $dy/$adx}
     $y = $y1
-    if ($y1 -lt $y2) { $ch = '\'} else {$ch='/'}
-    $cell = new-object Management.Automation.Host.BufferCell -argumentList $ch,$fg,$bg,"Complete"
-    for ([int]$x=$x1; $x -le $x2; $x+=1) {
-      $r = new-rect ($c.X+$x) ($c.Y+$y) ($c.X+$x) ($c.Y+$y)
-      $host.ui.rawui.SetBufferContents($r,$cell)
+    $x = $x1
+    for ([int]$i=0; $i -le $len; $i++) {
+      draw-image $pf $img $x $y
       $y += $iy
+      $x += $ix
     }
   }
   else {
+    $len =$ady
     [int]$iy = $dy/$ady
     $ix = $dx/$ady
+    if ($ady -eq 0) { $ix=0} else {$ix = $dx/$ady}
     $x = $x1
-    if ($x1 -lt $x2) { $ch = '\'} else {$ch='/'}
-    $cell = new-object Management.Automation.Host.BufferCell -argumentList $ch,$fg,$bg,"Complete"
-    for ([int]$y=$y1; $y -le $y2; $y+=1) {
-      $r = new-rect ($c.X+$x) ($c.Y+$y) ($c.X+$x) ($c.Y+$y)
-      $host.ui.rawui.SetBufferContents($r,$cell)
+    $y = $y1
+    for ([int]$i=0; $i -le $len; $i++) {
+      draw-image $pf $img $x $y
       $x += $ix
+      $y += $iy
     }
   }
 }
