@@ -191,6 +191,7 @@ function set-playfield-viewport {
   $playfield.vpy = $vpy
 }
 
+
 #------------------------------------------------------------------------------
 # Create an image
 #
@@ -370,7 +371,7 @@ function create-tilemap {
     [int]$tilewidth = 3,
     [int]$tileheight = 2
   ) 
- 
+
   return @{
     "lines"     = $lines
     "imagemap"  = $imagemap
@@ -497,6 +498,63 @@ function create-spritehandlers-for-motionpath {
     "numdeltas"   = $deltas.length
     "didinit"     = $didinit
     "willdraw"    = $willdraw
+  }
+}
+
+
+
+#------------------------------------------------------------------------------
+# Draw a line from x1,y1 to x2,y2 using the specified image
+#
+function draw-line {
+  param(
+    $pf = $(throw "you must supply a playfield"),
+    [int]$x1,$y1,
+    [int]$x2,$y2,
+    [string]$fg = "white",
+    [string]$bg = "black"
+  )
+  $c = $pf.pfcoord
+  # check for simple cases
+  [boolean]$vert = ($x1 -eq $x2)
+  if ($vert -or $y1 -eq $y2) {
+    if ($vert) { $ch = '|'} else {$ch='-'}
+    $cell = new-object Management.Automation.Host.BufferCell -argumentList $ch,$fg,$bg,"Complete"
+    $r = new-rect ($c.X+$x1) ($c.Y+$y1) ($c.X+$x2) ($c.Y+$y2)
+    $host.ui.rawui.SetBufferContents($r,$cell)
+    return
+  }
+
+  # not so simple..
+  [int]$dx = $x2-$x1
+  [int]$dy = $y2-$y1
+
+  [int]$adx = [Math]::Abs($dx)
+  [int]$ady = [Math]::Abs($dy)
+
+  if ($adx -gt $ady) {
+    [int]$ix = $dx/$adx
+    $iy = $dy/$adx
+    $y = $y1
+    if ($y1 -lt $y2) { $ch = '\'} else {$ch='/'}
+    $cell = new-object Management.Automation.Host.BufferCell -argumentList $ch,$fg,$bg,"Complete"
+    for ([int]$x=$x1; $x -le $x2; $x+=1) {
+      $r = new-rect ($c.X+$x) ($c.Y+$y) ($c.X+$x) ($c.Y+$y)
+      $host.ui.rawui.SetBufferContents($r,$cell)
+      $y += $iy
+    }
+  }
+  else {
+    [int]$iy = $dy/$ady
+    $ix = $dx/$ady
+    $x = $x1
+    if ($x1 -lt $x2) { $ch = '\'} else {$ch='/'}
+    $cell = new-object Management.Automation.Host.BufferCell -argumentList $ch,$fg,$bg,"Complete"
+    for ([int]$y=$y1; $y -le $y2; $y+=1) {
+      $r = new-rect ($c.X+$x) ($c.Y+$y) ($c.X+$x) ($c.Y+$y)
+      $host.ui.rawui.SetBufferContents($r,$cell)
+      $x += $ix
+    }
   }
 }
 

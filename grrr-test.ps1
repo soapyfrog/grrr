@@ -186,6 +186,31 @@ function test-set-playfield-viewport {
 
 }
 
+#----------------------------------------------------------------
+# test drawing lines
+function test-draw-line {
+  $pf = create-playfield -x 40 -y 25 -width 36 -height 20 -bg "black" 
+  clear-playfield $pf
+
+  # simple horizontal and vertical lines
+  draw-line $pf 0 0 35 0 "red" "black"
+  draw-line $pf 0 1 0 19 "yellow" "black"
+
+  # pure diaganals
+  draw-line $pf 20 10 25 15 "white" "black"
+  draw-line $pf 25 10 20 15 "white" "black"
+
+  # mostly horizontal
+  draw-line $pf 2 2 30 5 "magenta" "black"
+  draw-line $pf 2 5 30 2 "cyan" "black"
+ 
+  # mostly vertical
+  draw-line $pf 10 8 14 19 "magenta" "black"
+  draw-line $pf 14 8 10 19 "cyan" "black"
+
+  flush-playfield $pf
+}
+
 
 
 #----------------------------------------------------------------
