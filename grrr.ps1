@@ -362,8 +362,10 @@ function draw-sprites {
       $playfield = $(throw "you must supply a playfield"),
       $sprites = $(throw "you must supply a sprite array, sprites")
       )
-  $sprites | where { $_.alive} | foreach {
-    draw-sprite -playfield $playfield -sprite $_
+  foreach ($s in $sprites) {
+    if ($s.alive) {
+      draw-sprite -playfield $playfield -sprite $s
+    }
   }
 }
 
