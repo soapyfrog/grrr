@@ -29,9 +29,11 @@ function main {
   $w=80; $h=50
   init-console $w $h
   $pf = create-playfield -x 0 -y 0 -width $w -height $h -bg "black"
-  $secsImg = create-image @("**","**") -bg "black" -fg "red"
-  $minsImg = create-image @("**","**") -bg "black" -fg "yellow"
-  $hrsImg = create-image @("**","**") -bg "black" -fg "green"
+  # can't rely on unicode literals and ps1 doesn't support unicode escapes :-(
+  $txt = ([string][char]0x2666)*2  
+  $secsImg = create-image @($txt,$txt) -bg "black" -fg "red"
+  $minsImg = create-image @($txt,$txt) -bg "black" -fg "yellow"
+  $hrsImg = create-image @($txt,$txt) -bg "black" -fg "green"
 
   $pi = [Math]::Pi
   $pd2 = $pi/2
