@@ -1,5 +1,6 @@
 #------------------------------------------------------------------------------
-# Copyright 2006 Adrian Milliner (adrian dot milliner at soapyfrog dot com)
+# Copyright 2006 Adrian Milliner (ps1 at soapyfrog dot com)
+# http://ps1.soapyfrog.com
 #
 # This work is licenced under the Creative Commons 
 # Attribution-NonCommercial-ShareAlike 2.5 License. 
