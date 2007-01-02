@@ -407,7 +407,7 @@ function draw-tilemap {
       $offsetx = 0,         # x offset into the tilemap
       $offsety = 0,         # y offset into the tilemap
       $x = 0, $y = 0,       # x,y pos in playfield to draw
-      $w = 0, $h = 0        # width, height to draw in playfield (default is available width)
+      $w = 0, $h = 0        # width, height to draw in playfield 
     )
 
   # tw,th is an optimisation to avoid requerying the hash
