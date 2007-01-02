@@ -29,8 +29,15 @@ write-host "Sprites with manual (yellow) and path based (red) movement."
 
 function main {
   $pf = create-playfield -x 0 -y 2 -width 78 -height 48 -bg "black"
-  $imga1 = create-image "<#>","/ \" -fg "yellow" -bg "black"
-  $imga2 = create-image "<#>","| |" -fg "yellow" -bg "black"
+
+  # create the anim frames for the yellow aliens
+  $l1 = [char]0x2554 + [char]0x256a + [char]0x2557
+  $l2a = [char]0x255d + " " + [char]0x255a
+  $l2b = [char]0x2551 + " " + [char]0x2551
+  $l2c = [char]0x255a + " " + [char]0x255d
+  $imga1 = create-image $l1,$l2a -fg "yellow" -bg "black"
+  $imga2 = create-image $l1,$l2b -fg "yellow" -bg "black"
+  $imga3 = create-image $l1,$l2c -fg "yellow" -bg "black"
 
   # an array of sprites
   $sprites = @()
@@ -41,12 +48,13 @@ function main {
             elseif ($s.x -lt 4) { $s.y--; $s.dx=1 }
             $s.x += $s.dx
           }
+  $images = @($imga1,$imga2,$imga3,$imga2)
   # build a load of them
   0..15 | foreach {
     [int]$n=$_
     $x = [Math]::Floor($n / 4) * 7 + 4
     $y = ($n % 4) * 4 + 3
-    $sa = create-sprite -images @($imga1,$imga2) -x $x -y $y -handlers $handlers
+    $sa = create-sprite -images $images -x $x -y $y -handlers $handlers
     $sprites += $sa
   }
 
@@ -63,6 +71,7 @@ function main {
     clear-playfield $pf
     draw-sprites $pf $sprites
     flush-playfield $pf
+    sleep -millis 20
   }
 }
 
