@@ -185,14 +185,14 @@ function flush-playfield {
 function set-playfield-viewport {
   param(
     $playfield = $(throw "you must supply a playfield"),
-    $vpx = 0,       # new x offset into playfield for viewport
-    $vpy = 0        # new y offset into playfield for viewport
+    [int]$vpx = 0,       # new x offset into playfield for viewport
+    [int]$vpy = 0        # new y offset into playfield for viewport
     )
 
-  $x = $vpx + $playfield.pfcoord.X
-  $y = $vpy + $playfield.pfcoord.Y
-  $vpwidth = $playfield.vpwidth
-  $vpheight = $playfield.vpheight
+  [int]$x = $vpx + $playfield.pfcoord.X
+  [int]$y = $vpy + $playfield.pfcoord.Y
+  [int]$vpwidth = $playfield.vpwidth
+  [int]$vpheight = $playfield.vpheight
   
   $playfield.vpbcoord = new-object Management.Automation.Host.Coordinates -argumentList $x,$y
   $playfield.vpbrect = new-object Management.Automation.Host.Rectangle -argumentList $x,$y,($x+$vpwidth-1),($y+$vpheight-1)
@@ -222,7 +222,7 @@ function create-image {
     ) 
 
   $lines | foreach {[int]$width=0}{$width = [Math]::Max($_.length,$width)}
-  $height = $lines.count
+  [int]$height = $lines.count
 
   # create a buffercellarray 
   $bca = $host.ui.RawUI.NewBufferCellArray( $lines, $fg, $bg )
@@ -404,10 +404,10 @@ function draw-tilemap {
   param(
       $playfield = $(throw "you must supply a playfield"),
       $tilemap = $(throw "you must supply a tilemap"),
-      $offsetx = 0,         # x offset into the tilemap
-      $offsety = 0,         # y offset into the tilemap
-      $x = 0, $y = 0,       # x,y pos in playfield to draw
-      $w = 0, $h = 0        # width, height to draw in playfield 
+      [int]$offsetx = 0,         # x offset into the tilemap
+      [int]$offsety = 0,         # y offset into the tilemap
+      [int]$x = 0, [int]$y = 0,  # x,y pos in playfield to draw
+      [int]$w = 0, [int]$h = 0   # width, height to draw in playfield 
     )
 
   # tw,th is an optimisation to avoid requerying the hash
@@ -470,8 +470,8 @@ function create-spritehandlers-for-motionpath {
   $deltas = @()
   # split by space and parse the commands - crude but effective
   $mpath.split(" ") | foreach {
-    $delta = $null
-    $off = 1
+    [int[]]$delta = $null
+    [int]$off = 1
     switch -wildcard ($_) {
       "ne*" { $delta=1,-1 ; $off=2; break } 
       "se*" { $delta=1,1 ; $off=2; break } 
@@ -493,7 +493,7 @@ function create-spritehandlers-for-motionpath {
   # didinit handler is used to place state in the sprite instance (curdelta)
   [scriptblock]$didinit = {
     $s = $args[0]
-    $s.curdelta = 0
+    [int]$s.curdelta = 0
   }
   # willdraw handler is used to update the x,y with each delta in turn
   [scriptblock]$willdraw = {
@@ -521,15 +521,10 @@ function create-spritehandlers-for-motionpath {
 function draw-line {
   param(
     $pf = $(throw "you must supply a playfield"),
-    [int]$x1,$y1,
-    [int]$x2,$y2,
+    [int]$x1,[int]$y1,
+    [int]$x2,[int]$y2,
     $img = $(throw "you must supply an image")
   )
-  # pin the numbers to the floor
-  $x1 = [Math]::Floor($x1)
-  $x2 = [Math]::Floor($x2)
-  $y1 = [Math]::Floor($y1)
-  $y2 = [Math]::Floor($y2)
 
   [int]$dx = $x2-$x1
   [int]$dy = $y2-$y1
