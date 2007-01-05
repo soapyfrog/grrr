@@ -44,7 +44,7 @@ function new-size($w,$h) { return new-object Management.Automation.Host.Size -ar
 
 #------------------------------------------------------------------------------
 # Globals
-[int]$script:__nextbufline  = 100    # should really set this properl with init-console
+[int]$script:__nextbufline  = 100    # normally set with init-console - dont here for safety
 
 #------------------------------------------------------------------------------
 # Initialise the console to be a certain visible width/height with 
