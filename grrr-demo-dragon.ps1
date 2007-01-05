@@ -23,12 +23,12 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 # load modules
 . .\grrr.ps1
 
-init-console 120 51
+init-console 120 60
 write-host "scary dragon thing"
 
 
 function main {
-  $pf = create-playfield -x 0 -y 2 -width 78 -height 48 -bg "black"
+  $pf = create-playfield -x 0 -y 2 -width 120 -height 58 -bg "black"
 
 $dragontxt = @"
       .==.        .==.
@@ -53,7 +53,7 @@ $dragontxt = @"
 
   $init = {
     $s=$args[0]
-    $s.xoff=30;$s.yoff=10; $s.xamp=20;$s.yamp=10; 
+    $s.xoff=60-15;$s.yoff=28-6-2; $s.xamp=45;$s.yamp=18; 
     $s.xangle=$rnd.nextdouble(); $s.yangle=$rnd.nextdouble() 
     $s.xspeed = $rnd.nextdouble()/10 + 0.02
     $s.yspeed = $rnd.nextdouble()/10 + 0.01
