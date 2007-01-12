@@ -44,7 +44,6 @@ $dragontxt = @"
          ((('  ')))
 "@
   $dragonlines = $dragontxt.replace("`r","X").replace("`n","").split("X")
-  $dragons
   $yellowdragon = create-image $dragonlines -fg "yellow" -bg "black"
   $reddragon = create-image $dragonlines -fg "red" -bg "black"
   $bluedragon = create-image $dragonlines -fg "blue" -bg "black"
