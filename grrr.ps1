@@ -45,6 +45,7 @@ function new-size($w,$h) { return new-object Management.Automation.Host.Size -ar
 #------------------------------------------------------------------------------
 # Globals
 [int]$script:__nextbufline  = 100    # normally set with init-console - dont here for safety
+$script:grrr_ui = $host.ui.rawui  # saves dereferencing all the time
 
 #------------------------------------------------------------------------------
 # Initialise the console to be a certain visible width/height with 
@@ -62,12 +63,11 @@ function init-console {
   )
   # clear console and resize it
   clear-host
-  $ui=$host.ui.rawui
-  $ui.BufferSize = new-size $bufwidth $bufheight
-  $ui.WindowSize = new-size $width $height
+  $grrr_ui.BufferSize = new-size $bufwidth $bufheight
+  $grrr_ui.WindowSize = new-size $width $height
 
   # start allocating buffers from just below visible window
-  $script:__nextbufline=$height+1
+  $script:__nextbufline=$height+1  # TODO: this is not needed anymore
 }
 
 #------------------------------------------------------------------------------
@@ -75,11 +75,7 @@ function init-console {
 #
 # A play field is rectangular viewport in the visible
 # part of the console (usually) with a backing buffer
-# away from the visible part of the console.
-#
-# The backing buffer can be bigger than the viewport,
-# and the viewport can be set to show a sub part of the
-# buffer.
+# held in a BufferCell array in memory.
 #
 # Drawing is always done in the backing buffer, then
 # flushed to the visual buffer to give the illusion
@@ -100,47 +96,30 @@ function create-playfield {
       [int]$width=80,               # width of playfield 
       [int]$height=25,              # height of playfield 
       [int]$x=0,[int]$y=0,          # top left of the viewport
-      [string]$bg="black",          # background colour (default black)
-      [int]$vpwidth,                # width of viewport (default same as width)
-      [int]$vpheight,               # height of viewport (default same as height)
-      [int]$vpx=0,                  # viewport x offset into backbuf
-      [int]$vpy=0                   # viewport y offset into backbuf
+      [string]$bg="black"           # background colour (default black)
       )
 
-  # if unspecified, make the viewport width/height the same as the
-  if ($vpwidth -eq 0) { $vpwidth = $width }
-  if ($vpheight -eq 0) { $vpheight = $height }
-
-  # hack value to permit writing to the buffer lazily without worrying about 
-  # going out of bounds
-  [int]$private:margin = 10   
-
-  # back buffer goes at next free position - no error checking
-  [int]$by = $script:__nextbufline
-  $script:__nextbufline += ($height + $margin)
-  [int]$bx = $margin
+  # create a back buffer as a 2d BufferCell array and clone it 
+  # so we have a fast erasebuffer
+  $buflines = @(" " * $width) * $height
+  $buffer=$grrr_ui.NewBufferCellArray($buflines,"white",$bg)
+  $erasebuffer=$buffer.Clone();
 
   return @{
-    # vpcoord and vprect are for the visual viewport
-    "vpcoord" = new-object Management.Automation.Host.Coordinates -argumentList $x,$y
-    "vprect"  = new-object Management.Automation.Host.Rectangle -argumentList $x,$y,($x+$vpwidth-1),($y+$vpheight-1)
+    # coord and rect are for the visual viewport
+    # these are used when blitting the buffer to the console
+    # nothing should be written outside of 'rect'
+    "coord" = new-coord $x $y
+    "rect"  = new-rect $x $y ($x+$width-1) ($y+$height-1)
 
-    # pfcoord and pfrect are for the whole back buffer
-    "pfcoord" = new-object Management.Automation.Host.Coordinates -argumentList $bx,$by
-    "pfrect"  = new-object Management.Automation.Host.Rectangle -argumentList $bx,$by,($bx+$width-1),($by+$height-1)
-
-    # vpbcoord and vpbrect are for the back buffer section for just the viewport
-    "vpbcoord"= new-object Management.Automation.Host.Coordinates -argumentList ($bx+$vpx),($by+$vpy)
-    "vpbrect" = new-object Management.Automation.Host.Rectangle -argumentList ($bx+$vpx),($by+$vpy),($bx+$vpx+$vpwidth-1),($by+$vpy+$vpheight-1)
+    # the buffers themselves
+    "buffer"      = $buffer
+    "erasebuffer" = $erasebuffer
 
     # somewhat redundant, but for convenience
-    "vpx"     = $vpx
-    "vpy"     = $vpy
-    "vpwidth" = $vpwidth
-    "vpheight"= $vpheight
-
-    # default background fill cell
-    "fillcell" = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$bg,"Complete" 
+    "width"       = $width
+    "height"      = $height
+    "buffersize"  = [int]($width * $height)
   }
 }
 
@@ -150,13 +129,8 @@ function create-playfield {
 # To see the results, flush-playfield
 #
 function clear-playfield {
-  param(
-      $playfield = $(throw "you must supply a playfield"),
-      [string]$bg           # optional colour - if ommitted, uses playfield default
-      )
-  if ($bg -eq "") { $fillcell = $playfield.fillcell }
-  else { $fillcell = new-object Management.Automation.Host.BufferCell -argumentList ' ',"white",$bg,"Complete" }
-  $host.ui.rawui.SetBufferContents($playfield.pfrect,$fillcell)
+  param( $playfield = $(throw "you must supply a playfield"))
+  [Array]::Copy($playfield.erasebuffer,$playfield.buffer,$playfield.buffersize)
 }
 
 
@@ -167,40 +141,9 @@ function clear-playfield {
 # visual buffer
 #
 function flush-playfield {
-  param(
-      $playfield = $(throw "you must supply a playfield")
-      )
-  $blitcells = $host.ui.rawui.GetBufferContents($playfield.vpbrect)
-  $host.ui.rawui.SetBufferContents($playfield.vpcoord,$blitcells)
+  param( $playfield = $(throw "you must supply a playfield"))
+  $grrr_ui.SetBufferContents($playfield.coord,$playfield.buffer)
 }
-
-#------------------------------------------------------------------------------
-# Reposition the viewport for the playfield.
-#
-# Updates the internals - makes no attempt to validate anything as
-# PowerShell is soooooo f-ing slow, it's just not worth it.
-#
-# You need to call flush-playfield to see the result.
-#
-function set-playfield-viewport {
-  param(
-    $playfield = $(throw "you must supply a playfield"),
-    [int]$vpx = 0,       # new x offset into playfield for viewport
-    [int]$vpy = 0        # new y offset into playfield for viewport
-    )
-
-  [int]$x = $vpx + $playfield.pfcoord.X
-  [int]$y = $vpy + $playfield.pfcoord.Y
-  [int]$vpwidth = $playfield.vpwidth
-  [int]$vpheight = $playfield.vpheight
-  
-  $playfield.vpbcoord = new-object Management.Automation.Host.Coordinates -argumentList $x,$y
-  $playfield.vpbrect = new-object Management.Automation.Host.Rectangle -argumentList $x,$y,($x+$vpwidth-1),($y+$vpheight-1)
-
-  $playfield.vpx = $vpx
-  $playfield.vpy = $vpy
-}
-
 
 #------------------------------------------------------------------------------
 # Create an image
@@ -220,12 +163,15 @@ function create-image {
     [string]$fg = "white",    # foreground colour (default white) 
     [string]$bg = "black"     # background colour (default black)
     ) 
-
-  $lines | foreach {[int]$width=0}{$width = [Math]::Max($_.length,$width)}
-  [int]$height = $lines.count
+  
+  [int]$width=0
+  foreach ($line in $lines) {
+    $width = [Math]::Max($line.length,$width)
+  }
+  [int]$height = $lines.Count
 
   # create a buffercellarray 
-  $bca = $host.ui.RawUI.NewBufferCellArray( $lines, $fg, $bg )
+  $bca = $grrr_ui.NewBufferCellArray( $lines, $fg, $bg )
 
   return @{
     "bca"     = $bca     # array of buffercell arrays
@@ -245,9 +191,41 @@ function draw-image {
       [int]$x,
       [int]$y
       )
-  $coord = new-object Management.Automation.Host.Coordinates -argumentList ($playfield.pfcoord.X+$x),($playfield.pfcoord.Y+$y)  
-  $host.ui.rawui.SetBufferContents($coord,$image.bca)
-  
+  # cache values and clip
+  [int]$bw = $playfield.width
+  [int]$iw = $image.width
+  if ($x -ge $bw -or ($x+$iw -lt 0) ) { return }
+  [int]$bh = $playfield.height
+  [int]$ih = $image.height
+  if ($y -ge $bh -or ($y+$ih -lt 0) ) { return }
+
+  # now handle partial clipping
+  [int]$startline = 0
+  [int]$endline = $ih - 1
+  # clip top
+  if ($y -lt 0) {$startline = -$y}
+  # clip bottom
+  [int]$overlap = $bh - ($y+$ih)
+  if ($overlap -lt 0) {$endline += $overlap}
+  # clip left
+  [int]$x1 = 0
+  [int]$x2 = $iw-1
+  [int]$ilen=$iw
+  if ($x -lt 0) {$x1=-$x; $ilen+=$x}
+  # clip right
+  $overlap = $bw - ($x+$iw)
+  if ($overlap -lt 0) {$x2 += $overlap; $ilen+=$overlap}
+
+  # do the copying
+  $ibca = $image.bca
+  $bbca = $playfield.buffer
+  [int]$boffset = ($y+$startline) * $bw + $x + $x1
+  [int]$ioffset = $x1
+  for ([int]$line=$startline; $line -le $endline; $line++) {
+    [Array]::Copy($ibca,$ioffset,$bbca,$boffset,$ilen)
+    $ioffset += $iw
+    $boffset += $bw
+  }
 }
 
 
