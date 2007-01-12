@@ -28,7 +28,7 @@ init-console 120 50
 write-host "This is waaaay too slow :-("
 
 #--------------------------------------------------------------------
-# Parallelax scrolling demo
+# Parallax scrolling demo
 #
 function main {
   $pf = create-playfield -x 0 -y 2 -width 78 -height 33 -bg "black" #78? multiple of 3
