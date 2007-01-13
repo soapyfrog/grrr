@@ -1,0 +1,30 @@
+[00003 | 10/12/2006 | Open | Feature | External file support]
+
+Would be nice to be able to load image and tile map info from external files.
+Having an editor would really rock.
+
+
+[00004 | 10/12/2006 | Open | Feature | Buffer diffing/combining]
+
+Drawing an image to the playfield should have some alternate modes, eg same
+background colour, xor colour, only paint on spaces, etc. Provides an alternate
+to layering.
+
+[00005 | 10/12/2006 | Open | Feature | Event capture]
+
+Declare what events are interesting (key presses) and capture it in a single
+place. So keep track of which keys are down/up and so on.
+
+[00006 | 10/12/2006 | Open | Feature | Star fields]
+
+Create a mechanism where a starfield can be efficiently drawn and moved with
+each frame – support twinkling, different directions, etc.
+
+[00007 | 10/12/2006 | Open | Feature | Movement constraints, walls/maps]
+
+Allow movement of a sprite to be constrained by basic shapes, and also within a
+map.  Maybe reuse tilemaps. Useful in Gauntlet-type games where you don’t want
+to expensively test collisions, but to want to constrain.
+
+Perhaps generalize by knowing where a player sprite is in relation to an
+environment map.
