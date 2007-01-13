@@ -44,7 +44,6 @@ function new-size($w,$h) { return new-object Management.Automation.Host.Size -ar
 
 #------------------------------------------------------------------------------
 # Globals
-[int]$script:__nextbufline  = 100    # normally set with init-console - dont here for safety
 $script:grrr_ui = $host.ui.rawui  # saves dereferencing all the time
 
 #------------------------------------------------------------------------------
@@ -65,9 +64,6 @@ function init-console {
   clear-host
   $grrr_ui.BufferSize = new-size $bufwidth $bufheight
   $grrr_ui.WindowSize = new-size $width $height
-
-  # start allocating buffers from just below visible window
-  $script:__nextbufline=$height+1  # TODO: this is not needed anymore
 }
 
 #------------------------------------------------------------------------------
@@ -174,15 +170,21 @@ function create-image {
   $bca = $grrr_ui.NewBufferCellArray( $lines, $fg, $bg )
 
   return @{
-    "bca"     = $bca     # array of buffercell arrays
-    "width"   = $width
-    "height"  = $height
+    "bca"     = $bca    # buffercell array
+    "width"   = $width  # width of image
+    "height"  = $height # height of image
   }
 }
 
 
 #------------------------------------------------------------------------------
-# Draw an image into the back buffer of a playfield
+# Draw an image into the back buffer of a playfield.
+#
+# This takes the image buffercell array and write its
+# cell lines to the playfield buffer.
+#
+# Drawing is clipped to the edges and fast fails if 
+# completely outside the buffer bounds.
 #
 function draw-image {
   param(
@@ -194,10 +196,10 @@ function draw-image {
   # cache values and clip
   [int]$bw = $playfield.width
   [int]$iw = $image.width
-  if ($x -ge $bw -or ($x+$iw -lt 0) ) { return }
+  if ($x -ge $bw -or ($x+$iw -lt 0) ) { return } # fast quit
   [int]$bh = $playfield.height
   [int]$ih = $image.height
-  if ($y -ge $bh -or ($y+$ih -lt 0) ) { return }
+  if ($y -ge $bh -or ($y+$ih -lt 0) ) { return } # fast quit
 
   # now handle partial clipping
   [int]$startline = 0
@@ -232,7 +234,7 @@ function draw-image {
 #------------------------------------------------------------------------------
 # Create a sprite.
 #
-# A sprite is set of animated images frames with a position (x,y) a depth
+# A sprite is set of animated image frames with a position (x,y) a depth
 # and assorted other meta data, such as liveness.
 #
 # All the script blocks take the sprite as the first param ($args[0]).
