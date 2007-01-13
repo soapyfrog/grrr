@@ -573,3 +573,38 @@ function draw-line {
   }
 }
 
+#------------------------------------------------------------------------------
+# Prepare a wave file for playing
+#
+# Specify a name and a file name, play it later using play-sound
+#
+function prepare-sound {
+  param(
+    [string]$name = $(throw "You need to supply a sound name"),
+    [string]$path = $(throw "You need to supply a wave file path")
+    )
+  if (-not $script:grrr_sounds) { $script:grrr_sounds = @{} }
+  $p = resolve-path "$path" -erroraction "silentlycontinue"
+  if ($p) {
+    $pm = new-object media.soundplayer ($p.path)
+    $pm.load()
+    $script:grrr_sounds[$name] = $pm
+  }
+  else {
+    write-debug "Unable to find sound $name"
+  }
+}
+
+
+#------------------------------------------------------------------------------
+# Play a prepared sound asynchronously.
+#
+# Nothing happens if the sound is not prepared.
+#
+# TODO: support high/lowpriority sounds
+#
+function play-sound {
+  param([string]$name=$(throw "supply a prepared sound name"))
+  $pm = $script:grrr_sounds[$name]
+  if ($pm) { $pm.play() }
+}

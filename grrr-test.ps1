@@ -210,11 +210,20 @@ function test-drawing-transparent-images {
   $opaquedragon = create-image $dragonlines -fg "red" -bg "darkred"
   $transparentdragon = create-image $dragonlines -fg "yellow" -bg "darkgreen" -transparent 32
 
-  
+
   clear-playfield $pf
   draw-image $pf $opaquedragon 1 6
   draw-image $pf $transparentdragon 6 3
   flush-playfield $pf
+}
+
+
+#----------------------------------------------------------------
+# test sound preparation and playing
+function test-playing-sounds {
+  $path = join-path $env:SystemRoot "media\tada.wav"
+  prepare-sound "tada" $path
+  play-sound "tada"
 }
 
 
