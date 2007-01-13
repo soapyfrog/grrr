@@ -68,9 +68,7 @@ function main {
     $secsY = $secsRadiusY * [Math]::Sin($secsAngle)
     draw-line $pf $midx $midy ($midx+$secsX) ($midy+$secsY) $secsImg
 
-    flush-playfield $pf
-
-    sleep -millis 1000
+    flush-playfield $pf -sync 1000
   }
 }
 

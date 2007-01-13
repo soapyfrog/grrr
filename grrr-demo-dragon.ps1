@@ -24,7 +24,7 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 . .\grrr.ps1
 
 init-console 120 60
-write-host "scary dragon thing - the blue one has transparency enabled"
+write-host "scary dragon thing - dragons with transparancy"
 
 
 function main {
@@ -47,9 +47,9 @@ $dragontxt = @"
   $dragontxt = $dragontxt.replace("x",[string][char]0x00b7)
   # split into lines
   $dragonlines = $dragontxt.replace("`r","W").replace("`n","").split("W")
-  $yellowdragon = create-image $dragonlines -fg "yellow" -bg "black"
-  $reddragon = create-image $dragonlines -fg "red" -bg "black"
-  $bluedragon = create-image $dragonlines -fg "blue" -bg "black" -transparent 32
+  $yellowdragon = create-image $dragonlines -fg "yellow" -bg "darkgreen" -transparent 32
+  $reddragon = create-image $dragonlines -fg "red" -bg "darkred" -transparent 32
+  $bluedragon = create-image $dragonlines -fg "cyan" -bg "darkblue" -transparent 32
 
   $rnd = new-object Random
 
@@ -82,8 +82,7 @@ $dragontxt = @"
     $fc++
     clear-playfield $pf
     draw-sprites $pf $sprites
-    flush-playfield $pf
-    sleep -millis 40
+    flush-playfield $pf -sync 40
   }
 }
 

@@ -25,7 +25,7 @@ $ErrorActionPreference="Stop" # endless errors annoy me
 . .\psunit.ps1
 . .\grrr.ps1
 
-$Kwidth = 80
+$Kwidth = 120
 $Kheight = 50
 $Kiters = 150
 
@@ -35,7 +35,7 @@ init-console -w $Kwidth -h $Kheight
 #----------------------------------------------------------------
 # test playfield alone
 function test-playfield-alone {
-  $pf = create-playfield -x 0 -y 24 -width 34 -height 20 -bg "darkblue" 
+  $pf = create-playfield -x 0 -y 24 -width 34 -height 20 -bg "black" 
   for ([int]$iter=$Kiters; $iter -gt 0; $iter--) {
     clear-playfield $pf
     flush-playfield $pf
@@ -44,9 +44,8 @@ function test-playfield-alone {
 
 
 #----------------------------------------------------------------
-# test drawing opaque images
-function test-draw-image-opaque {
-  $pf = create-playfield -x 0 -y 24 -width 34 -height 20 -bg "darkblue" 
+# build a dragon image source
+function build-dragonlines {
   $dragontxt = @"
       .==.        .==.
      //'^\\      //^'\\
@@ -64,7 +63,14 @@ function test-draw-image-opaque {
   $dragontxt = $dragontxt.replace("x",[string][char]0x00b7)
   # split into lines
   $dragonlines = $dragontxt.replace("`r","W").replace("`n","").split("W")
-  $opaquedragon = create-image $dragonlines -fg "red" -bg "darkred"
+  return $dragonlines
+}
+
+#----------------------------------------------------------------
+# test drawing opaque images
+function test-draw-image-opaque {
+  $pf = create-playfield -x 0 -y 24 -width 34 -height 20 -bg "black" 
+  $opaquedragon = create-image (build-dragonlines) -fg "red" -bg "darkred"
 
   for ([int]$iter=$Kiters; $iter -gt 0; $iter--) {
     clear-playfield $pf
@@ -75,25 +81,8 @@ function test-draw-image-opaque {
 #----------------------------------------------------------------
 # test drawing transparent images
 function test-draw-image-transparent {
-  $pf = create-playfield -x 0 -y 24 -width 34 -height 20 -bg "darkblue" 
-  $dragontxt = @"
-      .==.        .==.
-     //'^\\      //^'\\
-    //x^x^\(\__/)/^x^^\\
-   //^x^^x^/6xx6\x^^x^^\\
-  //^x^^x^x(x..x)x^x^^^x\\
- //x^^x^/\//v""v\\/\^x^x^\\
-//x^^/\/  /x'~~'x\  \/\^x^\\
-\\^x/    /x,xxxx,x\    \^x//
- \\/    (x(xxxxxx)x)    \//
-  ^      \x\.__./x/      ^
-         ((('  ')))
-"@
-  # replace the x with spaces, well dots
-  $dragontxt = $dragontxt.replace("x",[string][char]0x00b7)
-  # split into lines
-  $dragonlines = $dragontxt.replace("`r","W").replace("`n","").split("W")
-  $transparentdragon = create-image $dragonlines -fg "yellow" -bg "darkgreen" -transparent 32
+  $pf = create-playfield -x 0 -y 24 -width 34 -height 20 -bg "black" 
+  $transparentdragon = create-image (build-dragonlines) -fg "yellow" -bg "darkgreen" -transparent 32
 
   for ([int]$iter=$Kiters; $iter -gt 0; $iter--) {
     clear-playfield $pf

@@ -24,7 +24,7 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 # load modules
 . .\grrr.ps1
 
-init-console 120 50
+init-console 80 50
 write-host "This is waaaay too slow :-("
 
 #--------------------------------------------------------------------
@@ -85,8 +85,7 @@ function main {
     draw-tilemap $pf $backtm -offsetx $bx -offsety 0 -x 0 -y 25 -w 78 -h 12
     draw-tilemap $pf $fronttm -offsetx $fx -offsety 0 -x 0 -y 24 -w 78 -h 15
     draw-sprites $pf $sprites
-    flush-playfield $pf
-    sleep -millis 2 # wish this could be negative :-)
+    flush-playfield $pf -sync 20
   }
 }
 

@@ -70,8 +70,7 @@ function main {
     $fc++
     clear-playfield $pf
     draw-sprites $pf $sprites
-    flush-playfield $pf
-    sleep -millis 20
+    flush-playfield $pf -sync 40 # 25fps
   }
 }
 

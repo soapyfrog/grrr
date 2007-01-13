@@ -47,22 +47,21 @@ function new-size($w,$h) { return new-object Management.Automation.Host.Size -ar
 $script:grrr_ui = $host.ui.rawui  # saves dereferencing all the time
 
 #------------------------------------------------------------------------------
-# Initialise the console to be a certain visible width/height with 
-# specified bufferspace for backing buffers.
-#
-# Buffers are not reclaimed when not used, so you can use this to
-# reinitialise the console for new work
+# Initialise the console to be a certain visible width/height 
 #
 function init-console {
   param(
     [int]$width       = 120,    # width of console window
-    [int]$height      = 50,     # height of console window
-    [int]$bufwidth    = 200,    # width of buffer
-    [int]$bufheight   = 1000    # height of buffer
+    [int]$height      = 50      # height of console window
   )
   # clear console and resize it
+  # enlage the buffer size if required
+  $bw = $grrr_ui.BufferSize.Width
+  $bh = $grrr_ui.BufferSize.Height
+  $bw = [Math]::Max($width,$bw)
+  $bh = [Math]::Max($height,$bh)
   clear-host
-  $grrr_ui.BufferSize = new-size $bufwidth $bufheight
+  $grrr_ui.BufferSize = new-size $bw $bh
   $grrr_ui.WindowSize = new-size $width $height
 }
 
@@ -116,6 +115,9 @@ function create-playfield {
     "width"       = $width
     "height"      = $height
     "buffersize"  = [int]($width * $height)
+
+    # time last flush occured
+    "flushtime"   = (get-date)
   }
 }
 
@@ -136,10 +138,25 @@ function clear-playfield {
 # This copies the content of the back buffer to the
 # visual buffer
 #
+# Optionally takes a sync time (ms) where this function will sleep
+# so that the time between flushes is constant
+#
 function flush-playfield {
-  param( $playfield = $(throw "you must supply a playfield"))
+  param( 
+    $playfield = $(throw "you must supply a playfield"),
+    [int]$sync=0       # the number of milliseconds between flushes
+  )
+  if ($sync) {
+    $now = get-date
+    $elapsed = $now - $playfield.flushtime
+    $remain = $sync - ($elapsed.TotalMilliseconds)
+    if ($remain -ge 0) { sleep -millis $remain }
+    $playfield.flushtime = get-date
+  }
   $grrr_ui.SetBufferContents($playfield.coord,$playfield.buffer)
 }
+
+
 
 #------------------------------------------------------------------------------
 # Create an image
