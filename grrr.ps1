@@ -157,7 +157,8 @@ function create-image {
   param(
     [string[]] $lines=@("X"), # an array of text lines (should be same length)
     [string]$fg = "white",    # foreground colour (default white) 
-    [string]$bg = "black"     # background colour (default black)
+    [string]$bg = "black",    # background colour (default black)
+    [char]$transparent = [char]0  # character to indicate transparency (0=none)
     ) 
   
   [int]$width=0
@@ -170,9 +171,10 @@ function create-image {
   $bca = $grrr_ui.NewBufferCellArray( $lines, $fg, $bg )
 
   return @{
-    "bca"     = $bca    # buffercell array
-    "width"   = $width  # width of image
-    "height"  = $height # height of image
+    "bca"         = $bca          # buffercell array
+    "width"       = $width        # width of image
+    "height"      = $height       # height of image
+    "transparent" = $transparent  # char to use for transparency
   }
 }
 
@@ -193,7 +195,7 @@ function draw-image {
       [int]$x,
       [int]$y
       )
-  # cache values and clip
+  # fast exclude images entirely outside of the buffer
   [int]$bw = $playfield.width
   [int]$iw = $image.width
   if ($x -ge $bw -or ($x+$iw -lt 0) ) { return } # fast quit
@@ -202,31 +204,46 @@ function draw-image {
   if ($y -ge $bh -or ($y+$ih -lt 0) ) { return } # fast quit
 
   # now handle partial clipping
-  [int]$startline = 0
-  [int]$endline = $ih - 1
+  [int]$startrow = 0
+  [int]$numrows = $ih
   # clip top
-  if ($y -lt 0) {$startline = -$y}
+  if ($y -lt 0) {$startrow = -$y; $numrows += $y}
   # clip bottom
   [int]$overlap = $bh - ($y+$ih)
-  if ($overlap -lt 0) {$endline += $overlap}
+  if ($overlap -lt 0) {$numrows += $overlap}
   # clip left
-  [int]$x1 = 0
-  [int]$x2 = $iw-1
+  [int]$startcol = 0
+  [int]$numcols = $iw
   [int]$ilen=$iw
-  if ($x -lt 0) {$x1=-$x; $ilen+=$x}
+  if ($x -lt 0) {$startcol=-$x; $numcols += $x}
   # clip right
   $overlap = $bw - ($x+$iw)
-  if ($overlap -lt 0) {$x2 += $overlap; $ilen+=$overlap}
+  if ($overlap -lt 0) {$numcols += $overlap}
 
   # do the copying
   $ibca = $image.bca
   $bbca = $playfield.buffer
-  [int]$boffset = ($y+$startline) * $bw + $x + $x1
-  [int]$ioffset = $x1
-  for ([int]$line=$startline; $line -le $endline; $line++) {
-    [Array]::Copy($ibca,$ioffset,$bbca,$boffset,$ilen)
-    $ioffset += $iw
-    $boffset += $bw
+  [char]$transparent=$image.transparent
+  if ($transparent) {
+    # todo
+    for ([int]$r=0;$r -lt $numrows;$r++) {
+      for ([int]$c=0;$c -lt $numcols;$c++) {
+        $cell = $ibca[($startrow+$r),($startcol+$c)]
+        if ($cell.Character -ne $transparent) {
+          $bbca[($y+$startrow+$r),($x+$startcol+$c)] = $cell
+        }
+      }
+    }
+
+  }
+  else {
+    [int]$boffset = ($y+$startrow) * $bw + $x + $startcol
+    [int]$ioffset = $startcol
+    for ([int]$i=0; $i -lt $numrows; $i++) {
+      [Array]::Copy($ibca,$ioffset,$bbca,$boffset,$numcols) #fast copy whole row
+      $ioffset += $iw
+      $boffset += $bw
+    }
   }
 }
 

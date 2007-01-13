@@ -24,7 +24,7 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 . .\grrr.ps1
 
 init-console 120 60
-write-host "scary dragon thing"
+write-host "scary dragon thing - the blue one has transparency enabled"
 
 
 function main {
@@ -33,20 +33,23 @@ function main {
 $dragontxt = @"
       .==.        .==.
      //'^\\      //^'\\
-    // ^ ^\(\__/)/^ ^^\\
-   //^ ^^ ^/6  6\ ^^ ^^\\
-  //^ ^^ ^ ( .. ) ^ ^^^ \\
- // ^^ ^/\//v""v\\/\^ ^ ^\\
-// ^^/\/  / '~~' \  \/\^ ^\\
-\\^ /    / ,    , \    \^ //
- \\/    ( (      ) )    \//
-  ^      \ \.__./ /      ^
+    //x^x^\(\__/)/^x^^\\
+   //^x^^x^/6xx6\x^^x^^\\
+  //^x^^x^x(x..x)x^x^^^x\\
+ //x^^x^/\//v""v\\/\^x^x^\\
+//x^^/\/  /x'~~'x\  \/\^x^\\
+\\^x/    /x,xxxx,x\    \^x//
+ \\/    (x(xxxxxx)x)    \//
+  ^      \x\.__./x/      ^
          ((('  ')))
 "@
-  $dragonlines = $dragontxt.replace("`r","X").replace("`n","").split("X")
+  # replace the x with spaces
+  $dragontxt = $dragontxt.replace("x",[string][char]0x00b7)
+  # split into lines
+  $dragonlines = $dragontxt.replace("`r","W").replace("`n","").split("W")
   $yellowdragon = create-image $dragonlines -fg "yellow" -bg "black"
   $reddragon = create-image $dragonlines -fg "red" -bg "black"
-  $bluedragon = create-image $dragonlines -fg "blue" -bg "black"
+  $bluedragon = create-image $dragonlines -fg "blue" -bg "black" -transparent 32
 
   $rnd = new-object Random
 

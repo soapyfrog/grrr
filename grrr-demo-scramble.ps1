@@ -41,7 +41,7 @@ function main {
   $imge = create-image "\=/","/=\" -fg "yellow" -bg "red"
   
   $imgx = create-image "<=>"," W " -fg "magenta" -bg "black"
-  $imgy = create-image " | ","/%\" -fg "yellow" -bg "black"
+  $imgy = create-image " | ","/%\" -fg "yellow" -bg "black" -transparent 32
 
   $map = @{"A"=$imga; "B"=$imgb; "C"=$imgc; "D"=$imgd; "E"=$imge; "X"=$imgx; "Y"=$imgy}
 

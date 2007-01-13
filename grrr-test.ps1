@@ -186,6 +186,36 @@ function test-draw-line {
   flush-playfield $pf
 }
 
+#----------------------------------------------------------------
+# test drawing transparent images
+function test-drawing-transparent-images {
+  $pf = create-playfield -x 60 -y 24 -width 34 -height 20 -bg "darkblue" 
+  $dragontxt = @"
+      .==.        .==.
+     //'^\\      //^'\\
+    //x^x^\(\__/)/^x^^\\
+   //^x^^x^/6xx6\x^^x^^\\
+  //^x^^x^x(x..x)x^x^^^x\\
+ //x^^x^/\//v""v\\/\^x^x^\\
+//x^^/\/  /x'~~'x\  \/\^x^\\
+\\^x/    /x,xxxx,x\    \^x//
+ \\/    (x(xxxxxx)x)    \//
+  ^      \x\.__./x/      ^
+         ((('  ')))
+"@
+  # replace the x with spaces, well dots
+  $dragontxt = $dragontxt.replace("x",[string][char]0x00b7)
+  # split into lines
+  $dragonlines = $dragontxt.replace("`r","W").replace("`n","").split("W")
+  $opaquedragon = create-image $dragonlines -fg "red" -bg "darkred"
+  $transparentdragon = create-image $dragonlines -fg "yellow" -bg "darkgreen" -transparent 32
+
+  
+  clear-playfield $pf
+  draw-image $pf $opaquedragon 1 6
+  draw-image $pf $transparentdragon 6 3
+  flush-playfield $pf
+}
 
 
 #----------------------------------------------------------------
