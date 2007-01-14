@@ -4,6 +4,9 @@ New Features:
 
 * New back buffer system based on in-memory BufferCell arrays, no
   longer needs spare buffer space.
+  SetBufferContents is slow, and this is now only done once
+  during flush-playfield.
+  Performance gains in demos range from 2 to 5 times.
 
 * Sound support with prepare-sound and play-sound
 
