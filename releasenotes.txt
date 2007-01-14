@@ -1,0 +1,49 @@
+Version 0,2,alpha | ? 2007
+
+New Features:
+
+* New back buffer system based on in-memory BufferCell arrays, no
+  longer needs spare buffer space.
+
+* Sound support with prepare-sound and play-sound
+
+* Non-opaque images. You can now specify which character is to be
+  transparent when calling create-image. draw-image will only
+  draw the non-opaque characters. Example in grrr-demo-dragon.
+
+* New demo - grrr-demo-dragon, showing transparancy and motion
+  handlers.
+
+* Image clipping. draw-image will now clip an image to the
+  playfield. Oversized back buffers are not needed. 
+
+* Sprite animation speed is now controllable. 
+  create-sprite as a -animrate param that lets you choose
+  how often a sprite's frame updates. Default is 1.
+
+* Playfield frame syncing. Nothing fancy like VBL syncing!
+  Just means that when you flush-playfield, you can specify
+  a sync time in ms, which means it will try to ensure that
+  all flushes are N ms apart, regardless of how much time
+  you spend in the game loop.
+
+* String drawing. You can now draw a string in a particular
+  colour at a specific x,y coordinate in the playfield.
+  This is just a convenient wrapper around create-image
+  and draw-image.
+
+Bugs fixed:
+
+* Lots
+
+Dropped Features:
+
+* Scolling viewport. The drawing pipeline became a bit too long
+  and slow and complex. May re-introduce it in later versions.
+ 
+------------------------------------------------------------------
+Version 0,1,alpha | 3 Jan 2007
+
+First version posted to http://ps1.soapyfrog.com/2007/01/03/grrr/
+
+Had basic concepts and some working unit tests and demos.

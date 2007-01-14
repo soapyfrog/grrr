@@ -23,14 +23,15 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 # load modules
 . .\grrr.ps1
 
-init-console 120 60
-write-host "scary dragon thing - dragons with transparancy"
+init-console 100 50
+write-host "dragon sprites with transparancy (ie not opaque rectangles)"
 
 
 function main {
-  $pf = create-playfield -x 0 -y 2 -width 120 -height 58 -bg "black"
+  $pf = create-playfield -x 0 -y 2 -width 100 -height 48 -bg "black"
 
-$dragontxt = @"
+  # we use a 'here' string for ease of typing.
+  $dragontxt = @"
       .==.        .==.
      //'^\\      //^'\\
     //x^x^\(\__/)/^x^^\\
@@ -43,48 +44,53 @@ $dragontxt = @"
   ^      \x\.__./x/      ^
          ((('  ')))
 "@
-  # replace the x with spaces
+  # replace the lower case x with small dots
   $dragontxt = $dragontxt.replace("x",[string][char]0x00b7)
   # split into lines
   $dragonlines = $dragontxt.replace("`r","W").replace("`n","").split("W")
-  $yellowdragon = create-image $dragonlines -fg "yellow" -bg "darkgreen" -transparent 32
-  $reddragon = create-image $dragonlines -fg "red" -bg "darkred" -transparent 32
-  $bluedragon = create-image $dragonlines -fg "cyan" -bg "darkblue" -transparent 32
+  # -transparent 32 means that a space will be transparent
+  $yellowdragon = create-image $dragonlines -fg "white" -bg "darkgray" -transparent 32
+  $reddragon = create-image $dragonlines -fg "yellow" -bg "darkred" -transparent 32
+  $bluedragon = create-image $dragonlines -fg "cyan" -bg "darkmagenta" -transparent 32
 
   $rnd = new-object Random
 
+  # handlers for the dragon sprites
+  # init just sets up the basic vars in the sprite
   $init = {
     $s=$args[0]
-    $s.xoff=60-15;$s.yoff=28-6-2; $s.xamp=45;$s.yamp=18; 
+    $s.xoff=50-15;$s.yoff=23-6-2; $s.xamp=43;$s.yamp=16; 
     $s.xangle=$rnd.nextdouble(); $s.yangle=$rnd.nextdouble() 
     $s.xspeed = $rnd.nextdouble()/10 + 0.02
-    $s.yspeed = $rnd.nextdouble()/10 + 0.01
+    $s.yspeed = $rnd.nextdouble()/10 + 0.02
   }
+  # move varies the angle and computes the x,y position
   $move = { 
     $s=$args[0]
     $s.x = [Math]::cos($s.xangle) * $s.xamp + $s.xoff
     $s.y = [Math]::cos($s.yangle) * $s.yamp + $s.yoff
-    $s.xangle += $s.xspeed #0.08
-    $s.yangle += $s.yspeed #0.07
+    $s.xangle += $s.xspeed
+    $s.yangle += $s.yspeed
   }
-    
+  
+  # wrap the two handlers in to a single handlers object
   $handlers = create-spritehandlers -didinit $init -willdraw $move
 
+  # create 3 dragon sprites in an array
   $sprites = @()
   foreach ($img in ($yellowdragon,$reddragon,$bluedragon) ) {
     $s = create-sprite -images @($img) -x 10 -y 10 -handlers $handlers
     $sprites += $s
   }
 
-  # game loop
-  [int]$fc = 0
+  # game loop - ctrl+c to quit
   while ($true) {
-    $fc++
     clear-playfield $pf
     draw-sprites $pf $sprites
-    flush-playfield $pf -sync 40
+    flush-playfield $pf -sync 40 # so frame rate is 25 (1000/40)
   }
 }
 
+# off we go
 main
 

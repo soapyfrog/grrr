@@ -18,13 +18,16 @@
 # sprites, tiles, scrolling, eventing and other stuff
 # that can be useful in writing games.
 #
-# To use this in a script:
-# . grrr.ps1
+# To use it, just source it like this:
+# . <path-to>\grrr.ps1
 #
-# All functions etc will be created in the calling scope.
-#
+# You may like to include that line in your $profile
 #------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
+# Globals
+$script:grrr_ui = $host.ui.rawui  # saves dereferencing all the time
+$script:grrr_version=0,2,"alpha" # major,minor,state
 
 #------------------------------------------------------------------------------
 # Create a Coord
@@ -41,10 +44,6 @@ function new-rect($left,$top,$right,$bottom) {
 #------------------------------------------------------------------------------
 # Create a Size
 function new-size($w,$h) { return new-object Management.Automation.Host.Size -argumentList $w,$h }
-
-#------------------------------------------------------------------------------
-# Globals
-$script:grrr_ui = $host.ui.rawui  # saves dereferencing all the time
 
 #------------------------------------------------------------------------------
 # Initialise the console to be a certain visible width/height 
@@ -242,7 +241,7 @@ function draw-image {
   $bbca = $playfield.buffer
   [char]$transparent=$image.transparent
   if ($transparent) {
-    # todo
+    # todo make this more efficient than cell-by-cell copying
     for ([int]$r=0;$r -lt $numrows;$r++) {
       for ([int]$c=0;$c -lt $numcols;$c++) {
         $cell = $ibca[($startrow+$r),($startcol+$c)]
