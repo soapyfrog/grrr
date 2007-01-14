@@ -24,14 +24,15 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 # load modules
 . .\grrr.ps1
 
-init-console 80 50
+$cw = 80
+init-console $cw 50
 write-host "This is waaaay too slow :-("
 
 #--------------------------------------------------------------------
 # Parallax scrolling demo
 #
 function main {
-  $pf = create-playfield -x 0 -y 2 -width 78 -height 33 -bg "black" #78? multiple of 3
+  $pf = create-playfield -x 0 -y 2 -width $cw -height 33 -bg "black"
 
   $imga = create-image "'''","'''" -fg "blue" -bg "darkmagenta"
   $imgb = create-image "@@@","@@@" -fg "darkblue" -bg "darkmagenta"
@@ -60,8 +61,8 @@ function main {
   $fronttm = create-tilemap $frontlines $map 3 2
 
   #wrap points
-  [int]$backwp = $backtm.tilewidth * $backtm.mapwidth-78
-  [int]$frontwp = $backtm.tilewidth * $fronttm.mapwidth-78
+  [int]$backwp = $backtm.tilewidth * $backtm.mapwidth-$cw
+  [int]$frontwp = $backtm.tilewidth * $fronttm.mapwidth-$cw
 
   # create sprites to complete the look
   $thrustimg1 = create-image @(">") -fg "yellow" -bg "black"
@@ -82,8 +83,8 @@ function main {
     $bx = [Math]::Floor($fc/2) % $backwp
 
     clear-playfield $pf
-    draw-tilemap $pf $backtm -offsetx $bx -offsety 0 -x 0 -y 25 -w 78 -h 12
-    draw-tilemap $pf $fronttm -offsetx $fx -offsety 0 -x 0 -y 24 -w 78 -h 15
+    draw-tilemap $pf $backtm -offsetx $bx -offsety 0 -x 0 -y 25 -w $cw -h 12
+    draw-tilemap $pf $fronttm -offsetx $fx -offsety 0 -x 0 -y 24 -w $cw -h 15
     draw-sprites $pf $sprites
     flush-playfield $pf -sync 20
   }

@@ -217,6 +217,16 @@ function test-drawing-transparent-images {
   flush-playfield $pf
 }
 
+#----------------------------------------------------------------
+# test string drawing
+function test-draw-string {
+  $str = "Hello, world!"
+  $pf = create-playfield -x 0 -y 24 -width ($str.length+2) -height 3 -bg "darkred" 
+  clear-playfield $pf
+  draw-string $pf "Hello, world!" -x 1 -y 1 -fg "white" -bg "black"
+  flush-playfield $pf
+}
+
 
 #----------------------------------------------------------------
 # test sound preparation and playing
@@ -225,7 +235,6 @@ function test-playing-sounds {
   prepare-sound "tada" $path
   play-sound "tada"
 }
-
 
 #----------------------------------------------------------------
 # hand over to unit test framework

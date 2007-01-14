@@ -595,6 +595,23 @@ function prepare-sound {
   }
 }
 
+#------------------------------------------------------------------------------
+# Draw a string at the specified position in the playfield.
+#
+# This is really a wrapper around create-image and draw-image
+#
+function draw-string {
+  param(
+      $playfield  = $(throw "you must supply a playfield"),
+      $string     = $(throw "you must supply a string"),
+      [int]$x     = 0,
+      [int]$y     = 0,
+      [string]$fg = "white",
+      [string]$bg = "black"
+      )
+  $image = create-image -lines @($string) -fg $fg -bg $bg
+  draw-image $pf $image $x $y
+}
 
 #------------------------------------------------------------------------------
 # Play a prepared sound asynchronously.
@@ -608,3 +625,4 @@ function play-sound {
   $pm = $script:grrr_sounds[$name]
   if ($pm) { $pm.play() }
 }
+
