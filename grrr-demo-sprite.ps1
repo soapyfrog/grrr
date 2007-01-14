@@ -54,7 +54,7 @@ function main {
     [int]$n=$_
     $x = [Math]::Floor($n / 4) * 7 + 4
     $y = ($n % 4) * 4 + 3
-    $sa = create-sprite -images $images -x $x -y $y -handlers $handlers
+    $sa = create-sprite -images $images -x $x -y $y -handlers $handlers -animrate 8
     $sprites += $sa
   }
 

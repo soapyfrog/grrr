@@ -280,7 +280,8 @@ function create-sprite {
     [int]$y = 0,                  # initial y position
     [int]$z = 0,                  # initial z position
     [boolean]$alive = $true,      # initial live status (won't be drawn if not alive)
-    $handlers = $null             # created by create-spritehandlers (and family)
+    $handlers = $null,            # created by create-spritehandlers (and family)
+    $animrate = 1                 # switch frame every $animrate frames
     )
   
   $sprite = @{
@@ -291,6 +292,8 @@ function create-sprite {
     "alive"       = $alive
     "numframes"   = ($images.count)
     "fseq"        = 0               # frame sequence
+    "animrate"    = $animrate
+    "animcounter" = 0 # when reaches animrate, fseq++
     "handlers"    = $handlers
   }
   if ($handlers -and $handlers.didinit) { & $handlers.didinit $sprite }
@@ -336,12 +339,15 @@ function draw-sprite {
   $private:h = $sprite.handlers
   if ($h -and $h.willdraw) { &($h.willdraw) $sprite }
   if ($frame -eq -1) {
-    $sprite.fsec = (($sprite.fsec+1) % ($sprite.numframes))
+    if (($sprite.animcounter++) -eq $sprite.animrate) {
+      $sprite.animcounter = 0;
+      $sprite.fseq = (($sprite.fseq+1) % ($sprite.numframes))
+    }
   }
   else {
-    $sprite.fsec = ($frame % ($sprite.numframes))
+    $sprite.fseq = ($frame % ($sprite.numframes))
   }
-  draw-image $playfield ($sprite.images[$sprite.fsec]) $sprite.x $sprite.y
+  draw-image $playfield ($sprite.images[$sprite.fseq]) $sprite.x $sprite.y
   if ($h -and $h.diddraw) { &($h.diddraw) $sprite }
 }
 
