@@ -19,6 +19,7 @@ $global:___globcheck___=1
 $local:___globcheck___=2
 if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global scope"}
 
+set-psdebug -strict           # why not
 $ErrorActionPreference="Stop" # endless errors annoy me
 
 # load modules
@@ -238,4 +239,7 @@ function test-playing-sounds {
 
 #----------------------------------------------------------------
 # hand over to unit test framework
-run-tests
+run-tests | format-table -autosize -wrap
+
+# alternate form to htmll
+# run-tests | convertto-html -body @("Test results at $(get-date)") > results.html ; ii results.html

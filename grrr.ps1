@@ -589,7 +589,7 @@ function prepare-sound {
     [string]$name = $(throw "You need to supply a sound name"),
     [string]$path = $(throw "You need to supply a wave file path")
     )
-  if (-not $script:grrr_sounds) { $script:grrr_sounds = @{} }
+  if (-not (test-path variable:\grrr_sounds)) { $script:grrr_sounds = @{} }
   $p = resolve-path "$path" -erroraction "silentlycontinue"
   if ($p) {
     $pm = new-object media.soundplayer ($p.path)

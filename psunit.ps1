@@ -21,7 +21,7 @@ function run-tests {
     $script:r="passed"
     $script:n=$_.name
     trap [object] {
-      write-warning "Test $script:n failed"
+      write-warning "`"$script:n`" failed"
       $script:r="failed"
       continue
     }
@@ -32,10 +32,12 @@ function run-tests {
     $res = add-member -i (new-object object) -type "noteproperty" -name "name" -value $_.name -force -passthru
     $res = add-member -i $res -type "noteproperty" -name "duration" -value $ms -force -passthru
     $res = add-member -i $res -type "noteproperty" -name "result" -value "$script:r" -force -passthru
+    $err = $( if ($r -ne "passed") { $error[$error.count-1] } else { "" } )
+    $res = add-member -i $res -type "noteproperty" -name "error" -value $err -force -passthru
     $results += $res
   }
   # put results in pipe - receiver can do what it likes with it.
-  $results | select name,duration,result
+  $results | select name,duration,result,error
 }
 
 
