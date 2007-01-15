@@ -157,7 +157,7 @@ function test-draw-tilemap {
 #
 function test-create-spritehandlers-for-motionpath {
   $h = create-spritehandlers-for-motionpath "e4 s3 w1 n3"
-  assert-true "numdeltas" 11 $h.numdeltas
+  assert-equal "numdeltas" 11 $h.numdeltas
 }
 
 #----------------------------------------------------------------

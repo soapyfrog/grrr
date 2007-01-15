@@ -16,14 +16,26 @@
 # run the test suite
 #
 function run-tests {
-  write-host "--- Starting tests ---"
+  $results = @()
   ls function:test* | foreach {
-    write-host -noNewLine "Running `"$_`" ... "
+    $script:r="passed"
+    $script:n=$_.name
+    trap [object] {
+      write-warning "Test $script:n failed"
+      $script:r="failed"
+      continue
+    }
     $dur = measure-command { & $_ }
     $ms = $dur.TotalMilliseconds
-    write-host " done in $ms ms"
+    # put results in to an object with properties so makes sense in pipeline
+    # pity lists of hashes can be treated this way :-(
+    $res = add-member -i (new-object object) -type "noteproperty" -name "name" -value $_.name -force -passthru
+    $res = add-member -i $res -type "noteproperty" -name "duration" -value $ms -force -passthru
+    $res = add-member -i $res -type "noteproperty" -name "result" -value "$script:r" -force -passthru
+    $results += $res
   }
-  write-host "--- Tests complete ---"
+  # put results in pipe - receiver can do what it likes with it.
+  $results | select name,duration,result
 }
 
 

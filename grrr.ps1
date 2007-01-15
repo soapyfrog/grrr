@@ -28,6 +28,7 @@
 # Globals
 $script:grrr_ui = $host.ui.rawui  # saves dereferencing all the time
 $script:grrr_version=0,2,"alpha" # major,minor,state
+$script:grrr_versionstr=[string]::join(".",$script:grrr_version)
 
 #------------------------------------------------------------------------------
 # Create a Coord
@@ -630,4 +631,21 @@ function play-sound {
   $pm = $script:grrr_sounds[$name]
   if ($pm) { $pm.play() }
 }
+
+
+
+#------------------------------------------------------------------------------
+# Grrr is a set of functions that are used by other scripts, however, 
+# if this is run as a script, it just prints out some interesting information.
+#
+write-host "`nGrrr version $script:grrr_versionstr`n"
+write-host @"
+Grrr is not run as a script. You need to 'dot source' it, eg:
+
+. [path to\]grrr.ps1
+
+Either put that in your own script that uses Grrr, or put it
+in your `$PROFILE so that all scripts can use it.
+
+"@
 
