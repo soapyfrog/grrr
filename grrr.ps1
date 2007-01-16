@@ -634,18 +634,3 @@ function play-sound {
 
 
 
-#------------------------------------------------------------------------------
-# Grrr is a set of functions that are used by other scripts, however, 
-# if this is run as a script, it just prints out some interesting information.
-#
-write-host "`nGrrr version $script:grrr_versionstr`n"
-write-host @"
-Grrr is not run as a script. You need to 'dot source' it, eg:
-
-. [path to\]grrr.ps1
-
-Either put that in your own script that uses Grrr, or put it
-in your `$PROFILE so that all scripts can use it.
-
-"@
-
