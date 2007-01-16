@@ -94,4 +94,5 @@ function test-draw-image-transparent {
 
 #----------------------------------------------------------------
 # hand over to unit test framework
-run-tests
+run-tests | format-table -autosize -wrap
+
