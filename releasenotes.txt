@@ -35,6 +35,8 @@ New Features:
   This is just a convenient wrapper around create-image
   and draw-image.
 
+* Can load images from a specially formatted text file
+
 Bugs fixed:
 
 * Lots
