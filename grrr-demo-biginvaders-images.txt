@@ -1,0 +1,100 @@
+#! $Id$
+
+#! translate I to a solid char
+#translate I 9608
+#begin invc0 green black
+    IIII
+ IIIIIIIIII
+IIIIIIIIIIII
+III  II  III
+IIIIIIIIIIII
+   II  II
+  II II II
+II        II
+#end
+#begin invc1 green black
+    IIII
+ IIIIIIIIII
+IIIIIIIIIIII
+III  II  III
+IIIIIIIIIIII
+  III  III
+ II  II  II
+  II    II
+#end
+#begin invb0 green black
+  I     I
+   I   I
+  IIIIIII
+ II III II
+I IIIIIII I
+I IIIIIII I
+I I     I I
+   II II
+#end
+#begin invb1 green black
+  I     I
+I  I   I  I
+I IIIIIII I
+III III III
+IIIIIIIIIII
+ IIIIIIIII
+  I     I
+ I       I
+#end
+#begin inva0 green black
+   II
+  IIII
+ IIIIII
+II II II
+IIIIIIII
+ I II I
+I      I
+ I    I
+#end
+#begin inva1 green black
+   II
+  IIII
+ IIIIII
+II II II
+IIIIIIII
+  I  I
+ I II I
+I I  I I
+#end
+#begin base green black
+     I
+    III
+ IIIIIIIII
+IIIIIIIIIII
+IIIIIIIIIII
+IIIIIIIIIII
+#end
+#begin bomba green black
+ I
+  I
+ I
+I
+ I
+#end
+#begin bombb green black
+ I
+ I
+II
+ II
+ I
+#end
+#begin missile green black
+I
+I
+I
+#end
+#begin mothership green black
+     IIIIII
+   IIIIIIIIII
+  IIIIIIIIIIII
+ II II II II II
+IIIIIIIIIIIIIIII
+  III  II  III
+   I        I
+#end

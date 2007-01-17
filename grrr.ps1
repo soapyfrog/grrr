@@ -197,6 +197,62 @@ function create-image {
 
 
 #------------------------------------------------------------------------------
+# Load images from a file
+function get-images {
+  param($filename=$(throw "supply a filename"))
+  $p = resolve-path $filename # will throw if doesn't exist
+  $images = @{}
+  $translations = @{}
+  $lines = $null
+  $id = $null
+  $fg = $null
+  $bg = $null
+  get-content $p | foreach {
+    if ($_ -match "^#.*") {
+      if ($_ -match "^#begin\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)") {
+        $lines = @()
+        $id = $matches[1]
+        $fg = $matches[2]
+        $bg = $matches[3]
+
+        write-debug "found image $curid"
+      }
+      elseif ($_ -match "^#end") {
+        if ($id) {
+          write-debug "closing image"
+          $images[$id] = create-image $lines -fg $fg -bg $bg
+          $id=$null
+        }
+        else { write-warning "Unexpected #end token" }
+      }
+      elseif ($_ -match "^#translate\s+([^\s]+)\s+([^\s]+)") {
+        $translations[[string][char]$matches[1]] = [string][char][int]$matches[2]
+      }
+      elseif ($_ -match "^#!") {
+        # a comment
+      }
+      else {
+        write-warning "Unknown token: $_"
+      }
+    }
+    else {
+      if ($id) {
+        write-debug "adding line $_"
+        $l = $_
+        foreach ($t in $translations.keys) {
+          $l = $l.replace($t,$translations[$t])
+        }
+        $lines += $l
+      }
+      else { 
+        if (-not $_ -match "^\s*$" ){ write-warning "Skipping $_" }
+      }
+    }
+  }
+  $images
+}
+
+#------------------------------------------------------------------------------
 # Draw an image into the back buffer of a playfield.
 #
 # This takes the image buffercell array and write its
