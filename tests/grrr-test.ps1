@@ -23,8 +23,8 @@ set-psdebug -strict           # why not
 $ErrorActionPreference="Stop" # endless errors annoy me
 
 # load modules
-. .\psunit.ps1
-. .\grrr.ps1
+. ..\lib\psunit.ps1
+. ..\lib\grrr.ps1
 
 # init console
 init-console -w 120 -h 50 

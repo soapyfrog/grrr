@@ -21,7 +21,7 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 
 
 # load modules
-. .\grrr.ps1
+. ..\lib\grrr.ps1
 
 init-console 100 50
 write-host "dragon sprites with transparancy (ie not opaque rectangles)"

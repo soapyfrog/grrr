@@ -22,7 +22,7 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 
 
 # load modules
-. .\grrr.ps1
+. ..\lib\grrr.ps1
 
 $cw = 78 # reqd for tile wrapping to work
 init-console $cw 50

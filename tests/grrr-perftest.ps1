@@ -22,8 +22,8 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 $ErrorActionPreference="Stop" # endless errors annoy me
 
 # load modules
-. .\psunit.ps1
-. .\grrr.ps1
+. ..\lib\psunit.ps1
+. ..\lib\grrr.ps1
 
 $Kwidth = 120
 $Kheight = 50

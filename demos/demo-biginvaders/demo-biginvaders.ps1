@@ -22,7 +22,7 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 $ErrorActionPreference="Stop"
 
 # load modules
-. .\grrr.ps1
+. ..\..\lib\grrr.ps1
 
 [int]$script:pfwidth = 256
 [int]$script:pfheight = 130
@@ -110,7 +110,7 @@ function main {
   $pf = create-playfield -x 0 -y 2 -width 256 -height 128 -bg "black"
 
   # load the alien images from the file
-  $images = get-images "grrr-demo-biginvaders-images.txt"
+  $images = get-images "images.txt"
   # create an alien hoard (well, a small gathering) 
   $aliens_controller,$aliens = create-invadersprites $images
   # create a base ship
