@@ -24,11 +24,10 @@ $ErrorActionPreference="Stop"
 # load modules
 . ..\..\lib\grrr.ps1
 
-[int]$script:pfwidth = 256
-[int]$script:pfheight = 130
+[int]$script:maxwidth = 120
+[int]$script:maxheight = 60
 
-init-console 256 130
-write-host "big space invaders demo - using original graphics!!"
+init-console $maxwidth $maxheight
 
 #------------------------------------------------------------------------------
 # Create the invader sprites
@@ -36,51 +35,60 @@ write-host "big space invaders demo - using original graphics!!"
 # sprite array
 #
 function create-invadersprites($images) {
-  $sprites = @()
+  $sprites = new-object collections.arraylist # @()
+  [hashtable]$ctl = @{  # shared controller for all sprites
+    current="R"         # current block direction
+    next="R"            # next block direction
+    left=1              # left edge
+    right=$maxwidth-12  # right edge
+    bottom=$maxheight-8 # bottom edge
+    landed=$false       # becomes true if aliens reach the bottom
+  } 
   # handlers for motion
-  $controller = @{current="R"; next="R"} # shared controller for all sprites
   $init = {
-    $args[0].controller = $controller
-    $args[0].tagged = $false # only the tagged invader moves
+    $args[0].controller = $ctl
   }
   $move = { 
     $s=$args[0]
     $dx = 1
-    $dy = 6
+    $dy = 2
     $d = $s.controller
     switch ($d.current) {
       "R" {
         $s.x+=$dx
-        if ($s.x -gt 200) { $d.next="DL" }
+
+        if ($s.x -ge $d.right) { $d.next="DL" }
       }
       "L" {
         $s.x-=$dx
-        if ($s.x -lt 10) { $d.next="DR" }
+        if ($s.x -le $d.left) { $d.next="DR" }
       }
       "DL" {
         $s.y+=$dy
+        if ($s.y -ge $d.bottom) { $d.landed=$true }
         $d.next="L"
       }
       "DR" {
         $s.y+=$dy
+        if ($s.y -ge $d.bottom) { $d.landed=$true }
         $d.next="R"
       }
     }
   }
   $handlers = create-spritehandlers -didinit $init -willdraw $move
-  $y = 5
+  $y = 0
   $xo = 2
   "inva","invb","invc" | foreach {
     $i = $_
     for ($x=0; $x -lt 5; $x++) {
       $ip = $images["$i"+"0"],$images["$i"+"1"]
-      $s = create-sprite -images $ip -x ($xo+10+20*$x) -y $y -handlers $handlers
+      $s = create-sprite -images $ip -x ($xo+10+18*$x) -y $y -handlers $handlers
       $sprites += $s
     }
     $xo -= 1
-    $y += 13
+    $y += 11
   }
-  return $controller,$sprites
+  return $ctl,$sprites
 }
 
 
@@ -91,7 +99,7 @@ function create-basesprite {
   param($images)
   $handlers = create-spritehandlers -didinit {
     $s=$args[0]
-    $s.x = 30; $s.y=100
+    $s.x = 30; $s.y=$script:maxheight-6
     $s.dx = 0
   } -willdraw {
     $s=$args[0]
@@ -107,7 +115,7 @@ function create-basesprite {
 #
 function main {
   # create a plafield to put it all on
-  $pf = create-playfield -x 0 -y 2 -width 256 -height 128 -bg "black"
+  $pf = create-playfield -x 0 -y 0 -width $maxwidth -height $maxheight -bg "black"
 
   # load the alien images from the file
   $images = get-images "images.txt"
@@ -117,12 +125,12 @@ function main {
   $base = create-basesprite $images
 
 
-  while ($true) {
+  while (-not $aliens_controller.landed) {
     clear-playfield $pf
     draw-sprites $pf $aliens
     $aliens_controller.current = $aliens_controller.next
     draw-sprite $pf $base
-    draw-string $pf "$duhidx  $duh   " 0 0
+    draw-string $pf "Big Space Invaders!" 0 0
     flush-playfield $pf -sync 40
   }
 }
