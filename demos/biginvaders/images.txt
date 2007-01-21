@@ -2,6 +2,7 @@
 
 #! translate I to a solid char
 #translate I 9608
+#transparent 32
 #begin invc0 green black
     IIII
  IIIIIIIIII
@@ -62,7 +63,7 @@ IIIIIIII
  I II I
 I I  I I
 #end
-#begin base green black
+#begin base yellow red
      I
     III
  IIIIIIIII

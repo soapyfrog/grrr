@@ -76,6 +76,7 @@ function main {
   $sprites = $thrustsprite,$rocketsprite
 
   # game loop
+  $debugline=" "
   [int]$fc = 0;
   while ($true) {
     $fc++
@@ -86,7 +87,10 @@ function main {
     draw-tilemap $pf $backtm -offsetx $bx -offsety 0 -x 0 -y 25 -w $cw -h 12
     draw-tilemap $pf $fronttm -offsetx $fx -offsety 0 -x 0 -y 24 -w $cw -h 15
     draw-sprites $pf $sprites
-    flush-playfield $pf -sync 20
+    draw-string $pf $debugline 0 0 red
+    flush-playfield $pf -sync 40 -stats
+    $fps = get-playfieldfps $pf
+    $debugline = "$fps fps (target 25)"
   }
 }
 

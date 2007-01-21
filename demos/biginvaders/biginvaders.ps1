@@ -143,7 +143,7 @@ function main {
     flush-playfield $pf -sync 40 -stats
     # lets see what we actually get
     $fps = get-playfieldfps $pf
-    $debugline = "$fps fps"
+    $debugline = "$fps fps (target 25)"
   }
 }
 

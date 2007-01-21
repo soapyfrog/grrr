@@ -65,12 +65,16 @@ function main {
   $sprites += $spr
 
   # game loop
+  $debugline=" "
   [int]$fc = 0;
   while ($true) {
     $fc++
     clear-playfield $pf
+    draw-string $pf $debugline 0 0 red
     draw-sprites $pf $sprites
-    flush-playfield $pf -sync 40 # 25fps
+    flush-playfield $pf -sync 40 -stats
+    $fps = get-playfieldfps $pf
+    $debugline = "$fps fps (target 25)"
   }
 }
 

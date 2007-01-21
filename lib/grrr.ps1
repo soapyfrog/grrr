@@ -229,6 +229,8 @@ function get-images {
   $p = resolve-path $filename # will throw if doesn't exist
   $images = @{}
   $translations = @{}
+  $translationseq = @()
+  [int]$transparent = 0
   $lines = $null
   $id = $null
   $fg = $null
@@ -246,13 +248,18 @@ function get-images {
       elseif ($_ -match "^#end") {
         if ($id) {
           write-debug "closing image"
-          $images[$id] = create-image $lines -fg $fg -bg $bg
+          $images[$id] = create-image $lines -fg $fg -bg $bg -transparent $transparent
           $id=$null
         }
         else { write-warning "Unexpected #end token" }
       }
+      elseif ($_ -match "^#transparent\s+([^\s]+)") {
+        $transparent=[int]$matches[1]
+      }
       elseif ($_ -match "^#translate\s+([^\s]+)\s+([^\s]+)") {
-        $translations[[string][char]$matches[1]] = [string][char][int]$matches[2]
+        $k=[string][char]$matches[1]
+        $translations[$k] = [string][char][int]$matches[2]
+        $translationseq += $k
       }
       elseif ($_ -match "^#!") {
         # a comment
@@ -265,7 +272,7 @@ function get-images {
       if ($id) {
         write-debug "adding line $_"
         $l = $_
-        foreach ($t in $translations.keys) {
+        foreach ($t in $translationseq) {
           $l = $l.replace($t,$translations[$t])
         }
         $lines += $l
