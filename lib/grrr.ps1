@@ -118,6 +118,10 @@ function create-playfield {
 
     # time last flush occured
     "flushtime"   = (get-date)
+
+    # stats - array of frame times
+    "stats"       = [int[]]@(0)*20
+    "nextstat"    = [int]0
   }
 }
 
@@ -144,18 +148,40 @@ function clear-playfield {
 function flush-playfield {
   param( 
     $playfield = $(throw "you must supply a playfield"),
-    [int]$sync=0       # the number of milliseconds between flushes
+    [int]$sync=0,         # the number of milliseconds between flushes
+                          # fps would be 1000/sync
+    [switch]$stats        # if true, records fps stats
   )
   if ($sync) {
     $now = get-date
     $elapsed = $now - $playfield.flushtime
     $remain = $sync - ($elapsed.TotalMilliseconds)
     if ($remain -ge 0) { sleep -millis $remain }
-    $playfield.flushtime = get-date
   }
+  $lastflushtime = $playfield.flushtime
+  $thisflushtime = get-date
+  if ($stats) {
+    $s = $playfield.stats
+    $sl = $s.count
+    $ns = $playfield.nextstat
+    $s[$ns] = ($thisflushtime - $lastflushtime).TotalMilliseconds
+    # unfortunately, [ref]$playfield.nextstat doesn't work :(
+    $playfield.nextstat=(($ns+1) % $sl)
+  }
+  $playfield.flushtime = $thisflushtime
   $grrr_ui.SetBufferContents($playfield.coord,$playfield.buffer)
 }
 
+function get-playfieldfps() {
+  param( $playfield = $(throw "you must supply a playfield"))
+  [int]$sum=0
+  [int]$num=0
+  foreach ($n in $pf.stats) {
+    if ($n -ne 0) { $sum += $n; $num++ }
+  }
+  $avg = $sum/$num
+  return [int](1000/$avg)
+}
 
 
 #------------------------------------------------------------------------------
@@ -689,4 +715,56 @@ function play-sound {
 }
 
 
+
+#------------------------------------------------------------------------------
+# Create a key map
+#
+# A key map represents codeblocks associated with key up and down
+# events.
+#
+function create-keymap {
+  return @{
+    keyup = @{}
+    keydown = @{}
+  }
+}
+
+#------------------------------------------------------------------------------
+# Process all pending key events using the supplied mapping
+#
+# All other events are ignored
+#
+function process-keyevents {
+  param($keymap=$(throw "you must supply a keymap"))
+
+  while ($grrr_ui.KeyAvailable) {
+    $rk = $grrr_ui.ReadKey('NoEcho,IncludeKeyDown,IncludeKeyUp')
+    $k = $rk.VirtualKeyCode
+    if ($rk.KeyDown) {
+      $block = $keymap.keydown[$k]
+      if ($block) { & $block }
+    }
+    else {
+      $block = $keymap.keyup[$k]
+      if ($block) { & $block }
+    }
+  }
+}
+
+
+#------------------------------------------------------------------------------
+# Register a code block with a key event
+#
+# TODO: better documentation
+#
+function register-keyevent {
+  param(
+    $keymap = $(throw "you must supply a keymap"),
+    [int]$keycode = $(throw "you must supply a keycode"),
+    [scriptblock]$down,
+    [scriptblock]$up
+  )
+  if ($up) { $keymap.keyup[$keycode] = $up }
+  if ($down) { $keymap.keydown[$keycode] = $down }
+}
 

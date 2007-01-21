@@ -80,7 +80,7 @@ function create-invadersprites($images) {
   $xo = 2
   "inva","invb","invc" | foreach {
     $i = $_
-    for ($x=0; $x -lt 5; $x++) {
+    for ($x=0; $x -lt 3; $x++) {
       $ip = $images["$i"+"0"],$images["$i"+"1"]
       $s = create-sprite -images $ip -x ($xo+10+18*$x) -y $y -handlers $handlers
       $sprites += $s
@@ -124,14 +124,26 @@ function main {
   # create a base ship
   $base = create-basesprite $images
 
+  # create a keyevent map
+  $keymap = create-keymap
+  register-keyevent $keymap 37 -down {$base.dx=-1} -up {$base.dx=0}
+  register-keyevent $keymap 39 -down {$base.dx=1} -up {$base.dx=0}
 
+  $debugline = "big invaders!"
+
+  # game loop
   while (-not $aliens_controller.landed) {
+    process-keyevents $keymap
     clear-playfield $pf
     draw-sprites $pf $aliens
     $aliens_controller.current = $aliens_controller.next
     draw-sprite $pf $base
-    draw-string $pf "Big Space Invaders!" 0 0
-    flush-playfield $pf -sync 40
+    draw-string $pf $debugline 0 0 -fg "red"
+    # 40 = 25fps
+    flush-playfield $pf -sync 40 -stats
+    # lets see what we actually get
+    $fps = get-playfieldfps $pf
+    $debugline = "$fps fps"
   }
 }
 
