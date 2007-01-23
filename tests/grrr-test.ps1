@@ -228,6 +228,31 @@ function test-draw-string {
   flush-playfield $pf
 }
 
+#----------------------------------------------------------------
+# test scan-image
+function test-scan-image {
+  $tpf = create-playfield -x 0 -y 0 -width 10 -height 10 -bg "darkblue"
+  $timg = create-image "ABC","DEF" "yellow" "red"
+  assert-equal "timg width" 3 $timg.width
+  assert-equal "timg height" 2 $timg.height
+  clear-playfield $tpf
+  draw-image $tpf $timg -x 2 -y 2
+  # now scan an image with space around that one
+  $img = scan-image $tpf -x 1 -y 1 -width 5 -height 4
+  assert-equal "img width" 5 $img.width
+  assert-equal "img height" 4 $img.height
+  # now create a new playfield to draw it
+  $pf = create-playfield -x 10 -y 24 -width 10 -height 10 -bg "gray"
+  clear-playfield $pf
+  draw-image $pf $img -x 1 -y 1
+  flush-playfield $pf
+  # finally check that a fullsize scan is possible
+  $fimg = scan-image $tpf
+  assert-equal "fimg width" 10 $fimg.width
+  assert-equal "fimg height" 10 $fimg.height
+
+}
+
 
 #----------------------------------------------------------------
 # test sound preparation and playing
@@ -240,6 +265,7 @@ function test-playing-sounds {
 #----------------------------------------------------------------
 # hand over to unit test framework
 run-tests | format-table -autosize -wrap
+
 
 # alternate form to htmll
 # run-tests | convertto-html -body @("Test results at $(get-date)") > results.html ; ii results.html

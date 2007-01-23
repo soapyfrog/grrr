@@ -221,6 +221,51 @@ function create-image {
   }
 }
 
+#------------------------------------------------------------------------------
+# Scan an image from the the specified playfield.
+#
+# You can use this to draw a composite image to a non-flushed playfield,
+# or just grab a screen shot of something live.
+#
+function scan-image  {
+  param(
+    $playfield = $(throw "you must supply a playfield"),
+    [int]$x = 0,                  # top left to scan from
+    [int]$y = 0,      
+    [int]$width = 65535,          # default is very wide
+    [int]$height = 65535,         # default is very tall
+    [char]$transparent = [char]0  # character to indicate transparency (0=none)
+  )
+  # cache playfield numbers
+  [int]$px=0
+  [int]$py=0
+  [int]$px2 = $playfield.width
+  [int]$py2 = $playfield.height
+  # calc right/bottom for require size
+  [int]$x2=$x+$width
+  [int]$y2=$y+$height
+  # compute output intersecting rectangle
+  [int]$ox = [Math]::Max($x,$px)
+  [int]$oy = [Math]::Max($y,$py)
+  [int]$ox2 = [Math]::Min($x2,$px2)
+  [int]$oy2 = [Math]::Min($y2,$py2)
+  [int]$owidth=$ox2-$ox
+  [int]$oheight=$oy2-$oy
+  # create array from blank lines - easiest overload of NBCA
+  $lines=@(" "*$owidth)*$oheight
+  $image = create-image $lines "white" "black" $transparent
+  $obca = $image.bca
+  # do copying
+  $pbca = $playfield.buffer
+  for ([int]$iy=0; $iy -lt $oheight; $iy++) {
+    for ([int]$ix=0; $ix -lt $owidth; $ix++) {
+      $obca[$iy,$ix] = $pbca[($y+$iy),($x+$ix)]
+    }
+  }
+  return $image
+}
+
+
 
 #------------------------------------------------------------------------------
 # Load images from a file
