@@ -250,7 +250,6 @@ function test-scan-image {
   $fimg = scan-image $tpf
   assert-equal "fimg width" 10 $fimg.width
   assert-equal "fimg height" 10 $fimg.height
-
 }
 
 

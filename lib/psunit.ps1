@@ -20,8 +20,10 @@ function run-tests {
   ls function:test* | foreach {
     $script:r="passed"
     $script:n=$_.name
+    $script:er=$null
     trap [object] {
-      write-warning "`"$script:n`" failed"
+      $script:er = $_
+      write-warning "`"$script:n`" failed : $_"
       $script:r="failed"
       continue
     }
@@ -32,7 +34,7 @@ function run-tests {
     $res = add-member -i (new-object object) -type "noteproperty" -name "name" -value $_.name -force -passthru
     $res = add-member -i $res -type "noteproperty" -name "duration" -value $ms -force -passthru
     $res = add-member -i $res -type "noteproperty" -name "result" -value "$script:r" -force -passthru
-    $err = $( if ($r -ne "passed") { $error[$error.count-1] } else { "" } )
+    $err = $( if ($r -ne "passed") { $script:er } else { "" } )
     $res = add-member -i $res -type "noteproperty" -name "error" -value $err -force -passthru
     $results += $res
   }
