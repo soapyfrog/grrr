@@ -641,7 +641,7 @@ function create-spritehandlers-for-motionpath {
     if ($delta) {
       [int]$n=1
       if ($_.length -ge $off) { $n = [int]$_.substring($off) }
-      1..$n | foreach { $deltas += 1; $deltas[-1] = $delta }
+      1..$n | foreach { $deltas += ,$delta }
     }
   }
   # didinit handler is used to place state in the sprite instance (curdelta)

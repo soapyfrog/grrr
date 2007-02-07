@@ -121,7 +121,7 @@ function test-draw-sprite {
   $pf = create-playfield -x 70 -y 36 -width 20 -height 20 -bg "black"
 
   $img = create-image "ABC","DEF" -bg "red" -fg "yellow"
-  $h = create-spritehandlers -willdraw { $s=$args[0]; $s.x++; $s.y++ }
+  $h = create-spritehandlers -willdraw { param($s) $s.x++; $s.y++ }
   $spr = create-sprite @($img) -x 1 -y 1 -handlers $h
 
   1..8 | foreach {

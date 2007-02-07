@@ -42,8 +42,8 @@ function main {
   # an array of sprites
   $sprites = @()
   # motion behaviour handlers - a somewhat manual approach - see below for alternative
-  $handlers = create-spritehandlers -didinit {  $args[0].dx = 1 } -willdraw {
-            $s = $args[0]
+  $handlers = create-spritehandlers -didinit { param($s) $s.dx = 1 } -willdraw {
+            param($s)
             if ($s.x -gt 72) { $s.y++; $s.dx=-1 }
             elseif ($s.x -lt 4) { $s.y--; $s.dx=1 }
             $s.x += $s.dx

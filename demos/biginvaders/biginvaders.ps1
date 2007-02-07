@@ -46,10 +46,10 @@ function create-invadersprites($images) {
   } 
   # handlers for motion
   $init = {
-    $args[0].controller = $ctl
+    param($s) $s.controller = $ctl
   }
   $move = { 
-    $s=$args[0]
+    param($s)
     $dx = 1
     $dy = 2
     $d = $s.controller
@@ -98,7 +98,7 @@ function create-invadersprites($images) {
 function create-basesprite {
   param($images)
   $handlers = create-spritehandlers -didinit {
-    $s=$args[0]
+    param($s)
     $s.x = 30; $s.y=$script:maxheight-6
     $s.dx = 0
   } -willdraw {
