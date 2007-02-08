@@ -72,9 +72,9 @@ function main {
     clear-playfield $pf
     draw-string $pf $debugline 0 0 red
     draw-sprites $pf $sprites
-    flush-playfield $pf -sync 40 -stats
+    flush-playfield $pf -sync 20 -stats
     $fps = get-playfieldfps $pf
-    $debugline = "$fps fps (target 25)"
+    $debugline = "$fps fps (target 50)"
   }
 }
 

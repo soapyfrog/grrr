@@ -346,6 +346,11 @@ function draw-image {
       [int]$x,
       [int]$y
       )
+  if ($grrrlib_present) {
+    $count = [grrrlib.Util]::DrawImage($image.bca,$playfield.buffer,$x,$y,$image.transparent)
+    return
+  }
+
   # fast exclude images entirely outside of the buffer
   [int]$bw = $playfield.width
   [int]$iw = $image.width

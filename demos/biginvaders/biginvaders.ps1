@@ -140,10 +140,10 @@ function main {
     draw-sprite $pf $base
     draw-string $pf $debugline 0 0 -fg "red"
     # 40 = 25fps
-    flush-playfield $pf -sync 40 -stats
+    flush-playfield $pf -sync 20 -stats
     # lets see what we actually get
     $fps = get-playfieldfps $pf
-    $debugline = "$fps fps (target 25)"
+    $debugline = "$fps fps (target 50)"
   }
 }
 
