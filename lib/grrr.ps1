@@ -27,8 +27,9 @@
 #------------------------------------------------------------------------------
 # Globals
 $script:grrr_ui = $host.ui.rawui  # saves dereferencing all the time
-$script:grrr_version=0,2,"alpha" # major,minor,state
+$script:grrr_version=1,1,"beta" # major,minor,state
 $script:grrr_versionstr=[string]::join(".",$script:grrr_version)
+$script:grrr_snapin = $(get-pssnapin -ea "silentlycontinue" Soapyfrog.Grrr)
 
 #------------------------------------------------------------------------------
 # Create a Coord
@@ -346,8 +347,9 @@ function draw-image {
       [int]$x,
       [int]$y
       )
-  if ($grrrlib_present) {
-    $count = [grrrlib.Util]::DrawImage($image.bca,$playfield.buffer,$x,$y,$image.transparent)
+
+  if ($script:grrr_snapin) {
+    $count = [Soapyfrog.Grrr.Util]::DrawImage($image.bca,$playfield.buffer,$x,$y,$image.transparent)
     return
   }
 

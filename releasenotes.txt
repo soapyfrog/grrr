@@ -1,4 +1,4 @@
-Version 0,2,alpha | ??? 2007
+Version 1,1,beta | 9 Feb 2007
 
 New Features:
 
@@ -36,6 +36,9 @@ New Features:
   and draw-image.
 
 * Can load images from a specially formatted text file
+
+* Started supporting the Soapyfrog.Grrr snap-in.
+
 
 Bugs fixed:
 

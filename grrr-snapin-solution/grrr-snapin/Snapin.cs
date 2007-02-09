@@ -16,7 +16,7 @@ namespace Soapyfrog.Grrr
         {
             get
             {
-                return "GrrrSnapin01";
+                return "Soapyfrog.Grrr";
             }
         }
 
