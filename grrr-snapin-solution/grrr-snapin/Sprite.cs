@@ -6,35 +6,26 @@ using System.Management.Automation.Host;
 
 namespace Soapyfrog.Grrr
 {
-    public class Image
+    public class Sprite
     {
         private int width, height;
         public int Width { get { return width; } set { width = value; } }
         public int Height { get { return height; } set { height = value; } }
     }
 
-    [Cmdlet("Create", "Image")]
-    public class CreateImageCmdlet : PSCmdlet
+    [Cmdlet("Create", "Sprite")]
+    public class CreateSpriteCmdlet : PSCmdlet
     {
 
     }
 
 
-    [Cmdlet("Draw", "Image")]
-    public class DrawImageCmdlet : PSCmdlet
+    [Cmdlet("Draw", "Sprite")]
+    public class DrawSpriteCmdlet : PSCmdlet
     {
-
     }
 
 
-    /// <summary>
-    /// Get Image(s) from a data stream
-    /// </summary>
-    [Cmdlet("Get", "Image")]
-    public class GetImageCmdlet : PSCmdlet
-    {
+    // TODO can add handlers, hit testing and so on in here too.
 
-    }
-
-    // TODO: ScanImage
 }

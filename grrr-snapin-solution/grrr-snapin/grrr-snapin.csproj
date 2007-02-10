@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawing.cs" />
     <Compile Include="GetGrrrinfoCmdlet.cs">
     </Compile>
     <Compile Include="Image.cs" />
@@ -50,7 +51,12 @@
     <Compile Include="Snapin.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Sprite.cs" />
+    <Compile Include="Tilemap.cs" />
     <Compile Include="Util.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="grrr.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
