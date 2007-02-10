@@ -42,7 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DrawImageCmdlet.cs" />
+    <Compile Include="GetGrrrinfoCmdlet.cs">
+    </Compile>
+    <Compile Include="Image.cs" />
+    <Compile Include="Playfield.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Snapin.cs">
       <SubType>Component</SubType>
