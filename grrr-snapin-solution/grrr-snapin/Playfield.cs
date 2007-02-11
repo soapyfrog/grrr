@@ -37,7 +37,7 @@ namespace Soapyfrog.Grrr
         public ConsoleColor Background { get { return background; } }
 
 
-        public Playfield(PSHostRawUserInterface ui, int w, int h, int x, int y, ConsoleColor c)
+        protected internal Playfield(PSHostRawUserInterface ui, int w, int h, int x, int y, ConsoleColor c)
         {
             this.ui = ui;
             coord = new Coordinates(x, y);
@@ -47,14 +47,129 @@ namespace Soapyfrog.Grrr
             buffer = (BufferCell[,])erasebuffer.Clone();
         }
 
+        /// <summary>
+        /// Flush the contents of the playfield buffer to the screen.
+        /// </summary>
         public void Flush()
         {
             ui.SetBufferContents(coord, buffer);
         }
 
+        /// <summary>
+        /// Clear the playfield buffer to the original empty state 
+        /// </summary>
         public void Clear()
         {
             Array.Copy(erasebuffer, buffer, buffer.Length);
+        }
+
+        /// <summary>
+        /// Draw an Image into the playfield buffer at the specified coords, clipping
+        /// to the playfield boundary.
+        /// </summary>
+        /// <param name="img">The Image to draw</param>
+        /// <param name="x">x coord (zero-based from left)</param>
+        /// <param name="y">y coord (zero-based from top)</param>
+        /// <returns>The number of cells actually drawn (some may be transparent or clipped)</returns>
+        public int DrawImage(Image img, int x, int y)
+        {
+            int count = 0; // number of cells drawn
+
+            // fast exclude images entirely outside of the buffer
+            int bw = Width; // playfield width
+            int iw = img.Width; // image width
+            if (x >= bw || (x + iw < 0)) return count; // fast quit
+
+            // heights
+            int bh = Height;
+            int ih = img.Height;
+
+            if (y >= bh || (y + ih < 0)) return count;  // fast quit
+
+            // now handle partial clipping
+            int startrow = 0;
+            int numrows = ih;
+            // clip top
+            if (y < 0) { startrow = -y; numrows += y; }
+            // clip bottom
+            int overlap = bh - (y + ih);
+            if (overlap < 0) numrows += overlap;
+            // clip left
+            int startcol = 0;
+            int numcols = iw;
+            int ilen = iw;
+            if (x < 0) { startcol = -x; numcols += x; }
+            // clip right
+            overlap = bw - (x + iw);
+            if (overlap < 0) numcols += overlap;
+
+            // do the copying
+            BufferCell[,] icells = img.Cells;
+            char t = img.Transparent;
+            if (t != 0)
+            {
+                for (int r = 0; r < numrows; r++)
+                {
+                    for (int c = 0; c < numcols; c++)
+                    {
+                        BufferCell cell = icells[(startrow + r), (startcol + c)];
+                        if (cell.Character != t)
+                        {
+                            buffer[(y + startrow + r), (x + startcol + c)] = cell;
+                            count++;
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                int boffset = (y + startrow) * bw + x + startcol;
+                int ioffset = startcol;
+                
+                for (int i = 0; i < numrows; i++)
+                {
+                    Array.Copy(icells, ioffset, buffer, boffset, numcols); //fast copy whole row
+                    ioffset += iw;
+                    boffset += bw;
+                    count += numcols;
+                }
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// Scan an image from the playfield buffer.
+        /// The resulting image maybe smaller than requested
+        /// if it is clipped at playfield boundary.
+        /// </summary>
+        /// <param name="x">x position in playfield</param>
+        /// <param name="y">y position in playfield</param>
+        /// <param name="w">width of image</param>
+        /// <param name="h">height of image</param>
+        /// <param name="t">transparent character</param>
+        /// <returns>an Image</returns>
+        public Image ScanImage(int x, int y, int w, int h, char t)
+        {
+            // determine intersecting rectangle
+            // px,py->px2,py2 is playfield
+            // x,y->x2,y2 is image
+            int px = 0, py = 0;
+            int px2 = Width, py2 = Height;
+            int x2 = x + w, y2 = y + h;
+            // ox,oy->ox2,oy2 is output intersection
+            int ox = Math.Max(x, px);
+            int oy = Math.Max(y, py);
+            int ox2 = Math.Min(x2, px2);
+            int oy2 = Math.Min(y2, py2);
+            int owidth = ox2 - ox;
+            int oheight = oy2 - oy;
+            BufferCell[,] cells = ui.NewBufferCellArray(owidth, oheight, new BufferCell());
+            // do copying
+            for (int iy = 0; iy < oheight; iy++)
+                for (int ix = 0; ix < owidth; ix++)
+                    cells[iy, ix] = buffer[y + iy, x+ix];
+            return new Image(cells, t);
         }
 
     }

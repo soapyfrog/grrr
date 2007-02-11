@@ -43,8 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Drawing.cs" />
-    <Compile Include="GetGrrrinfoCmdlet.cs">
-    </Compile>
     <Compile Include="Image.cs" />
     <Compile Include="Playfield.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
