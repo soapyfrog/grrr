@@ -14,6 +14,9 @@ namespace Soapyfrog.Grrr
         private int x, y, z;
         bool alive = true;
         int animrate = 1;
+        private SpriteHandler sh;
+
+
 
         [Parameter(Position=0,Mandatory=true,ValueFromPipeline=true)]
         public Image[] Images { get { return images; } set { images = value; } }
@@ -33,9 +36,17 @@ namespace Soapyfrog.Grrr
         [Parameter(Position = 5)]
         public int AnimRate { get { return animrate; } set { animrate = value; } }
 
+        [Parameter(Position=6)]
+        [ValidateNotNull]
+        public SpriteHandler SpriteHandler
+        {
+            get { return sh; }
+            set { sh = value; }
+        }
+
         protected override void EndProcessing()
         {
-            Sprite s = new Sprite(images, x, y, z, alive, animrate);
+            Sprite s = new Sprite(images, x, y, z, alive, animrate,sh);
             WriteObject(s, false);
         }
     }

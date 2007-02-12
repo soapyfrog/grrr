@@ -18,8 +18,9 @@ namespace Soapyfrog.Grrr
         private Image[] images;
         private int width, height;
         private int x, y, z;
-        bool alive = true;
-        int animrate = 1;
+        private bool alive = true;
+        private int animrate = 1;
+        private SpriteHandler handler;
 
         public int Width { get { return width; } set { width = value; } }
         public int Height { get { return height; } set { height = value; } }
@@ -30,7 +31,36 @@ namespace Soapyfrog.Grrr
         public int AnimRate { get { return animrate; } set { animrate = value; } }
         public Image[] Images { get { return images; } }
 
-        protected internal Sprite(Image[]images,int x,int y,int z,bool alive,int animrate)
+        private int numframes;
+        private int fseq = 0; // frame sequence
+        private int animcounter = 0; // when reaches animrate, fseq++
+
+
+
+        public SpriteHandler SpriteHandler
+        {
+            get { return handler; }
+            set { handler = value; }
+        }
+
+        /// <summary>
+        /// Return the next image in the anim sequence for drawing.
+        /// </summary>
+        public Image NextImage
+        {
+            get
+            {
+                int f = fseq;
+                if (++animcounter == animrate)
+                {
+                    animcounter = 0;
+                    fseq = (fseq + 1) % numframes;
+                }
+                return images[f];
+            }
+        }
+
+        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate,SpriteHandler sh)
         {
             this.images = images;
             this.x = x;
@@ -38,6 +68,8 @@ namespace Soapyfrog.Grrr
             this.z = z;
             this.alive = alive;
             this.animrate = animrate;
+            this.handler = sh;
+            numframes = images.Length;
         }
     }
 }

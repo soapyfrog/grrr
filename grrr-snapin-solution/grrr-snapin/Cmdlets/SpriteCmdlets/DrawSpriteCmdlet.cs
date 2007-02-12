@@ -6,8 +6,9 @@ using System.Management.Automation.Host;
 
 namespace Soapyfrog.Grrr
 {
-
-
+    /// <summary>
+    /// Draw all passed sprites, calling their handlers if present.
+    /// </summary>
     [Cmdlet("Draw", "Sprite")]
     public class DrawSpriteCmdlet : PSCmdlet
     {
@@ -28,7 +29,10 @@ namespace Soapyfrog.Grrr
             {
                 foreach (Sprite s in sprites)
                 {
-                    pf.DrawImage(s.Images[0], s.X, s.Y); // TODO: make this better!
+                    SpriteHandler sh = s.SpriteHandler;
+                    if (sh != null && sh.WillDraw != null) sh.WillDraw.Invoke(s);
+                    pf.DrawImage(s.NextImage, s.X, s.Y);
+                    if (sh != null && sh.DidDraw != null) sh.DidDraw.Invoke(s);
                 }
             }
         }
