@@ -60,7 +60,7 @@ namespace Soapyfrog.Grrr
             }
         }
 
-        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate,SpriteHandler sh)
+        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, SpriteHandler sh)
         {
             this.images = images;
             this.x = x;
@@ -70,6 +70,28 @@ namespace Soapyfrog.Grrr
             this.animrate = animrate;
             this.handler = sh;
             numframes = images.Length;
+            // FIXME: the following are a bit of hack - what if images are diff sizes?
+            width = images[0].Width;
+            height = images[0].Height;
+        }
+
+        /// <summary>
+        /// Determines if this sprite's rectangle intersects with
+        /// the other one.
+        /// 
+        /// Both sprites need to be alive unless evenIfDead is true
+        /// </summary>
+        /// <param name="other">The other sprite to check</param>
+        /// <param name="evenIfDead">Check even if not alive</param>
+        /// <returns>true if overlapping, else false</returns>
+        public bool Overlaps(Sprite other,bool evenIfDead)
+        {
+            int right = x + width;
+            int otherRight = other.x + other.width;
+            int bottom = y + height;
+            int otherBottom = other.y + other.height;
+            return !(other.x >= right || otherRight < x
+                || other.y >= bottom || otherBottom < y);
         }
     }
 }
