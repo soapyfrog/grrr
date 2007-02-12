@@ -26,9 +26,11 @@ namespace Soapyfrog.Grrr
         public string[] Lines { set { lines = value; } get { return lines; } }
 
         [Parameter(Position = 1)]
+        [Alias("fg")]
         public ConsoleColor Foreground { set { f = value; } }
 
         [Parameter(Position = 2)]
+        [Alias("bg")]
         public ConsoleColor Background { set { b = value; } }
 
         [Parameter(Position = 3)]

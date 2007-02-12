@@ -26,6 +26,7 @@ namespace Soapyfrog.Grrr
         [ValidateRange(0, 1000)]
         public int Y { set { y = value; } }
         [Parameter(Position = 4)]
+        [Alias("bg")]
         public ConsoleColor Background { set { c = value; } }
 
         /// <summary>
