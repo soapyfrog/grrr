@@ -37,10 +37,7 @@ namespace Soapyfrog.Grrr
 
         protected override void ProcessRecord()
         {
-            if (lines != null)
-            {
-                allLines.AddRange(lines);
-            }
+            if (lines != null) allLines.AddRange(lines);
         }
 
         protected override void EndProcessing()
