@@ -42,7 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cmdlets\DrawingCmdlets\DrawLineCmdlet.cs" />
+    <Compile Include="Cmdlets\DrawingCmdlets\DrawLineCmdlet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cmdlets\DrawingCmdlets\DrawStringCmdlet.cs" />
     <Compile Include="Cmdlets\ImageCmdlets\CreateImageCmdlet.cs" />
     <Compile Include="Cmdlets\ImageCmdlets\DrawImageCmdlet.cs" />
     <Compile Include="Cmdlets\ImageCmdlets\GetImageCmdlet.cs" />

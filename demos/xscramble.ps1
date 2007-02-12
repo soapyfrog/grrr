@@ -91,7 +91,7 @@ echo $map.GetType()
     draw-tilemap $pf $backtm -offsetx $bx -offsety 0 -x 0 -y 25 -w $cw -h 12
     draw-tilemap $pf $fronttm -offsetx $fx -offsety 0 -x 0 -y 24 -w $cw -h 15
     draw-sprite $pf $sprites
-    draw-image $pf (create-image $debugline -foreground red) 0 0
+    draw-string $pf $debugline 0 0 "red"
     flush-playfield $pf -sync 20
     $fps = $pf.FPS
     $debugline = "$fps fps (target 50)"

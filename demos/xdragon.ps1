@@ -86,10 +86,10 @@ function main {
   while ($true) {
     clear-playfield $pf
     draw-sprite $pf $sprites
-    draw-image $pf (create-image $debugline) 0 0
-    flush-playfield $pf -sync 1 
+    draw-string $pf $debugline 0 0 "red"
+    flush-playfield $pf -sync 20 
     $fps = $pf.FPS
-    $debugline = "$fps fps (target 30)"
+    $debugline = "$fps fps (target 50)"
   }
 }
 
