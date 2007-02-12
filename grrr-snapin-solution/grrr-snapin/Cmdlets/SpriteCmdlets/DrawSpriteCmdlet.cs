@@ -29,7 +29,7 @@ namespace Soapyfrog.Grrr
             {
                 foreach (Sprite s in sprites)
                 {
-                    SpriteHandler sh = s.SpriteHandler;
+                    SpriteHandler sh = s.Handler;
                     if (sh != null && sh.WillDraw != null) sh.WillDraw.Invoke(s);
                     pf.DrawImage(s.NextImage, s.X, s.Y);
                     if (sh != null && sh.DidDraw != null) sh.DidDraw.Invoke(s);

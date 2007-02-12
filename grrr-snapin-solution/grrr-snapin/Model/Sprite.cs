@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
@@ -21,6 +21,18 @@ namespace Soapyfrog.Grrr
         private bool alive = true;
         private int animrate = 1;
         private SpriteHandler handler;
+        private Hashtable state=new Hashtable();
+
+        /// <summary>
+        /// User settable state properties. Saves mucking about with
+        /// adding note-properties.
+        /// </summary>
+        public Hashtable State
+        {
+            get { return state; }
+            set { state = value; }
+        }
+
 
         public int Width { get { return width; } set { width = value; } }
         public int Height { get { return height; } set { height = value; } }
@@ -37,7 +49,7 @@ namespace Soapyfrog.Grrr
 
 
 
-        public SpriteHandler SpriteHandler
+        public SpriteHandler Handler
         {
             get { return handler; }
             set { handler = value; }

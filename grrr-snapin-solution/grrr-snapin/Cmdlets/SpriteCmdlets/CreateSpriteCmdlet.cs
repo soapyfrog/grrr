@@ -38,7 +38,7 @@ namespace Soapyfrog.Grrr
 
         [Parameter(Position=6)]
         [ValidateNotNull]
-        public SpriteHandler SpriteHandler
+        public SpriteHandler Handler
         {
             get { return sh; }
             set { sh = value; }
@@ -47,6 +47,8 @@ namespace Soapyfrog.Grrr
         protected override void EndProcessing()
         {
             Sprite s = new Sprite(images, x, y, z, alive, animrate,sh);
+            SpriteHandler h = s.Handler;
+            if (h != null && h.DidInit != null) sh.DidInit.Invoke(s);
             WriteObject(s, false);
         }
     }

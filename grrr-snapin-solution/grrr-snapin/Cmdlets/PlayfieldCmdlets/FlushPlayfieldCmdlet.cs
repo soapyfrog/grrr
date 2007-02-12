@@ -16,9 +16,21 @@ namespace Soapyfrog.Grrr
         [ValidateNotNullOrEmpty]
         public Playfield Playfield { set { pf = value; } }
 
+
+        private int sync;
+
+        [Parameter(Position=1)]
+        [ValidateRange(0,3600)]
+        public int Sync
+        {
+            get { return sync; }
+            set { sync = value; }
+        }
+
+
         protected override void EndProcessing()
         {
-            pf.Flush();
+            pf.Flush(sync);
             base.EndProcessing();
         }
 

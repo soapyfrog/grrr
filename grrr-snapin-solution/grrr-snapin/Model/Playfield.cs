@@ -37,6 +37,12 @@ namespace Soapyfrog.Grrr
         public ConsoleColor Background { get { return background; } }
 
 
+        // stuff for fps stats
+        private DateTime flushtime = DateTime.Now;
+        private double[] stats = new double[20];
+        private int nextstat = 0;
+        private int fps;
+
         protected internal Playfield(PSHostRawUserInterface ui, int w, int h, int x, int y, ConsoleColor c)
         {
             this.ui = ui;
@@ -50,10 +56,32 @@ namespace Soapyfrog.Grrr
         /// <summary>
         /// Flush the contents of the playfield buffer to the screen.
         /// </summary>
-        public void Flush()
+        /// <param name="sync">the number of millis between flushes</param>
+        public void Flush(int sync)
         {
+            if (sync > 0)
+            {
+                TimeSpan elapsed = DateTime.Now - flushtime;
+                int remain = sync - (int)elapsed.TotalMilliseconds;
+                if (remain > 0) System.Threading.Thread.Sleep(remain);
+            }
+            DateTime thisflushtime = DateTime.Now;
+            stats[nextstat++] = (thisflushtime - flushtime).TotalMilliseconds;
+            nextstat = (nextstat + 1) % stats.Length;
+            if (nextstat == 0)
+            {
+                int sum = 0, num = 0;
+                foreach (int n in stats)
+                {
+                    if (n > 0) { sum += n; num++; }
+                }
+                fps = (int)(1000.0 / (sum / num));
+            }
+            flushtime = thisflushtime;
             ui.SetBufferContents(coord, buffer);
         }
+
+        public int FPS { get {return fps;}}
 
         /// <summary>
         /// Clear the playfield buffer to the original empty state 
