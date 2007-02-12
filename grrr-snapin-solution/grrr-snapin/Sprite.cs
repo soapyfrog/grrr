@@ -31,23 +31,4 @@ namespace Soapyfrog.Grrr
             animrate = ar;
         }
     }
-
-    [Cmdlet("Create", "Sprite")]
-    public class CreateSpriteCmdlet : PSCmdlet
-    {
-        protected override void EndProcessing()
-        {
-         //   Sprite s = new Sprite(
-        }
-    }
-
-
-    [Cmdlet("Draw", "Sprite")]
-    public class DrawSpriteCmdlet : PSCmdlet
-    {
-    }
-
-
-    // TODO can add handlers, hit testing and so on in here too.
-
 }

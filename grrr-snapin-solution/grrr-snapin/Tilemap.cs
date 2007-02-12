@@ -13,28 +13,5 @@ namespace Soapyfrog.Grrr
         public int Height { get { return height; } set { height = value; } }
     }
 
-    [Cmdlet("Create", "Tilemap")]
-    public class CreateTilemapCmdlet : PSCmdlet
-    {
-
-    }
-
-
-    [Cmdlet("Draw", "Tilemap")]
-    public class DrawTilemapCmdlet : PSCmdlet
-    {
-    }
-
-
-    /// <summary>
-    /// Get a Tilemap from an input stream (eg a file).
-    /// </summary>
-    [Cmdlet("Get", "Tilemap")]
-    public class GetTilemapCmdlet : PSCmdlet
-    {
-
-    }
-
-    // TODO can add handlers, hit testing and so on in here too.
 
 }

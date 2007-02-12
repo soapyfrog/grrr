@@ -5,9 +5,9 @@ using System.ComponentModel;
 namespace Soapyfrog.Grrr
 {
     [RunInstaller(true)]
-    public class GrrrSnapin01 : PSSnapIn
+    public class GrrrSnapin : PSSnapIn
     {
-        public GrrrSnapin01()
+        public GrrrSnapin()
             : base()
         {
         }

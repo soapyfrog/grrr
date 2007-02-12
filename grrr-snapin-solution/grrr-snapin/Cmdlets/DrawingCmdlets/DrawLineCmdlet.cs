@@ -14,16 +14,4 @@ namespace Soapyfrog.Grrr
     }
 
 
-    [Cmdlet("Draw", "Point")]
-    public class DrawPointCmdlet : PSCmdlet
-    {
-    }
-
-    [Cmdlet("Draw", "Rectangle")]
-    public class DrawRectangleCmdlet : PSCmdlet
-    {
-    }
-
-    // TODO circles?
-
 }
