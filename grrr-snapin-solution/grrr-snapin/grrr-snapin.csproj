@@ -51,6 +51,9 @@
     <Compile Include="Cmdlets\PlayfieldCmdlets\ClearPlayfieldCmdlet.cs" />
     <Compile Include="Cmdlets\PlayfieldCmdlets\CreatePlayfieldCmdlet.cs" />
     <Compile Include="Cmdlets\PlayfieldCmdlets\FlushPlayfieldCmdlet.cs" />
+    <Compile Include="Cmdlets\SpriteCmdlets\CreateSpriteCmdlet.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Cmdlets\SpriteCmdlets\CreateSpriteHandlerCmdlet.cs" />
     <Compile Include="Cmdlets\SpriteCmdlets\DrawSpriteCmdlet.cs" />
     <Compile Include="Cmdlets\SpriteCmdlets\TestSpriteOverlap.cs" />

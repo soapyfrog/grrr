@@ -60,6 +60,15 @@ namespace Soapyfrog.Grrr
             }
         }
 
+        /// <summary>
+        /// Returns the current image (the one calculated by
+        /// the most recent call to NextImage)
+        /// </summary>
+        public Image CurrImage
+        {
+            get { return images[fseq]; }
+        }
+
         protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, SpriteHandler sh)
         {
             this.images = images;
