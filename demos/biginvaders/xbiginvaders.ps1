@@ -124,15 +124,15 @@ function main {
   $base = create-basesprite $images
 
   # create a keyevent map
-#  $keymap = create-keymap
-#  register-keyevent $keymap 37 -down {$base.dx=-1} -up {$base.dx=0}
-#  register-keyevent $keymap 39 -down {$base.dx=1} -up {$base.dx=0}
+  $keymap = create-keyeventmap
+  register-keyevent $keymap 37 -keydown {$base.state.dx=-1} -keyup {$base.state.dx=0}
+  register-keyevent $keymap 39 -keydown {$base.state.dx=1} -keyup {$base.state.dx=0}
 
   $debugline = "big invaders!"
 
   # game loop
   while (-not $aliens_controller.landed) {
-#    process-keyevents $keymap
+    process-keyevents $keymap
     clear-playfield $pf
     draw-sprite $pf $aliens
     $aliens_controller.current = $aliens_controller.next
