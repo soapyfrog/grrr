@@ -26,7 +26,7 @@ namespace Soapyfrog.Grrr
         {
             get
             {
-                return "GrrrSnapin01,Soapyfrog";
+                return "GrrrSnapin,Soapyfrog";
             }
         }
 
@@ -42,7 +42,7 @@ namespace Soapyfrog.Grrr
         {
             get
             {
-                return "GrrrSnapin01,This is a PowerShell snap-in that high performance graphics and animation in the console.";
+                return "GrrrSnapin,This is a PowerShell snap-in that high performance graphics and animation in the console.";
             }
         }
 
