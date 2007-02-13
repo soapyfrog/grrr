@@ -4,7 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 
-namespace Soapyfrog.Grrr.Cmdlets
+namespace Soapyfrog.Grrr
 {
     /// <summary>
     /// Create a key event map.

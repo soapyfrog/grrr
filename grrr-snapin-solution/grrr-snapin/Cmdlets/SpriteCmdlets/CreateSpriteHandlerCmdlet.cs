@@ -4,27 +4,44 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 
-namespace Soapyfrog.Grrr.Cmdlets.SpriteCmdlets
+namespace Soapyfrog.Grrr
 {
-    /// <summary>
-    /// Create a MotionPath controller taking a string like:
-    /// "e4 s4 w4 n4" which will move in a square
-    /// </summary>
-    [Cmdlet("Create", "MotionPath")]
-    public class CreateMotionPathCmdlet : PSCmdlet
-    {
-        private string mps;
 
-        public string MotionPathSpec
+    [Cmdlet("Create", "SpriteHandler")]
+    public class CreateSpriteHandlerCmdlet : PSCmdlet
+    {
+        private ScriptBlock di;
+        private ScriptBlock wd;
+        private ScriptBlock dd;
+
+        [Parameter(Position = 0)]
+        [ValidateNotNullOrEmpty]
+        public ScriptBlock DidInit
         {
-            get { return mps; }
-            set { mps = value; }
+            get { return di; }
+            set { di = value; }
+        }
+
+        [Parameter(Position = 1)]
+        [ValidateNotNullOrEmpty]
+        public ScriptBlock WillDraw
+        {
+            get { return wd; }
+            set { wd = value; }
+        }
+
+        [Parameter(Position = 2)]
+        [ValidateNotNullOrEmpty]
+        public ScriptBlock DidDraw
+        {
+            get { return dd; }
+            set { dd = value; }
         }
 
         protected override void EndProcessing()
         {
-            MotionPath mp = new MotionPath(mps);
-            WriteObject(mp, false);
+            SpriteHandler sh = new SpriteHandler(di, wd, dd);
+            WriteObject(sh, false);
         }
 
     }
