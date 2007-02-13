@@ -75,7 +75,7 @@ namespace Soapyfrog.Grrr
                 {
                     if (n > 0) { sum += n; num++; }
                 }
-                fps = (int)(1000.0 / (sum / num));
+                if (num > 0) fps = (int)(1000.0 / (sum / num));
             }
             flushtime = thisflushtime;
             ui.SetBufferContents(coord, buffer);
