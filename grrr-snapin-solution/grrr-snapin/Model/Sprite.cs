@@ -19,8 +19,8 @@ namespace Soapyfrog.Grrr
         private int width, height;
         private int x, y, z;
         private bool alive = true;
-        private int animrate = 1;
         private SpriteHandler handler;
+        private MotionPath motionpath;
         private Hashtable state=new Hashtable();
 
         /// <summary>
@@ -40,14 +40,19 @@ namespace Soapyfrog.Grrr
         public int Y { get { return y; } set { y = value; } }
         public int Z { get { return z; } set { z = value; } }
         public bool Alive { get { return alive; } set { alive = value; } }
-        public int AnimRate { get { return animrate; } set { animrate = value; } }
+        public int AnimRate { get { return animSpeed; } set { animSpeed = value; } }
         public Image[] Images { get { return images; } }
 
-        private int numframes;
-        private int fseq = 0; // frame sequence
-        private int animcounter = 0; // when reaches animrate, fseq++
 
+        // stuff for animation
+        private int animSpeed = 1;          // 1 means update every frame
+        private int numAnimFrames;          
+        private int nextAnimFrame = 0;      // frame sequence
+        private int animSpeedCounter = 0;   // when reaches animSpeed, nextAnimFrame++
 
+        // stuff for motion path
+        private int nextMotionPathDeltaIndex = 0;   // the index of the next delta to use
+        private int nextMPDeltaRepeatCount = 0;     // the repeat count for the specific delta
 
         public SpriteHandler Handler
         {
@@ -55,18 +60,61 @@ namespace Soapyfrog.Grrr
             set { handler = value; }
         }
 
+        public MotionPath MotionPath
+        {
+            get { return motionpath; }
+            set
+            {
+                motionpath = value;
+            }
+        }
+
+        /// <summary>
+        /// Step along the motion path. We do this here because state is per sprite, not
+        /// per MotionPath.
+        /// </summary>
+        internal void StepMotionPath()
+        {
+            if (motionpath != null)
+            {
+                Delta d = motionpath.Deltas[nextMotionPathDeltaIndex];
+                x += d.dx;
+                y += d.dy;
+                if (++nextMPDeltaRepeatCount == d.num)
+                {
+                    nextMPDeltaRepeatCount = 0;
+                    nextMotionPathDeltaIndex = (nextMotionPathDeltaIndex + 1) % motionpath.Deltas.Count;
+                }
+            }
+        }
+        /// <summary>
+        /// Call willdraw scriptblock if any
+        /// </summary>
+        internal void WillDraw()
+        {
+            if (handler != null && handler.WillDraw != null) handler.WillDraw.Invoke(this);
+        }
+        /// <summary>
+        /// Call diddraw scriptblock if any
+        /// </summary>
+        internal void DidDraw()
+        {
+            if (handler != null && handler.DidDraw != null) handler.DidDraw.Invoke(this);
+        }
+
         /// <summary>
         /// Return the next image in the anim sequence for drawing.
+        /// TODO: support non-automatic frame stepping
         /// </summary>
         public Image NextImage
         {
             get
             {
-                int f = fseq;
-                if (++animcounter == animrate)
+                int f = nextAnimFrame;
+                if (++animSpeedCounter == animSpeed)
                 {
-                    animcounter = 0;
-                    fseq = (fseq + 1) % numframes;
+                    animSpeedCounter = 0;
+                    nextAnimFrame = (nextAnimFrame + 1) % numAnimFrames;
                 }
                 return images[f];
             }
@@ -78,7 +126,7 @@ namespace Soapyfrog.Grrr
         /// </summary>
         public Image CurrImage
         {
-            get { return images[fseq]; }
+            get { return images[nextAnimFrame]; }
         }
 
         protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, SpriteHandler sh)
@@ -88,9 +136,9 @@ namespace Soapyfrog.Grrr
             this.y = y;
             this.z = z;
             this.alive = alive;
-            this.animrate = animrate;
+            this.animSpeed = animrate;
             this.handler = sh;
-            numframes = images.Length;
+            numAnimFrames = images.Length;
             // FIXME: the following are a bit of hack - what if images are diff sizes?
             width = images[0].Width;
             height = images[0].Height;

@@ -8,7 +8,9 @@ namespace Soapyfrog.Grrr
 {
     /// <summary>
     /// Create a MotionPath controller taking a string like:
-    /// "e4 s4 w4 n4" which will move in a square
+    /// "10e h3 5w2" which will move 10 times to the east,
+    /// then hold for 3 frames, then move west 2 steps, 5 times
+    /// (bring it back to the beginning twice as fast).
     /// </summary>
     [Cmdlet("Create", "MotionPath")]
     public class CreateMotionPathCmdlet : PSCmdlet
@@ -26,6 +28,7 @@ namespace Soapyfrog.Grrr
         protected override void EndProcessing()
         {
             MotionPath mp = new MotionPath(mps);
+            foreach (string s in mp.Errors) { WriteWarning(s); }
             WriteObject(mp, false);
         }
 

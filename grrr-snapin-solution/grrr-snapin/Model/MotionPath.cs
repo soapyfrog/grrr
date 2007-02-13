@@ -11,7 +11,8 @@ namespace Soapyfrog.Grrr
     /// </summary>
     internal class Delta
     {
-        readonly internal int num, dx, dy;
+        internal readonly int num, dx, dy;
+
         internal Delta(int num, int dx, int dy)
         {
             this.dx = dx; this.dy = dy; this.num = num;
@@ -27,8 +28,6 @@ namespace Soapyfrog.Grrr
 
         // deltas
         private readonly List<Delta> deltas = new List<Delta>();
-        private int nextDelta = 0;
-        private int nextIter = 0;
 
         private readonly List<string> errors = new List<string>();
 
@@ -61,18 +60,9 @@ namespace Soapyfrog.Grrr
 
         }
 
-        public void Step(Sprite s) {
-            Delta d = deltas[nextDelta];
-            s.X += d.dx;
-            s.Y += d.dy;
-            if (++nextIter == d.num)
-            {
-                nextIter = 0;
-                nextDelta = (nextDelta + 1) % deltas.Count;
-            }
-        }
 
-        public List<string> Errors { get { return errors; } }
+        internal List<string> Errors { get { return errors; } }
+        internal List<Delta> Deltas { get { return deltas; } }
 
     }
 }

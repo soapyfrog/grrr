@@ -61,15 +61,17 @@
     <Compile Include="Cmdlets\PlayfieldCmdlets\ClearPlayfieldCmdlet.cs" />
     <Compile Include="Cmdlets\PlayfieldCmdlets\CreatePlayfieldCmdlet.cs" />
     <Compile Include="Cmdlets\PlayfieldCmdlets\FlushPlayfieldCmdlet.cs" />
-    <Compile Include="Cmdlets\SpriteCmdlets\CreateMotionPath.cs" />
+    <Compile Include="Cmdlets\SpriteCmdlets\CreateMotionPathCmdlet.cs" />
     <Compile Include="Cmdlets\SpriteCmdlets\CreateSpriteCmdlet.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Cmdlets\SpriteCmdlets\CreateSpriteHandlerCmdlet.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Cmdlets\SpriteCmdlets\DrawSpriteCmdlet.cs" />
-    <Compile Include="Cmdlets\SpriteCmdlets\TestSpriteOverlap.cs" />
+    <Compile Include="Cmdlets\SpriteCmdlets\DrawSpriteCmdlet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cmdlets\SpriteCmdlets\TestSpriteOverlapCmdlet.cs" />
     <Compile Include="Cmdlets\TilemapCmdlets\CreateTilemapCmdlet.cs" />
     <Compile Include="Cmdlets\TilemapCmdlets\DrawTilemapCmdlet.cs" />
     <Compile Include="Cmdlets\TilemapCmdlets\GetTilemapCmdlet.cs" />
