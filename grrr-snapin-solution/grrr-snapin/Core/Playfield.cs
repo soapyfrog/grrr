@@ -4,7 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 
-namespace Soapyfrog.Grrr
+namespace Soapyfrog.Grrr.Core
 {
     /// <summary>
     /// A play field is rectangular viewport in the visible

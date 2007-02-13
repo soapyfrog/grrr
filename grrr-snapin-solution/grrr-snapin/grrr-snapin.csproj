@@ -75,19 +75,15 @@
     <Compile Include="Cmdlets\TilemapCmdlets\CreateTilemapCmdlet.cs" />
     <Compile Include="Cmdlets\TilemapCmdlets\DrawTilemapCmdlet.cs" />
     <Compile Include="Cmdlets\TilemapCmdlets\GetTilemapCmdlet.cs" />
+    <Compile Include="Core\Image.cs" />
+    <Compile Include="Core\KeyEventMap.cs" />
+    <Compile Include="Core\MotionPath.cs" />
+    <Compile Include="Core\Playfield.cs" />
+    <Compile Include="Core\Sprite.cs" />
+    <Compile Include="Core\SpriteHandler.cs" />
+    <Compile Include="Core\Tilemap.cs" />
     <Compile Include="Meta\Snapin.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Model\Image.cs" />
-    <Compile Include="Model\KeyEventMap.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Model\MotionPath.cs" />
-    <Compile Include="Model\Playfield.cs" />
-    <Compile Include="Model\Sprite.cs" />
-    <Compile Include="Model\SpriteHandler.cs" />
-    <Compile Include="Model\Tilemap.cs">
-      <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />

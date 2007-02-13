@@ -73,9 +73,9 @@ echo $map.GetType()
   $thrustimg2 = create-image @("=") -Foreground "red" -Background "black"
   $rocketimg = create-image " o  ","D#>-" -Foreground "white" -Background "black"
 
-#  $h = create-spritehandlers-for-motionpath "h3 n5 h3 s5"  # not stateful, so can share
-  $thrustsprite = create-sprite -images $thrustimg1,$thrustimg2 -x 4 -y 9 #-handlers $h
-  $rocketsprite = create-sprite -images @($rocketimg) -x 5 -y 8 #-handlers $h
+  $mp = create-motionpath "h3 n5 h3 s5" 
+  $thrustsprite = create-sprite -images $thrustimg1,$thrustimg2 -x 4 -y 9 -motionpath $mp
+  $rocketsprite = create-sprite -images @($rocketimg) -x 5 -y 8 -motionpath $mp
 
   $sprites = $thrustsprite,$rocketsprite
 

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
+using Soapyfrog.Grrr.Core;
 
-namespace Soapyfrog.Grrr
+namespace Soapyfrog.Grrr.DrawingCmdlets
 {
 
     [Cmdlet("Draw", "String")]

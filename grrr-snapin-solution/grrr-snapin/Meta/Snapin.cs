@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Management.Automation;
 using System.ComponentModel;
 
-namespace Soapyfrog.Grrr
+namespace Soapyfrog.Grrr.Meta
 {
     [RunInstaller(true)]
     public class GrrrSnapin : PSSnapIn

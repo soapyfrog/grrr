@@ -4,7 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 
-namespace Soapyfrog.Grrr
+namespace Soapyfrog.Grrr.Core
 {
     /// <summary>
     /// Definition of a Sprite, which is basically a list if Images (for

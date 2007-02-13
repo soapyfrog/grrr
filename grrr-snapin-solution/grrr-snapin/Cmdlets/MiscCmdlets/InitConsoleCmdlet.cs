@@ -4,7 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 
-namespace Soapyfrog.Grrr
+namespace Soapyfrog.Grrr.MiscCmdlets
 {
     /// <summary>
     /// Initialise the console, ensuring it is big enough

@@ -5,8 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Management.Automation;
 using System.Management.Automation.Host;
+using Soapyfrog.Grrr.Core;
 
-namespace Soapyfrog.Grrr
+namespace Soapyfrog.Grrr.ImageCmdlets
 {
 
 
