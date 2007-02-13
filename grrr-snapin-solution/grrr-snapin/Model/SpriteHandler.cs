@@ -9,32 +9,34 @@ namespace Soapyfrog.Grrr
     public class SpriteHandler
     {
 
-        private ScriptBlock didinit;
+        private ScriptBlock didInit;
 
         public ScriptBlock DidInit
         {
-            get { return didinit; }
+            get { return didInit; }
         }
 
-        private ScriptBlock willdraw;
+        private ScriptBlock willDraw;
         public ScriptBlock WillDraw
         {
-            get { return willdraw; }
+            get { return willDraw; }
         }
 
-        private ScriptBlock diddraw;
+        private ScriptBlock didDraw;
         public ScriptBlock DidDraw
         {
-            get { return diddraw; }
+            get { return didDraw; }
         }
 
 
-        protected internal SpriteHandler(ScriptBlock didinit, ScriptBlock willdraw, ScriptBlock diddraw)
+        protected internal SpriteHandler(ScriptBlock didInit,
+                                            ScriptBlock willDraw,
+                                            ScriptBlock didDraw)
         {
-            this.diddraw = diddraw;
-            this.willdraw = willdraw;
-            this.didinit = didinit;
+            this.didDraw = didDraw;
+            this.willDraw = willDraw;
+            this.didInit = didInit;
         }
-        
+
     }
 }

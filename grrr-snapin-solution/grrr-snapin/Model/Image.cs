@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 
-namespace Soapyfrog.Grrr
+namespace Soapyfrog.Grrr.Core
 {
     /// <summary>
     /// Class used to represent the image - created by the cmdlet

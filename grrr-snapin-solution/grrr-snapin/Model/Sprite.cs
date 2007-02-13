@@ -90,14 +90,14 @@ namespace Soapyfrog.Grrr
             }
         }
         /// <summary>
-        /// Call willdraw scriptblock if any
+        /// Call willDraw scriptblock if any
         /// </summary>
         internal void WillDraw()
         {
             if (handler != null && handler.WillDraw != null) handler.WillDraw.Invoke(this);
         }
         /// <summary>
-        /// Call diddraw scriptblock if any
+        /// Call didDraw scriptblock if any
         /// </summary>
         internal void DidDraw()
         {

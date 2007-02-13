@@ -11,6 +11,7 @@ namespace Soapyfrog.Grrr
     /// Determine if a sprite is overlapping any 
     /// other sprites. Returns a collection of sprites
     /// that do hit.
+    /// TODO: add option for cell-level overlap
     /// </summary>
     [Cmdlet("Test", "SpriteOverlap")]
     public class TestSpriteOverlapCmdlet : PSCmdlet
