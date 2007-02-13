@@ -51,7 +51,7 @@ namespace Soapyfrog.Grrr
         private int animSpeedCounter = 0;   // when reaches animSpeed, nextAnimFrame++
 
         // stuff for motion path
-        private int nextMotionPathDeltaIndex = 0;   // the index of the next delta to use
+        private int nextMPDeltaIndex = 0;           // the index of the next delta to use
         private int nextMPDeltaRepeatCount = 0;     // the repeat count for the specific delta
 
         public SpriteHandler Handler
@@ -66,6 +66,8 @@ namespace Soapyfrog.Grrr
             set
             {
                 motionpath = value;
+                nextMPDeltaIndex = 0;
+                nextMPDeltaRepeatCount = 0;
             }
         }
 
@@ -77,13 +79,13 @@ namespace Soapyfrog.Grrr
         {
             if (motionpath != null)
             {
-                Delta d = motionpath.Deltas[nextMotionPathDeltaIndex];
+                Delta d = motionpath.Deltas[nextMPDeltaIndex];
                 x += d.dx;
                 y += d.dy;
                 if (++nextMPDeltaRepeatCount == d.num)
                 {
                     nextMPDeltaRepeatCount = 0;
-                    nextMotionPathDeltaIndex = (nextMotionPathDeltaIndex + 1) % motionpath.Deltas.Count;
+                    nextMPDeltaIndex = (nextMPDeltaIndex + 1) % motionpath.Deltas.Count;
                 }
             }
         }
@@ -129,7 +131,7 @@ namespace Soapyfrog.Grrr
             get { return images[nextAnimFrame]; }
         }
 
-        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, SpriteHandler sh)
+        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, SpriteHandler sh,MotionPath mp)
         {
             this.images = images;
             this.x = x;
@@ -138,6 +140,7 @@ namespace Soapyfrog.Grrr
             this.alive = alive;
             this.animSpeed = animrate;
             this.handler = sh;
+            this.motionpath = mp;
             numAnimFrames = images.Length;
             // FIXME: the following are a bit of hack - what if images are diff sizes?
             width = images[0].Width;

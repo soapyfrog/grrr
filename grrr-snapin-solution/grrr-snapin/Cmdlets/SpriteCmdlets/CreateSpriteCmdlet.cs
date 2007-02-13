@@ -15,8 +15,7 @@ namespace Soapyfrog.Grrr
         bool alive = true;
         int animrate = 1;
         private SpriteHandler sh;
-
-
+        private MotionPath mp;
 
         [Parameter(Position=0,Mandatory=true,ValueFromPipeline=true)]
         public Image[] Images { get { return images; } set { images = value; } }
@@ -43,10 +42,17 @@ namespace Soapyfrog.Grrr
             get { return sh; }
             set { sh = value; }
         }
+        [Parameter(Position = 7)]
+        [ValidateNotNull]
+        public MotionPath MotionPath
+        {
+            get { return mp; }
+            set { mp = value; }
+        }
 
         protected override void EndProcessing()
         {
-            Sprite s = new Sprite(images, x, y, z, alive, animrate,sh);
+            Sprite s = new Sprite(images, x, y, z, alive, animrate,sh,mp);
             SpriteHandler h = s.Handler;
             if (h != null && h.DidInit != null) sh.DidInit.Invoke(s);
             WriteObject(s, false);
