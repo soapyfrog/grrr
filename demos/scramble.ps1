@@ -88,9 +88,9 @@ function main {
     draw-tilemap $pf $fronttm -offsetx $fx -offsety 0 -x 0 -y 24 -w $cw -h 15
     draw-sprites $pf $sprites
     draw-string $pf $debugline 0 0 red
-    flush-playfield $pf -sync 40 -stats
+    flush-playfield $pf -sync 20 -stats
     $fps = get-playfieldfps $pf
-    $debugline = "$fps fps (target 25)"
+    $debugline = "$fps fps (target 50)"
   }
 }
 
