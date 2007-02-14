@@ -9,71 +9,76 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
 {
 
     /// <summary>
-    /// Determine if a sprite is overlapping any 
-    /// other sprites. Returns a collection of sprites
-    /// that do hit.
+    /// Determine if any sprites in set a overlap any sprites in set b.
+    /// Calls their DidOverlap handlers if so.
+    /// If OutputPairs switch is set, returns them also.
+    /// By default, will not test dead sprites, but this can be overriden
+    /// with EvenIfDead switch.
+    /// 
     /// TODO: add option for cell-level overlap
     /// </summary>
     [Cmdlet("Test", "SpriteOverlap")]
     public class TestSpriteOverlapCmdlet : PSCmdlet
     {
-        private Sprite sprite;
+        private Sprite[] spritesA;
 
-        [Parameter(Position=0,Mandatory=true)]
+        [Parameter(Position = 0, Mandatory = true)]
         [ValidateNotNull]
-        public Sprite Sprite
+        public Sprite[] SpritesA
         {
-            get { return sprite; }
-            set { sprite = value; }
+            get { return spritesA; }
+            set { spritesA = value; }
         }
 
-        private Sprite[] otherSprites;
+        private Sprite[] spritesB;
 
-        [Parameter(Position=1,Mandatory=true,ValueFromPipeline=true)]
+        [Parameter(Position = 1, Mandatory = true, ValueFromPipeline = true)]
         [ValidateNotNullOrEmpty]
-        public Sprite[] OtherSprites
+        public Sprite[] SpritesB
         {
-            get { return otherSprites; }
-            set { otherSprites = value; }
+            get { return spritesB; }
+            set { spritesB = value; }
         }
 
         private bool evenIfDead = false;
 
         [Parameter(Position = 2)]
-        public bool EvenIfDead
+        public SwitchParameter EvenIfDead
         {
             get { return evenIfDead; }
             set { evenIfDead = value; }
         }
 
-        private bool noOutput = false;
+        private bool outputPairs = false;
 
-        [Parameter(Position = 3,HelpMessage="if false, will return overlapping sprites"]
-        [SwitchParameter]
-        public bool NoOutput
+        /// <summary>
+        /// If set, the colliding pairs will be output as Pair objects.
+        /// </summary>
+        [Parameter(Position = 3)]
+        public SwitchParameter OutputPairs
         {
-            get { return noOutput; }
-            set { noOutput = value; }
+            get { return outputPairs; }
+            set { outputPairs = value; }
         }
 
 
 
         protected override void ProcessRecord()
         {
-            foreach (Sprite other in otherSprites)
+            foreach (Sprite a in spritesA)
             {
-                if (sprite.Overlaps(other,evenIfDead))
+                foreach (Sprite b in spritesB)
                 {
-                    // notify both parties
-                    sprite.DidOverlap(other);
-                    other.DidOverlap(sprite);
-                    // write out the other if required
-                    if (!noOutput) WriteObject(other, false);
+                    if (a != b && a.Overlaps(b, evenIfDead))
+                    {
+                        // notify both parties
+                        a.DidOverlap(b);
+                        b.DidOverlap(a);
+                        // write out the b if required
+                        if (outputPairs) WriteObject(new Pair<Sprite>(a,b), false);
+                    }
                 }
             }
         }
-
     }
-
-
 }

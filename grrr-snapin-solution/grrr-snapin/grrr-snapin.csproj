@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Pair.cs" />
     <Compile Include="Core\Image.cs" />
     <Compile Include="Core\KeyEventMap.cs" />
     <Compile Include="Core\MotionPath.cs" />

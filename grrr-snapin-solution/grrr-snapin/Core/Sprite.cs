@@ -161,11 +161,11 @@ namespace Soapyfrog.Grrr.Core
 
         /// <summary>
         /// Determines if this sprite's rectangle intersects with
-        /// the other one.
+        /// the b one.
         /// 
         /// Both sprites need to be alive unless evenIfDead is true
         /// </summary>
-        /// <param name="other">The other sprite to check</param>
+        /// <param name="b">The b sprite to check</param>
         /// <param name="evenIfDead">Check even if not alive</param>
         /// <returns>true if overlapping, else false</returns>
         public bool Overlaps(Sprite other,bool evenIfDead)
@@ -178,4 +178,5 @@ namespace Soapyfrog.Grrr.Core
                 || other.y >= bottom || otherBottom < y);
         }
     }
+
 }

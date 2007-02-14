@@ -48,7 +48,7 @@ function main {
           }
   $images = @($imga1,$imga2,$imga3,$imga2)
   # build a load of them
-  0..31 | foreach {
+  0..15 | foreach {
     [int]$n=$_
     $x = [Math]::Floor($n / 4) * 7 + 4
     $y = ($n % 4) * 4 + 3
@@ -56,24 +56,26 @@ function main {
     $sprites += $sa
   }
 
+$script:hits = 0
   # create another one with different behaviour
   $imgb = create-image "/\","\/" -fg "red" -bg "black"
   $mp = create-motionpath "20e 6ne 20n 4ne 4e 4se 4s 4sw 8w 12s 6sw 20w 5h"
   $h = create-spritehandler -didoverlap {
     $me = $args[0]; $other=$args[1];
-    $hits++
+    $script:hits++
+    $other.alive = $false
   }
   $spr = create-sprite -images @($imgb) -x 10 -y 42  -motionpath $mp -handler $h
 
   # game loop
   $debugline=" "
-  $hits = 0
+  #$hits = 0
   while ($true) {
     clear-playfield $pf
     draw-string $pf $debugline 0 0 red
     draw-sprite $pf $sprites
     draw-sprite $pf $spr
-    test-spriteoverlap $spr $sprites -nooutput
+    test-spriteoverlap $spr $sprites -nooutput $true
     flush-playfield $pf -sync 20 
     $fps = $pf.FPS
     $debugline = "$fps fps (target 50) hits=$hits"

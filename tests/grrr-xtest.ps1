@@ -101,16 +101,16 @@ function test-overlap-sprite {
   $img = create-image "ABC","DEF" # 3x2 image
   $s1 = create-sprite @($img) -x 1 -y 1 
   $s2 = create-sprite @($img) -x 1 -y 1 
-  assert-true "full overlap" $s2 (test-spriteoverlap $s1 $s2) 
+  assert-notnull "full overlap" (Test-SpriteOverlap $s1 $s2 -OutputPairs)
 
   $s2 = create-sprite @($img) -x 3 -y 1 
-  assert-true "partial x overlap" (test-spriteoverlap $s1 $s2)
+  assert-notnull "partial x overlap" (test-spriteoverlap $s1 $s2 -outputpairs)
 
   $s2 = create-sprite @($img) -x 1 -y 2 
-  assert-true "partial y overlap" (test-spriteoverlap $s1 $s2)
+  assert-notnull "partial y overlap" (test-spriteoverlap $s1 $s2 -outputpairs)
 
   $s2 = create-sprite @($img) -x 4 -y 1 
-  assert-equal "no overlap" $null (test-spriteoverlap $s1 $s2)
+  assert-null "no overlap" (test-spriteoverlap $s1 $s2 -outputpairs)
 
 }
 

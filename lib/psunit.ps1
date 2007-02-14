@@ -82,3 +82,22 @@ function assert-false ($msg, $val) {
 }
 
 
+# --------------------------
+# assert null
+#
+function assert-null ($msg, $val) {
+  if ($val -ne $null) {
+    write-error "$msg : value was not null"
+  }
+}
+
+
+# --------------------------
+# assert not null
+#
+function assert-notnull ($msg, $val) {
+  if (! $val) {
+    write-error "$msg : value was null"
+  }
+}
+
