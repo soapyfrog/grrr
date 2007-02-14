@@ -15,7 +15,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
         private ScriptBlock willDraw;
         private ScriptBlock didDraw;
         private ScriptBlock didOverlap;
-        private ScriptBlock didHitBoundary;
+        private ScriptBlock didExceedBounds;
 
         [Parameter(Position = 0)]
         [ValidateNotNullOrEmpty]
@@ -40,10 +40,24 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
             get { return didDraw; }
             set { didDraw = value; }
         }
+        [Parameter(Position = 3)]
+        [ValidateNotNullOrEmpty]
+        public ScriptBlock DidOverlap
+        {
+            get { return didOverlap; }
+            set { didOverlap = value; }
+        }
+        [Parameter(Position = 4)]
+        [ValidateNotNullOrEmpty]
+        public ScriptBlock DidExceedBounds
+        {
+            get { return didExceedBounds; }
+            set { didExceedBounds = value; }
+        }
 
         protected override void EndProcessing()
         {
-            SpriteHandler sh = new SpriteHandler(didInit, willDraw, didDraw);
+            SpriteHandler sh = new SpriteHandler(didInit, willDraw, didDraw,didOverlap,didExceedBounds);
             WriteObject(sh, false);
         }
 

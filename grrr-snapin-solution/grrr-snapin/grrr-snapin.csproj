@@ -42,39 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cmdlets\DrawingCmdlets\DrawLineCmdlet.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Cmdlets\DrawingCmdlets\DrawStringCmdlet.cs" />
-    <Compile Include="Cmdlets\ImageCmdlets\CreateImageCmdlet.cs" />
-    <Compile Include="Cmdlets\ImageCmdlets\DrawImageCmdlet.cs" />
-    <Compile Include="Cmdlets\ImageCmdlets\GetImageCmdlet.cs" />
-    <Compile Include="Cmdlets\ImageCmdlets\ScanImageCmdlet.cs" />
-    <Compile Include="Cmdlets\KeyEventCmdlets\CreateKeyEventMapCmdlet.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Cmdlets\KeyEventCmdlets\ProcessKeyEventsCmdlet.cs" />
-    <Compile Include="Cmdlets\KeyEventCmdlets\RegisterKeyEventCmdlet.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Cmdlets\MiscCmdlets\InitConsoleCmdlet.cs" />
-    <Compile Include="Cmdlets\PlayfieldCmdlets\ClearPlayfieldCmdlet.cs" />
-    <Compile Include="Cmdlets\PlayfieldCmdlets\CreatePlayfieldCmdlet.cs" />
-    <Compile Include="Cmdlets\PlayfieldCmdlets\FlushPlayfieldCmdlet.cs" />
-    <Compile Include="Cmdlets\SpriteCmdlets\CreateMotionPathCmdlet.cs" />
-    <Compile Include="Cmdlets\SpriteCmdlets\CreateSpriteCmdlet.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Cmdlets\SpriteCmdlets\CreateSpriteHandlerCmdlet.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Cmdlets\SpriteCmdlets\DrawSpriteCmdlet.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Cmdlets\SpriteCmdlets\TestSpriteOverlapCmdlet.cs" />
-    <Compile Include="Cmdlets\TilemapCmdlets\CreateTilemapCmdlet.cs" />
-    <Compile Include="Cmdlets\TilemapCmdlets\DrawTilemapCmdlet.cs" />
-    <Compile Include="Cmdlets\TilemapCmdlets\GetTilemapCmdlet.cs" />
     <Compile Include="Core\Image.cs" />
     <Compile Include="Core\KeyEventMap.cs" />
     <Compile Include="Core\MotionPath.cs" />
@@ -82,10 +49,31 @@
     <Compile Include="Core\Sprite.cs" />
     <Compile Include="Core\SpriteHandler.cs" />
     <Compile Include="Core\Tilemap.cs" />
+    <Compile Include="DrawingCmdlets\DrawLineCmdlet.cs" />
+    <Compile Include="DrawingCmdlets\DrawStringCmdlet.cs" />
+    <Compile Include="ImageCmdlets\CreateImageCmdlet.cs" />
+    <Compile Include="ImageCmdlets\DrawImageCmdlet.cs" />
+    <Compile Include="ImageCmdlets\GetImageCmdlet.cs" />
+    <Compile Include="ImageCmdlets\ScanImageCmdlet.cs" />
+    <Compile Include="KeyEventCmdlets\CreateKeyEventMapCmdlet.cs" />
+    <Compile Include="KeyEventCmdlets\ProcessKeyEventsCmdlet.cs" />
+    <Compile Include="KeyEventCmdlets\RegisterKeyEventCmdlet.cs" />
     <Compile Include="Meta\Snapin.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="MiscCmdlets\InitConsoleCmdlet.cs" />
+    <Compile Include="PlayfieldCmdlets\ClearPlayfieldCmdlet.cs" />
+    <Compile Include="PlayfieldCmdlets\CreatePlayfieldCmdlet.cs" />
+    <Compile Include="PlayfieldCmdlets\FlushPlayfieldCmdlet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpriteCmdlets\CreateMotionPathCmdlet.cs" />
+    <Compile Include="SpriteCmdlets\CreateSpriteCmdlet.cs" />
+    <Compile Include="SpriteCmdlets\CreateSpriteHandlerCmdlet.cs" />
+    <Compile Include="SpriteCmdlets\DrawSpriteCmdlet.cs" />
+    <Compile Include="SpriteCmdlets\TestSpriteOverlapCmdlet.cs" />
+    <Compile Include="TilemapCmdlets\CreateTilemapCmdlet.cs" />
+    <Compile Include="TilemapCmdlets\DrawTilemapCmdlet.cs" />
+    <Compile Include="TilemapCmdlets\GetTilemapCmdlet.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>

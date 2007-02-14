@@ -28,14 +28,30 @@ namespace Soapyfrog.Grrr.Core
             get { return didDraw; }
         }
 
+        private ScriptBlock didOverlap;
+        public ScriptBlock DidOverlap
+        {
+            get { return didOverlap; }
+        }
 
-        protected internal SpriteHandler(ScriptBlock didInit,
-                                            ScriptBlock willDraw,
-                                            ScriptBlock didDraw)
+        private ScriptBlock didExceedBounds;
+        public ScriptBlock DidExceedBounds
+        {
+            get { return didExceedBounds; }
+        }
+
+        protected internal SpriteHandler(
+            ScriptBlock didInit,
+            ScriptBlock willDraw,
+            ScriptBlock didDraw,
+            ScriptBlock didOverlap,
+            ScriptBlock didExceedBounds)
         {
             this.didDraw = didDraw;
             this.willDraw = willDraw;
             this.didInit = didInit;
+            this.didOverlap = didOverlap;
+            this.didExceedBounds = didExceedBounds;
         }
 
     }

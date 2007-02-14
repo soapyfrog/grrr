@@ -59,20 +59,24 @@ function main {
   # create another one with different behaviour
   $imgb = create-image "/\","\/" -fg "red" -bg "black"
   $mp = create-motionpath "20e 6ne 20n 4ne 4e 4se 4s 4sw 8w 12s 6sw 20w 5h"
-  $spr = create-sprite -images @($imgb) -x 10 -y 42  -motionpath $mp
-  $sprites += $spr
+  $h = create-spritehandler -didoverlap {
+    $me = $args[0]; $other=$args[1];
+    $hits++
+  }
+  $spr = create-sprite -images @($imgb) -x 10 -y 42  -motionpath $mp -handler $h
 
   # game loop
   $debugline=" "
-  [int]$fc = 0;
+  $hits = 0
   while ($true) {
-    $fc++
     clear-playfield $pf
     draw-string $pf $debugline 0 0 red
     draw-sprite $pf $sprites
+    draw-sprite $pf $spr
+    test-spriteoverlap $spr $sprites -nooutput
     flush-playfield $pf -sync 20 
     $fps = $pf.FPS
-    $debugline = "$fps fps (target 50)"
+    $debugline = "$fps fps (target 50) hits=$hits"
   }
 }
 

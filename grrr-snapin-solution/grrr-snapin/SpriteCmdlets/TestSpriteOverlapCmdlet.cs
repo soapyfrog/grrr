@@ -46,6 +46,17 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
             set { evenIfDead = value; }
         }
 
+        private bool noOutput = false;
+
+        [Parameter(Position = 3,HelpMessage="if false, will return overlapping sprites"]
+        [SwitchParameter]
+        public bool NoOutput
+        {
+            get { return noOutput; }
+            set { noOutput = value; }
+        }
+
+
 
         protected override void ProcessRecord()
         {
@@ -53,7 +64,11 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
             {
                 if (sprite.Overlaps(other,evenIfDead))
                 {
-                    WriteObject(other, false);
+                    // notify both parties
+                    sprite.DidOverlap(other);
+                    other.DidOverlap(sprite);
+                    // write out the other if required
+                    if (!noOutput) WriteObject(other, false);
                 }
             }
         }

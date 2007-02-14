@@ -19,9 +19,9 @@ namespace Soapyfrog.Grrr.Core
         private int width, height;
         private int x, y, z;
         private bool alive = true;
+        private Hashtable state = new Hashtable(); // used by handlers to store their one state
         private SpriteHandler handler;
         private MotionPath motionpath;
-        private Hashtable state=new Hashtable();
 
         /// <summary>
         /// User settable state properties. Saves mucking about with
@@ -103,6 +103,18 @@ namespace Soapyfrog.Grrr.Core
         {
             if (handler != null && handler.DidDraw != null) handler.DidDraw.Invoke(this);
         }
+
+        /// <summary>
+        /// Call the didOverlap for this sprite with the overlapping partner as the second param
+        /// and this as the first.
+        /// This is called by Test-SpriteOverlap.
+        /// </summary>
+        /// <param name="otherSprite"></param>
+        internal void DidOverlap(Sprite otherSprite)
+        {
+            if (handler != null && handler.DidOverlap != null) handler.DidOverlap.Invoke(this, otherSprite);
+        }
+
 
         /// <summary>
         /// Return the next image in the anim sequence for drawing.
