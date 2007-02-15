@@ -22,6 +22,7 @@ namespace Soapyfrog.Grrr.Core
         private Hashtable state = new Hashtable(); // used by handlers to store their one state
         private SpriteHandler handler;
         private MotionPath motionpath;
+        private string tag; // optional tag string
 
         /// <summary>
         /// User settable state properties. Saves mucking about with
@@ -42,6 +43,8 @@ namespace Soapyfrog.Grrr.Core
         public bool Alive { get { return alive; } set { alive = value; } }
         public int AnimRate { get { return animSpeed; } set { animSpeed = value; } }
         public Image[] Images { get { return images; } }
+        public string Tag { get { return tag; } set { tag = value; } }
+
 
 
         // stuff for animation
@@ -143,7 +146,7 @@ namespace Soapyfrog.Grrr.Core
             get { return images[nextAnimFrame]; }
         }
 
-        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, SpriteHandler sh,MotionPath mp)
+        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, SpriteHandler sh,MotionPath mp,string tag)
         {
             this.images = images;
             this.x = x;
@@ -153,6 +156,7 @@ namespace Soapyfrog.Grrr.Core
             this.animSpeed = animrate;
             this.handler = sh;
             this.motionpath = mp;
+            this.tag = tag;
             numAnimFrames = images.Length;
             // FIXME: the following are a bit of hack - what if images are diff sizes?
             width = images[0].Width;

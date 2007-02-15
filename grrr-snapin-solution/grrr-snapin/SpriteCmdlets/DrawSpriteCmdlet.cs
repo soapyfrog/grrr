@@ -8,7 +8,8 @@ using Soapyfrog.Grrr.Core;
 namespace Soapyfrog.Grrr.SpriteCmdlets
 {
     /// <summary>
-    /// Draw all passed sprites, calling their handlers if present.
+    /// Draw all passed sprites, calling their handlers if present, optionally drawing
+    /// dead sprites too.
     /// </summary>
     [Cmdlet("Draw", "Sprite")]
     public class DrawSpriteCmdlet : PSCmdlet

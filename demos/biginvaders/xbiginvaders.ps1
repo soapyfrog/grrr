@@ -137,7 +137,7 @@ function create-missilesprite {
     $s.alive = $false
   }
   $mp = create-motionpath "n" # just head north
-  $s = create-sprite -images $images.missile -handler $handlers -motionpath $mp
+  $s = create-sprite -images $images.missile -handler $handlers -motionpath $mp -tag "missile"
   # start it off dead; it gets set to alive when it's fired.
   $s.alive = $false
   return $s
@@ -199,7 +199,7 @@ function main {
     flush-playfield $pf -sync 20 # to get 50 fps
 
     # update debug line for next frame
-    $debugline = "$($pf.fps) fps (target 50) missile y $($missile.Y)"
+    $debugline = "$($pf.fps) fps (target 50)"
     
     # cull dead aliens
     $aliens = ($aliens | where {$_.alive})
