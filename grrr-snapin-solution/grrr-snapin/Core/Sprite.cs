@@ -170,6 +170,8 @@ namespace Soapyfrog.Grrr.Core
         /// <returns>true if overlapping, else false</returns>
         public bool Overlaps(Sprite other,bool evenIfDead)
         {
+            if (!evenIfDead && !(alive && other.alive)) return false;
+
             int right = x + width;
             int otherRight = other.x + other.width;
             int bottom = y + height;

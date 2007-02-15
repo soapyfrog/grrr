@@ -15,6 +15,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
     {
         private Playfield pf;
         private Sprite[] sprites;
+        private bool evenIfDead;
 
         [Parameter(Position = 0, Mandatory = true)]
         [ValidateNotNull]
@@ -24,16 +25,22 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
         [ValidateNotNull]
         public Sprite[] Sprites { get { return sprites; } set { sprites = value; } }
 
+        [Parameter(Position = 2)]
+        public SwitchParameter EvenIfDead { get { return evenIfDead; } set { evenIfDead = value; } }
+
         protected override void ProcessRecord()
         {
             if (sprites != null)
             {
                 foreach (Sprite s in sprites)
                 {
-                    s.StepMotionPath();
-                    s.WillDraw();
-                    pf.DrawImage(s.NextImage, s.X, s.Y);
-                    s.DidDraw();
+                    if (evenIfDead || s.Alive)
+                    {
+                        s.StepMotionPath();
+                        s.WillDraw();
+                        pf.DrawImage(s.NextImage, s.X, s.Y);
+                        s.DidDraw();
+                    }
                 }
             }
         }

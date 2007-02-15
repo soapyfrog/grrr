@@ -23,6 +23,7 @@ $ErrorActionPreference="Stop"
 
 [int]$script:maxwidth = 120
 [int]$script:maxheight = 60
+$script:endreason = $null; # will be set to a reason later
 
 cls
 init-console $maxwidth $maxheight
@@ -51,7 +52,7 @@ function create-invadersprites($images) {
     $s=$args[0] 
     $o=$args[1] # what we hit
     if ($o -eq $base) {
-      $endreason="Aliens hit base";
+      $script:endreason="Aliens hit base";
     }
     # we may hit a missile, but the missile will handle it
   }
@@ -147,7 +148,6 @@ function create-missilesprite {
 # demo starts here
 #
 function main {
-  $endreason = $null; # will be set to a reason later
 
   # create a plafield to put it all on
   $pf = create-playfield -x 0 -y 0 -width $maxwidth -height $maxheight -bg "black"
@@ -176,12 +176,12 @@ function main {
   $debugline = "big invaders!"
 
   # game loop
-  while ($endreason -eq $null) {
+  while ($script:endreason -eq $null) {
     process-keyevents $keymap
     clear-playfield $pf
 
     # draw the aliens
-    draw-sprite $pf $aliens #TODO -EvenIfDead ?
+    draw-sprite $pf $aliens 
     $aliens_controller.current = $aliens_controller.next
 
     # draw the base
@@ -203,9 +203,9 @@ function main {
     
     # cull dead aliens
     $aliens = ($aliens | where {$_.alive})
-    if ($aliens -eq $null) { $endreason="all aliens dead!" }
+    if ($aliens -eq $null) { $script:endreason="all aliens dead!" }
   }
-  draw-string $pf "Demo ended: $endreason" 20 10 -fg "white" -bg "red"
+  draw-string $pf "Demo ended: $script:endreason" 20 10 -fg "white" -bg "red"
   flush-playfield $pf 
 }
 
