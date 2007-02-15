@@ -84,7 +84,7 @@ function create-invadersprites($images) {
       }
     }
     # lets drop a bomb!
-    if ($rnd.next(10) -eq 0) {
+    if ($rnd.next(10000) -eq 0) {
       foreach ($b in $d.bombs) {
         if (!$b.alive) {
           $b.X = $s.X + 5
@@ -183,7 +183,7 @@ function create-bombsprites {
   $mp = create-motionpath "s h" # just head south slowly
   # create a few
   1..3 | foreach {
-    $s = create-sprite -images $images.bomba -handler $handlers -motionpath $mp -tag "bomb"
+    $s = create-sprite -images $images.bomba0,$images.bomba1 -handler $handlers -motionpath $mp -animrate 4 -tag "bomb"
     # start it off dead; it gets set to alive when it's fired.
     $s.alive = $false
     $s

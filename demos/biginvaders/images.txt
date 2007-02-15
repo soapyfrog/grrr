@@ -71,11 +71,18 @@ IIIIIIIIIII
 IIIIIIIIIII
 IIIIIIIIIII
 #end
-#begin bomba red black
+#begin bomba0 red black
  I
   I
  I
 I
+ I
+#end
+#begin bomba1 red black
+ I
+I  
+ I
+  I
  I
 #end
 #begin bombb green black
