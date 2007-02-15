@@ -3,7 +3,7 @@
 #! translate I to a solid char
 #translate I 9608
 #transparent 32
-#begin invc0 green black
+#begin invc0 magenta black
     IIII
  IIIIIIIIII
 IIIIIIIIIIII
@@ -13,7 +13,7 @@ IIIIIIIIIIII
   II II II
 II        II
 #end
-#begin invc1 green black
+#begin invc1 magenta black
     IIII
  IIIIIIIIII
 IIIIIIIIIIII
@@ -43,7 +43,7 @@ IIIIIIIIIII
   I     I
  I       I
 #end
-#begin inva0 green black
+#begin inva0 cyan black
    II
   IIII
  IIIIII
@@ -53,7 +53,7 @@ IIIIIIII
 I      I
  I    I
 #end
-#begin inva1 green black
+#begin inva1 cyan black
    II
   IIII
  IIIIII
@@ -71,7 +71,7 @@ IIIIIIIIIII
 IIIIIIIIIII
 IIIIIIIIIII
 #end
-#begin bomba green black
+#begin bomba red black
  I
   I
  I

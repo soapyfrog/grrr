@@ -24,6 +24,7 @@ $ErrorActionPreference="Stop"
 [int]$script:maxwidth = 120
 [int]$script:maxheight = 60
 $script:endreason = $null; # will be set to a reason later
+$script:rnd = new-object Random
 
 cls
 init-console $maxwidth $maxheight
@@ -59,7 +60,7 @@ function create-invadersprites($images) {
   $move = { 
     $s=$args[0]
     $dx = 1
-    $dy = 2
+    $dy = 1
     $d = $s.state.controller
     switch ($d.current) {
       "R" {
@@ -80,6 +81,17 @@ function create-invadersprites($images) {
         $s.y+=$dy
         if ($s.y -ge $d.bottom) { $d.landed=$true }
         $d.next="R"
+      }
+    }
+    # lets drop a bomb!
+    if ($rnd.next(10) -eq 0) {
+      foreach ($b in $d.bombs) {
+        if (!$b.alive) {
+          $b.X = $s.X + 5
+          $b.Y = $s.Y + $s.Height
+          $b.alive = $true
+          break
+        }
       }
     }
   }
@@ -114,7 +126,7 @@ function create-basesprite {
     $s=$args[0]
     $s.x += $s.state.dx
   }
-  $base = create-sprite -images $images.base -handler $handlers
+  $base = create-sprite -images $images.base -handler $handlers -tag "base"
   return $base
 }
 
@@ -136,11 +148,46 @@ function create-missilesprite {
     $inv.alive = $false 
     $s.alive = $false
   }
-  $mp = create-motionpath "n h" # just head north
+  $mp = create-motionpath "n" # just head north
   $s = create-sprite -images $images.missile -handler $handlers -motionpath $mp -tag "missile"
   # start it off dead; it gets set to alive when it's fired.
   $s.alive = $false
   return $s
+}
+
+#------------------------------------------------------------------------------
+# create bomb sprites
+#
+function create-bombsprites {
+  param($images)
+  # test boundary condition with a DidMove handler
+  # TODO replace this with boundary handler when supported
+  $handlers = create-spritehandler  -DidMove {
+    $s=$args[0]
+    if ($s.Y -ge $maxheight) {
+      $s.alive = $false
+    }
+  } -DidOverlap {
+    $s=$args[0]
+    $b = $args[1]
+    if ($b.tag -eq "base") {
+      $s.alive = $false
+      $script:endreason="bombed by alien"
+    }
+    elseif ($b.tag -eq "missile") {
+      # cancel each other out
+      $b.alive = $false;
+      $s.alive = $false;
+    }
+  }
+  $mp = create-motionpath "s h" # just head south slowly
+  # create a few
+  1..3 | foreach {
+    $s = create-sprite -images $images.bomba -handler $handlers -motionpath $mp -tag "bomb"
+    # start it off dead; it gets set to alive when it's fired.
+    $s.alive = $false
+    $s
+  }
 }
 
 
@@ -160,6 +207,8 @@ function main {
   $base = create-basesprite $images
   # prepare a missile
   $missile = create-missilesprite $images
+  # prepare some bombs
+  $aliens_controller.bombs = create-bombsprites $images
 
   # create a keyevent map
   $keymap = create-keyeventmap
@@ -186,11 +235,13 @@ function main {
     move-sprite $aliens
     move-sprite $base
     move-sprite $missile
+    move-sprite $aliens_controller.bombs 
 
     # draw everything
     draw-sprite $pf $aliens 
     draw-sprite $pf $base
     draw-sprite $pf $missile 
+    draw-sprite $pf $aliens_controller.bombs 
 
     # update aliens controller state
     $aliens_controller.current = $aliens_controller.next
@@ -204,6 +255,7 @@ function main {
     # test for collisions - note, if this is done to ensure sprites are not
     # out of bounds, you might want to do it before drawing
     test-spriteoverlap $aliens $base,$missile # check if aliens have hit base or missile
+    test-spriteoverlap $aliens_controller.bombs $base,$missile
 
     # update debug line for next frame
     $debugline = "$($pf.fps) fps (target 50)"
