@@ -89,7 +89,7 @@ namespace Soapyfrog.Grrr.Core
                 animSpeedCounter = 0;
                 nextAnimFrame = (nextAnimFrame + 1) % numAnimFrames;
                 if (nextAnimFrame == 0 && handler != null && handler.DidEndAnim != null)
-                    handler.DidEndAnim.Invoke(this);
+                    handler.DidEndAnim.InvokeReturnAsIs(this);
             }
         }
 
@@ -107,7 +107,7 @@ namespace Soapyfrog.Grrr.Core
         /// </summary>
         internal void StepMotionPath()
         {
-            if (handler != null && handler.WillMove != null) handler.WillMove.Invoke(this);
+            if (handler != null && handler.WillMove != null) handler.WillMove.InvokeReturnAsIs(this);
             if (motionpath != null)
             {
                 Delta d = motionpath.Deltas[nextMPDeltaIndex];
@@ -118,24 +118,24 @@ namespace Soapyfrog.Grrr.Core
                     nextMPDeltaRepeatCount = 0;
                     nextMPDeltaIndex = (nextMPDeltaIndex + 1) % motionpath.Deltas.Count;
                     if (nextMPDeltaIndex == 0 && handler != null && handler.DidEndMotion != null)
-                        handler.DidEndMotion.Invoke(this);
+                        handler.DidEndMotion.InvokeReturnAsIs(this);
                 }
             }
-            if (handler != null && handler.DidMove != null) handler.DidMove.Invoke(this);
+            if (handler != null && handler.DidMove != null) handler.DidMove.InvokeReturnAsIs(this);
         }
         /// <summary>
         /// Call willDraw scriptblock if any
         /// </summary>
         internal void PreDraw()
         {
-            if (handler != null && handler.WillDraw != null) handler.WillDraw.Invoke(this);
+            if (handler != null && handler.WillDraw != null) handler.WillDraw.InvokeReturnAsIs(this);
         }
         /// <summary>
         /// Call didDraw scriptblock if any
         /// </summary>
         internal void PostDraw()
         {
-            if (handler != null && handler.DidDraw != null) handler.DidDraw.Invoke(this);
+            if (handler != null && handler.DidDraw != null) handler.DidDraw.InvokeReturnAsIs(this);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Soapyfrog.Grrr.Core
         /// <param name="otherSprite"></param>
         internal void DidOverlap(Sprite otherSprite)
         {
-            if (handler != null && handler.DidOverlap != null) handler.DidOverlap.Invoke(this, otherSprite);
+            if (handler != null && handler.DidOverlap != null) handler.DidOverlap.InvokeReturnAsIs(this, otherSprite);
         }
 
         /// <summary>
