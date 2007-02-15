@@ -42,7 +42,6 @@ function create-invadersprites($images) {
     left=1              # left edge
     right=$maxwidth-12  # right edge
     bottom=$maxheight-8 # bottom edge
-    landed=$false       # becomes true if aliens reach the bottom
   } 
   # handlers for motion
   $init = {
@@ -74,17 +73,17 @@ function create-invadersprites($images) {
       }
       "DL" {
         $s.y+=$dy
-        if ($s.y -ge $d.bottom) { $d.landed=$true }
+        if ($s.y -ge $d.bottom) { $endreason="aliens have landed" }
         $d.next="L"
       }
       "DR" {
         $s.y+=$dy
-        if ($s.y -ge $d.bottom) { $d.landed=$true }
+        if ($s.y -ge $d.bottom) { $endreason="aliens have landed" }
         $d.next="R"
       }
     }
     # lets drop a bomb!
-    if ($rnd.next(10000) -eq 0) {
+    if ($rnd.next(500) -eq 0) {
       foreach ($b in $d.bombs) {
         if (!$b.alive) {
           $b.X = $s.X + 5

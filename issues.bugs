@@ -10,11 +10,6 @@ Drawing an image to the playfield should have some alternate modes, eg same
 background colour, xor colour, only paint on spaces, etc. Provides an alternate
 to layering.
 
-[00005 | 10/12/2006 | Open | Feature | Event capture]
-
-Declare what events are interesting (key presses) and capture it in a single
-place. So keep track of which keys are down/up and so on.
-
 [00006 | 10/12/2006 | Open | Feature | Star fields]
 
 Create a mechanism where a starfield can be efficiently drawn and moved with
@@ -28,3 +23,61 @@ to expensively test collisions, but to want to constrain.
 
 Perhaps generalize by knowing where a player sprite is in relation to an
 environment map.
+
+[00008 | 15/02/2007 | Open | Feature | Motion path slowdown]
+
+Support motion every n frames instead of each frame.  With frame rates of
+up 100fps, we need a way to move things slowly.
+
+[00009 | 15/02/2007 | Open | Feature | Formations]
+
+Create a motionpath derivative that moves a sprite relative to another
+one.  This can facilitate a leader sprite with complex movement and, say, 4
+wingmen at a fixed position relative to it. Saves having to process script
+blocks for each sprite.
+
+An alternative is to simply get a sprite to treat the leader as the zero point
+so the wingmen can still have independent motion, eg fly around the leader
+in circles (kind of like a spinning shield).
+
+[00010 | 15/02/2007 | Open | Feature | Zones]
+
+A variant of a sprite that has no drawn image, but occupies space and can be
+tested for collisions, moved, etc. Could also be useful for formation leaders
+where there is no real leader.
+
+[00011 | 15/02/2007 | Open | Bug | Boundary]
+
+DidExeedBounds is never fired because there is no basic bounds feature yet
+(see issue 00007).
+
+[00012 | 15/02/2007 | Open | Feature | Fine Grain collision detection]
+
+Overlap only when non-transparent cells overlap.
+
+[00013 | 15/02/2007 | Open | Feature | Swap out image sets for sprites]
+
+Associate different sets of images with a sprite and change between them...
+eg a man looks different whether  he walks left or right.
+
+Or an alien that explodes.
+
+Changing set could be automatic based on motion path, eg an "east" set, a 
+"southwest" set, etc.
+
+Also support animating frames backwards, and manually.
+
+[00014 | 15/02/2007 | Open | Feature | Fast depth sorting, layers]
+
+We can order sprites with $s = ($s | sort {$_.z}) or something but maybe
+better to do it directly and in place.
+
+Also, introduce layering, so that collisions only occur in same
+layers... enables all sprites to be kept in one collection so no need
+to repeatedly call test-spriteoverlap
+
+
+
+
+
+

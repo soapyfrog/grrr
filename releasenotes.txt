@@ -7,6 +7,19 @@ New Features
 * Sprites now have DidOverlap handlers, called by Test-SpriteOverlap
   cmdlet.
 
+* Movement and Drawing are distinct. Move-Sprite triggers the 
+  motion path for each sprite and also calls WillMove and DidMove
+  script handlers. Drawing calls WillDraw and DidDraw and when
+  animating, calls DidEndAnim at the end of a sequence. 
+
+  When using a motion path, DidEndMotion will called at the end
+  of each loop.
+
+* Added a "Tag" property to each sprite for easy identification
+  of sprite types (eg missile, bomb, alien) from handlers.
+
+
+
 
 ------------------------------------------------------------------
 

@@ -33,6 +33,10 @@ namespace Soapyfrog.Grrr.MiscCmdlets
             bh = Math.Max(h, bh);
             ui.BufferSize = new Size(bw, bh);
             ui.WindowSize = new Size(w, h);
+
+            // TODO: look what can be done!
+            //this.GetVariableValue("fred");
+            //this.InvokeCommand.NewScriptBlock("hello, world")
         }
     }
 }
