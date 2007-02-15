@@ -70,7 +70,10 @@
     <Compile Include="SpriteCmdlets\CreateMotionPathCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateSpriteCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateSpriteHandlerCmdlet.cs" />
-    <Compile Include="SpriteCmdlets\DrawSpriteCmdlet.cs" />
+    <Compile Include="SpriteCmdlets\DrawSpriteCmdlet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SpriteCmdlets\MoveSpriteCmdlet.cs" />
     <Compile Include="SpriteCmdlets\TestSpriteOverlapCmdlet.cs" />
     <Compile Include="TilemapCmdlets\CreateTilemapCmdlet.cs" />
     <Compile Include="TilemapCmdlets\DrawTilemapCmdlet.cs" />

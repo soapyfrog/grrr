@@ -11,22 +11,17 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
     /// Draw all passed sprites, calling their handlers if present, optionally drawing
     /// dead sprites too.
     /// </summary>
-    [Cmdlet("Draw", "Sprite")]
-    public class DrawSpriteCmdlet : PSCmdlet
+    [Cmdlet("Move", "Sprite")]
+    public class MoveSpriteCmdlet : PSCmdlet
     {
-        private Playfield pf;
         private Sprite[] sprites;
         private bool evenIfDead;
 
-        [Parameter(Position = 0, Mandatory = true)]
-        [ValidateNotNull]
-        public Playfield Playfield { set { pf = value; }  get { return pf; } }
-
-        [Parameter(Position = 1, Mandatory = true, ValueFromPipeline = true)]
+        [Parameter(Position = 0, Mandatory = true, ValueFromPipeline = true)]
         [ValidateNotNull]
         public Sprite[] Sprites { get { return sprites; } set { sprites = value; } }
 
-        [Parameter(Position = 2)]
+        [Parameter(Position = 1)]
         public SwitchParameter EvenIfDead { get { return evenIfDead; } set { evenIfDead = value; } }
 
         protected override void ProcessRecord()
@@ -37,10 +32,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
                 {
                     if (evenIfDead || s.Alive)
                     {
-                        s.PreDraw();
-                        pf.DrawImage(s.CurrImage, s.X, s.Y);
-                        s.PostDraw();
-                        s.StepAnim();
+                        s.StepMotionPath();
                     }
                 }
             }

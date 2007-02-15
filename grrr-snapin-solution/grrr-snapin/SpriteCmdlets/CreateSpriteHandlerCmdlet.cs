@@ -7,57 +7,89 @@ using Soapyfrog.Grrr.Core;
 
 namespace Soapyfrog.Grrr.SpriteCmdlets
 {
-
+    /// <summary>
+    /// This cmdlet creates a SpriteHandler instances holding zero or more scriptblock
+    /// handlers that are used to control the behavious of a sprite.
+    /// </summary>
     [Cmdlet("Create", "SpriteHandler")]
     public class CreateSpriteHandlerCmdlet : PSCmdlet
     {
         private ScriptBlock didInit;
         private ScriptBlock willDraw;
         private ScriptBlock didDraw;
+        private ScriptBlock willMove;
+        private ScriptBlock didMove;
         private ScriptBlock didOverlap;
         private ScriptBlock didExceedBounds;
+        private ScriptBlock didEndAnim;
+        private ScriptBlock didEndMotion;
 
-        [Parameter(Position = 0)]
-        [ValidateNotNullOrEmpty]
+        [Parameter()]
         public ScriptBlock DidInit
         {
             get { return didInit; }
             set { didInit = value; }
         }
 
-        [Parameter(Position = 1)]
-        [ValidateNotNullOrEmpty]
+        [Parameter()]
+        public ScriptBlock WillMove
+        {
+            get { return willMove; }
+            set { willMove = value; }
+        }
+
+        [Parameter()]
+        public ScriptBlock DidMove
+        {
+            get { return didMove; }
+            set { didMove = value; }
+        }
+
+
+        [Parameter()]
         public ScriptBlock WillDraw
         {
             get { return willDraw; }
             set { willDraw = value; }
         }
 
-        [Parameter(Position = 2)]
-        [ValidateNotNullOrEmpty]
+        [Parameter()]
         public ScriptBlock DidDraw
         {
             get { return didDraw; }
             set { didDraw = value; }
         }
-        [Parameter(Position = 3)]
-        [ValidateNotNullOrEmpty]
+        [Parameter()]
         public ScriptBlock DidOverlap
         {
             get { return didOverlap; }
             set { didOverlap = value; }
         }
-        [Parameter(Position = 4)]
-        [ValidateNotNullOrEmpty]
+        [Parameter()]
         public ScriptBlock DidExceedBounds
         {
             get { return didExceedBounds; }
             set { didExceedBounds = value; }
         }
 
+        [Parameter()]
+        public ScriptBlock DidEndAnim
+        {
+            get { return didEndAnim; }
+            set { didEndAnim = value; }
+        }
+
+        [Parameter()]
+        public ScriptBlock DidEndMotion
+        {
+            get { return didEndMotion; }
+            set { didEndMotion = value; }
+        }
+
         protected override void EndProcessing()
         {
-            SpriteHandler sh = new SpriteHandler(didInit, willDraw, didDraw,didOverlap,didExceedBounds);
+            SpriteHandler sh = new SpriteHandler(didInit, willMove,didMove, willDraw, didDraw,didOverlap,
+                didExceedBounds,didEndAnim,didEndMotion);
             WriteObject(sh, false);
         }
 

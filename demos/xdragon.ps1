@@ -72,7 +72,7 @@ function main {
   }
   
   # wrap the two handlers in to a single handlers object
-  $handler = create-spritehandler -didinit $init -willdraw $move
+  $handler = create-spritehandler -didinit $init -didmove $move
 
   # create 3 dragon sprites in an array
   $sprites = @()
@@ -85,6 +85,7 @@ function main {
   # game loop - ctrl+c to quit
   while ($true) {
     clear-playfield $pf
+    move-sprite $sprites
     draw-sprite $pf $sprites
     draw-string $pf $debugline 0 0 "red"
     flush-playfield $pf -sync 20 

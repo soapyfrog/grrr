@@ -84,12 +84,12 @@ function create-invadersprites($images) {
     }
   }
 
-  $handlers = create-spritehandler -didinit $init -willdraw $move -didoverlap $overlap
+  $handlers = Create-SpriteHandler -DidInit $init -DidMove $move -DidOverlap $overlap
   $y = 0
   $xo = 2
   "inva","invb","invc" | foreach {
     $i = $_
-    for ($x=0; $x -lt 3; $x++) {
+    for ($x=0; $x -lt 4; $x++) {
       $ip = $images["$i"+"0"],$images["$i"+"1"]
       $s = create-sprite -images $ip -x ($xo+10+18*$x) -y $y -handler $handlers -animrate 8
       $sprites += $s
@@ -106,11 +106,11 @@ function create-invadersprites($images) {
 #
 function create-basesprite {
   param($images)
-  $handlers = create-spritehandler -didinit {
+  $handlers = create-spritehandler -DidInit {
     $s=$args[0]
     $s.x = 30; $s.y=$script:maxheight-6
     $s.state.dx = 0
-  } -willdraw {
+  } -DidMove {
     $s=$args[0]
     $s.x += $s.state.dx
   }
@@ -123,20 +123,20 @@ function create-basesprite {
 #
 function create-missilesprite {
   param($images)
-  # test boundary condition with a willdraw handler
+  # test boundary condition with a DidMove handler
   # TODO replace this with boundary handler when supported
-  $handlers = create-spritehandler  -willdraw {
+  $handlers = create-spritehandler  -DidMove {
     $s=$args[0]
     if ($s.Y -lt 0) {
       $s.alive = $false
     }
-  } -didoverlap {
+  } -DidOverlap {
     $s=$args[0]
     $inv = $args[1] # the thing we hit (will be an invader)
     $inv.alive = $false 
     $s.alive = $false
   }
-  $mp = create-motionpath "n" # just head north
+  $mp = create-motionpath "n h" # just head north
   $s = create-sprite -images $images.missile -handler $handlers -motionpath $mp -tag "missile"
   # start it off dead; it gets set to alive when it's fired.
   $s.alive = $false
@@ -177,26 +177,33 @@ function main {
 
   # game loop
   while ($script:endreason -eq $null) {
-    process-keyevents $keymap
     clear-playfield $pf
 
-    # draw the aliens
+    # process key events
+    process-keyevents $keymap
+
+    # move everything
+    move-sprite $aliens
+    move-sprite $base
+    move-sprite $missile
+
+    # draw everything
     draw-sprite $pf $aliens 
-    $aliens_controller.current = $aliens_controller.next
-
-    # draw the base
     draw-sprite $pf $base
+    draw-sprite $pf $missile 
 
-    # draw the missile if it's alive
-    if ($missile.alive) { draw-sprite $pf $missile }
-
-    # test for collisions
-    test-spriteoverlap $aliens $base,$missile # check if aliens have hit base or missile
+    # update aliens controller state
+    $aliens_controller.current = $aliens_controller.next
    
     # draw a status line
     draw-string $pf $debugline 0 0 -fg "red"
 
+    # flush the playfield to the console
     flush-playfield $pf -sync 20 # to get 50 fps
+
+    # test for collisions - note, if this is done to ensure sprites are not
+    # out of bounds, you might want to do it before drawing
+    test-spriteoverlap $aliens $base,$missile # check if aliens have hit base or missile
 
     # update debug line for next frame
     $debugline = "$($pf.fps) fps (target 50)"

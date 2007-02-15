@@ -40,7 +40,7 @@ function main {
   # an array of sprites
   $sprites = @()
   # motion behaviour handlers - a somewhat manual approach - see below for alternative
-  $handler = create-spritehandler -didinit {$args[0].state.dx = 1 } -willdraw {
+  $handler = create-spritehandler -didinit {$args[0].state.dx = 1 } -didmove {
             $s = $args[0]; $st=$s.state
             if ($s.x -gt 72) { $s.y++; $s.state.dx=-1 }
             elseif ($s.x -lt 4) { $s.y--; $s.state.dx=1 }
@@ -72,6 +72,10 @@ function main {
   while ($true) {
     clear-playfield $pf
     draw-string $pf $debugline 0 0 red
+    #move all
+    move-sprite $sprites
+    move-sprite $spr
+    #draw all
     draw-sprite $pf $sprites
     draw-sprite $pf $spr
     test-spriteoverlap $spr $sprites 

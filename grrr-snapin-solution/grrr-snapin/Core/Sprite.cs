@@ -75,11 +75,39 @@ namespace Soapyfrog.Grrr.Core
         }
 
         /// <summary>
+        /// Move the anim frame pointer to the next frame ready for drawing next time.
+        /// If there is a DidEndAnim handler, it will be called.
+        /// 
+        /// This should be called after drawing as a common use for it is to reset
+        /// the animation frames or sequence and this should be done after the last
+        /// frame was drawn.
+        /// </summary>
+        internal void StepAnim()
+        {
+            if (++animSpeedCounter == animSpeed)
+            {
+                animSpeedCounter = 0;
+                nextAnimFrame = (nextAnimFrame + 1) % numAnimFrames;
+                if (nextAnimFrame == 0 && handler != null && handler.DidEndAnim != null)
+                    handler.DidEndAnim.Invoke(this);
+            }
+        }
+
+        /// <summary>
         /// Step along the motion path. We do this here because state is per sprite, not
         /// per MotionPath.
+        /// 
+        /// The sprite's position is updated and the motion path pointer stepped one forward
+        /// ready for next time. If the sequence came to an end and there is a DidEndMotion
+        /// handler, it will be called.
+        /// 
+        /// This should be called prior to drawing as you want to ensure that the sprite is
+        /// drawn in the current position (the position that this method changes). The
+        /// handler can safely change the motionpath if desired.
         /// </summary>
         internal void StepMotionPath()
         {
+            if (handler != null && handler.WillMove != null) handler.WillMove.Invoke(this);
             if (motionpath != null)
             {
                 Delta d = motionpath.Deltas[nextMPDeltaIndex];
@@ -89,20 +117,23 @@ namespace Soapyfrog.Grrr.Core
                 {
                     nextMPDeltaRepeatCount = 0;
                     nextMPDeltaIndex = (nextMPDeltaIndex + 1) % motionpath.Deltas.Count;
+                    if (nextMPDeltaIndex == 0 && handler != null && handler.DidEndMotion != null)
+                        handler.DidEndMotion.Invoke(this);
                 }
             }
+            if (handler != null && handler.DidMove != null) handler.DidMove.Invoke(this);
         }
         /// <summary>
         /// Call willDraw scriptblock if any
         /// </summary>
-        internal void WillDraw()
+        internal void PreDraw()
         {
             if (handler != null && handler.WillDraw != null) handler.WillDraw.Invoke(this);
         }
         /// <summary>
         /// Call didDraw scriptblock if any
         /// </summary>
-        internal void DidDraw()
+        internal void PostDraw()
         {
             if (handler != null && handler.DidDraw != null) handler.DidDraw.Invoke(this);
         }
@@ -118,28 +149,9 @@ namespace Soapyfrog.Grrr.Core
             if (handler != null && handler.DidOverlap != null) handler.DidOverlap.Invoke(this, otherSprite);
         }
 
-
-        /// <summary>
-        /// Return the next image in the anim sequence for drawing.
-        /// TODO: support non-automatic frame stepping
-        /// </summary>
-        public Image NextImage
-        {
-            get
-            {
-                int f = nextAnimFrame;
-                if (++animSpeedCounter == animSpeed)
-                {
-                    animSpeedCounter = 0;
-                    nextAnimFrame = (nextAnimFrame + 1) % numAnimFrames;
-                }
-                return images[f];
-            }
-        }
-
         /// <summary>
         /// Returns the current image (the one calculated by
-        /// the most recent call to NextImage)
+        /// the most recent call to StepAnim or changed manually)
         /// </summary>
         public Image CurrImage
         {
@@ -183,6 +195,8 @@ namespace Soapyfrog.Grrr.Core
             return !(other.x >= right || otherRight < x
                 || other.y >= bottom || otherBottom < y);
         }
+
+
     }
 
 }

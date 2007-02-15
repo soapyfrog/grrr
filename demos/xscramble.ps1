@@ -90,6 +90,7 @@ echo $map.GetType()
     clear-playfield $pf
     draw-tilemap $pf $backtm -offsetx $bx -offsety 0 -x 0 -y 25 -w $cw -h 12
     draw-tilemap $pf $fronttm -offsetx $fx -offsety 0 -x 0 -y 24 -w $cw -h 15
+    move-sprite $sprites
     draw-sprite $pf $sprites
     draw-string $pf $debugline 0 0 "red"
     flush-playfield $pf -sync 20
