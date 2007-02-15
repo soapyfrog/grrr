@@ -47,6 +47,14 @@ function create-invadersprites($images) {
     $s=$args[0]
     $s.state.controller = $ctl
   }
+  $overlap= {
+    $s=$args[0] 
+    $o=$args[1] # what we hit
+    if ($o -eq $base) {
+      $endreason="Aliens hit base";
+    }
+    # we may hit a missile, but the missile will handle it
+  }
   $move = { 
     $s=$args[0]
     $dx = 1
@@ -74,7 +82,8 @@ function create-invadersprites($images) {
       }
     }
   }
-  $handlers = create-spritehandler -didinit $init -willdraw $move
+
+  $handlers = create-spritehandler -didinit $init -willdraw $move -didoverlap $overlap
   $y = 0
   $xo = 2
   "inva","invb","invc" | foreach {
@@ -108,11 +117,38 @@ function create-basesprite {
   return $base
 }
 
+#------------------------------------------------------------------------------
+# create missile sprite
+#
+function create-missilesprite {
+  param($images)
+  # test boundary condition with a willdraw handler
+  # TODO replace this with boundary handler when supported
+  $handlers = create-spritehandler  -willdraw {
+    $s=$args[0]
+    if ($s.Y -lt 0) {
+      $s.alive = $false
+    }
+  } -didoverlap {
+    $s=$args[0]
+    $inv = $args[1] # the thing we hit (will be an invader)
+    $inv.alive = $false 
+    $s.alive = $false
+  }
+  $mp = create-motionpath "n" # just head north
+  $s = create-sprite -images $images.missile -handler $handlers -motionpath $mp
+  # start it off dead; it gets set to alive when it's fired.
+  $s.alive = $false
+  return $s
+}
+
 
 #------------------------------------------------------------------------------
 # demo starts here
 #
 function main {
+  $endreason = $null; # will be set to a reason later
+
   # create a plafield to put it all on
   $pf = create-playfield -x 0 -y 0 -width $maxwidth -height $maxheight -bg "black"
 
@@ -122,28 +158,55 @@ function main {
   $aliens_controller,$aliens = create-invadersprites $images
   # create a base ship
   $base = create-basesprite $images
+  # prepare a missile
+  $missile = create-missilesprite $images
 
   # create a keyevent map
   $keymap = create-keyeventmap
   register-keyevent $keymap 37 -keydown {$base.state.dx=-1} -keyup {$base.state.dx=0}
   register-keyevent $keymap 39 -keydown {$base.state.dx=1} -keyup {$base.state.dx=0}
+  register-keyevent $keymap 32 -keydown {
+    if (! $missile.alive ) {
+      $missile.X = $base.X + 5
+      $missile.Y = $base.Y - 1
+      $missile.alive = $true
+    }
+  } 
 
   $debugline = "big invaders!"
 
   # game loop
-  while (-not $aliens_controller.landed) {
+  while ($endreason -eq $null) {
     process-keyevents $keymap
     clear-playfield $pf
-    draw-sprite $pf $aliens
+
+    # draw the aliens
+    draw-sprite $pf $aliens #TODO -EvenIfDead ?
     $aliens_controller.current = $aliens_controller.next
+
+    # draw the base
     draw-sprite $pf $base
+
+    # draw the missile if it's alive
+    if ($missile.alive) { draw-sprite $pf $missile }
+
+    # test for collisions
+    test-spriteoverlap $aliens $base,$missile # check if aliens have hit base or missile
+   
+    # draw a status line
     draw-string $pf $debugline 0 0 -fg "red"
-    # 40 = 25fps
-    flush-playfield $pf -sync 20 
-    # lets see what we actually get
-    $fps = $pf.FPS
-    $debugline = "$fps fps (target 50)"
+
+    flush-playfield $pf -sync 20 # to get 50 fps
+
+    # update debug line for next frame
+    $debugline = "$($pf.fps) fps (target 50) missile y $($missile.Y)"
+    
+    # cull dead aliens
+    $aliens = ($aliens | where {$_.alive})
+    if ($aliens -eq $null) { $endreason="all aliens dead!" }
   }
+  draw-string $pf "Demo ended: $endreason" 20 10 -fg "white" -bg "red"
+  flush-playfield $pf 
 }
 
 # off we go
