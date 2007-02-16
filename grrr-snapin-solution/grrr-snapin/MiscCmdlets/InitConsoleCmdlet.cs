@@ -9,6 +9,7 @@ namespace Soapyfrog.Grrr.MiscCmdlets
     /// <summary>
     /// Initialise the console, ensuring it is big enough
     /// for requirements, etc.
+    /// Will throw an exception if you try to exceed the physical bounds of the screen.
     /// </summary>
     [Cmdlet("Init","Console")]
     public class InitConsoleCmdlet : PSCmdlet
@@ -26,6 +27,12 @@ namespace Soapyfrog.Grrr.MiscCmdlets
         protected override void EndProcessing()
         {
             PSHostRawUserInterface ui = Host.UI.RawUI;
+            Size max = ui.MaxPhysicalWindowSize;
+            if (w > max.Width || h > max.Height)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Console can not be bigger than {0}x{1}. Consider using a smaller font size.", max.Width, max.Height));
+            }
             // ensure that the host console is big enough for our needs
             int bw = ui.BufferSize.Width;
             int bh = ui.BufferSize.Height;
@@ -34,9 +41,10 @@ namespace Soapyfrog.Grrr.MiscCmdlets
             ui.BufferSize = new Size(bw, bh);
             ui.WindowSize = new Size(w, h);
 
-            // TODO: look what can be done!
-            //this.GetVariableValue("fred");
-            //this.InvokeCommand.NewScriptBlock("hello, world")
+            // now erase using current background colour (not sure how to call clear-host)
+            ui.SetBufferContents(new Rectangle(0, 0, bw - 1, bh - 1), 
+                new BufferCell(' ', ui.ForegroundColor, ui.BackgroundColor, BufferCellType.Complete));
+            ui.CursorPosition = new Coordinates(0, 0);
         }
     }
 }

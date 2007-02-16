@@ -78,7 +78,6 @@
     <Compile Include="TilemapCmdlets\CreateTilemapCmdlet.cs" />
     <Compile Include="TilemapCmdlets\DrawTilemapCmdlet.cs" />
     <Compile Include="TilemapCmdlets\GetTilemapCmdlet.cs" />
-    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="grrr.ps1" />
