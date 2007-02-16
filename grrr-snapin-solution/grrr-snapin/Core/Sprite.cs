@@ -23,6 +23,7 @@ namespace Soapyfrog.Grrr.Core
         private SpriteHandler handler;
         private MotionPath motionpath;
         private string tag; // optional tag string
+        private Rect bounds; // optional bounds
 
         /// <summary>
         /// User settable state properties. Saves mucking about with
@@ -34,7 +35,7 @@ namespace Soapyfrog.Grrr.Core
             set { state = value; }
         }
 
-
+        public Rect Bounds { get { return bounds; } set { bounds = value; } }
         public int Width { get { return width; } set { width = value; } }
         public int Height { get { return height; } set { height = value; } }
         public int X { get { return x; } set { x = value; } }
@@ -114,6 +115,9 @@ namespace Soapyfrog.Grrr.Core
                     x += d.dx;
                     y += d.dy;
                     z += d.dz;
+                    // out of bounds check
+                    if (handler != null && handler.DidExceedBounds != null & OutOfBounds())
+                        handler.DidExceedBounds.InvokeReturnAsIs(this);
                 }
                 else
                 {
@@ -163,11 +167,13 @@ namespace Soapyfrog.Grrr.Core
             get { return images[nextAnimFrame]; }
         }
 
-        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, SpriteHandler sh,MotionPath mp,string tag)
+        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, 
+            SpriteHandler sh,MotionPath mp,string tag,Rect bounds)
         {
             this.images = images;
             this.animRate = animrate;
             numAnimFrames = images.Length;
+            this.bounds = bounds;
 
             this.x = x;
             this.y = y;
@@ -207,6 +213,15 @@ namespace Soapyfrog.Grrr.Core
                 || other.y >= bottom || otherBottom < y);
         }
 
+
+        /// <summary>
+        /// check if sprite is entirely inside bounds (not same as overlap)
+        /// </summary>
+        /// <returns></returns>
+        bool OutOfBounds() {
+            return bounds != null && (x + width >= bounds.X2 || y + height >= bounds.Y2 ||
+                x < bounds.X || y < bounds.Y);
+        }
 
     }
 

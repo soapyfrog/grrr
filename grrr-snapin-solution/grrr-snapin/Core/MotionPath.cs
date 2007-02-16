@@ -97,7 +97,7 @@ namespace Soapyfrog.Grrr.Core
         #region IEnumerable<Delta> Members
 
         /// <summary>
-        /// Infinitely return Deltas from the set of steps.
+        /// Return Deltas from the set of steps, potentially infinitely.
         /// </summary>
         /// <returns></returns>
         public IEnumerator<Delta> GetDeltaEnumerator()

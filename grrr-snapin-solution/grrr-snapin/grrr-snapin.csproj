@@ -48,6 +48,7 @@
     <Compile Include="Core\KeyEventMap.cs" />
     <Compile Include="Core\MotionPath.cs" />
     <Compile Include="Core\Playfield.cs" />
+    <Compile Include="Core\Rect.cs" />
     <Compile Include="Core\Sprite.cs" />
     <Compile Include="Core\SpriteHandler.cs" />
     <Compile Include="Core\Tilemap.cs" />

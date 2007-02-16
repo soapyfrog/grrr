@@ -18,6 +18,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
         private SpriteHandler sh;
         private MotionPath mp;
         private string tag;
+        private Rect bounds;
 
         [Parameter(Position=0,Mandatory=true,ValueFromPipeline=true)]
         public Image[] Images { get { return images; } set { images = value; } }
@@ -31,20 +32,20 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
         [Parameter(Position = 3)]
         public int Z { get { return z; } set { z = value; } }
 
-        [Parameter(Position = 4)]
+        [Parameter()]
         public bool Alive { get { return alive; } set { alive = value; } }
 
-        [Parameter(Position = 5)]
+        [Parameter()]
         public int AnimRate { get { return animrate; } set { animrate = value; } }
 
-        [Parameter(Position=6)]
+        [Parameter()]
         [ValidateNotNull]
         public SpriteHandler Handler
         {
             get { return sh; }
             set { sh = value; }
         }
-        [Parameter(Position = 7)]
+        [Parameter()]
         [ValidateNotNull]
         public MotionPath MotionPath
         {
@@ -52,7 +53,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
             set { mp = value; }
         }
 
-        [Parameter(Position = 8)]
+        [Parameter()]
         [ValidateNotNull]
         public string Tag
         {
@@ -60,9 +61,17 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
             set { tag = value; }
         }
 
+        [Parameter()]
+        [ValidateNotNull]
+        public Rect Bounds
+        {
+            get { return bounds; }
+            set { bounds = value; }
+        }
+
         protected override void EndProcessing()
         {
-            Sprite s = new Sprite(images, x, y, z, alive, animrate,sh,mp,tag);
+            Sprite s = new Sprite(images, x, y, z, alive, animrate,sh,mp,tag,bounds);
             SpriteHandler h = s.Handler;
             if (h != null && h.DidInit != null) sh.DidInit.Invoke(s);
             WriteObject(s, false);
