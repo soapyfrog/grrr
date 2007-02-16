@@ -29,9 +29,8 @@ $script:rnd = new-object Random
 init-console $maxwidth $maxheight -ea "Stop"
 
 #------------------------------------------------------------------------------
-# Create the invader sprites.
-# Returns a tuple of the shared direction controller object and the 
-# sprite array.
+# Create the invader sprites.  Returns a tuple of the shared direction
+# controller object and the sprite array.
 #
 function create-invadersprites($images) {
   $sprites = new-object collections.arraylist # @()

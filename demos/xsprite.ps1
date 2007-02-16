@@ -60,10 +60,12 @@ function main {
 
   # create another one with different behaviour
   $imgb = create-image "/\","\/" -fg "red" -bg "black"
-  $mp = create-motionpath "20e 6ne 20n 4ne 4e 4se 4s 4sw 8w 12s 6sw 20w 5h"
+  $mp = create-motionpath "20e 6ne 20n 4ne 4e 4se 4s 4sw 8w 12s 6sw 20w 5h" 3
   $h = create-spritehandler -didoverlap {
     $me = $args[0]; $other=$args[1];
     $script:collisions++
+  } -didendmotion {
+    xqwqwex
   }
   $spr = create-sprite -images @($imgb) -x 10 -y 42  -motionpath $mp -handler $h
 

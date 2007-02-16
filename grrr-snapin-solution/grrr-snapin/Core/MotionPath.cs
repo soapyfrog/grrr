@@ -102,8 +102,8 @@ namespace Soapyfrog.Grrr.Core
         /// <returns></returns>
         public IEnumerator<Delta> GetDeltaEnumerator()
         {
-            int d = repeatcount == 0 ? 0 : 1;
-            for (int i=0;i<repeatcount ;i+=d )
+            bool infinite = (repeatcount == 0);
+            for (int i=0;infinite || i<repeatcount ;i+=1 )
             {
                 foreach (Step s in steps)
                 {

@@ -34,7 +34,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
         /// Optional repeat count. If unspecified or set to 0,
         /// the motionpath will repeat endlessly.
         /// </summary>
-        [Parameter()]
+        [Parameter(Position=1)]
         [ValidateRange(0,int.MaxValue)]
         public int RepeatCount
         {

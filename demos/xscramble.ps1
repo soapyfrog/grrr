@@ -93,7 +93,7 @@ echo $map.GetType()
     move-sprite $sprites
     draw-sprite $pf $sprites
     draw-string $pf $debugline 0 0 "red"
-    flush-playfield $pf -sync 20
+    flush-playfield $pf -sync 40
     $fps = $pf.FPS
     $debugline = "$fps fps (target 50)"
   }
