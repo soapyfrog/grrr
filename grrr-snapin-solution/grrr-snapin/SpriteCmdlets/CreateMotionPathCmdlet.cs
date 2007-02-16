@@ -17,7 +17,11 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
     public class CreateMotionPathCmdlet : PSCmdlet
     {
         private string mps;
+        private int rep;
 
+        /// <summary>
+        /// Motion path spec, see MotionPath for details.
+        /// </summary>
         [Parameter(Position=0,Mandatory=true)]
         [ValidateNotNullOrEmpty]
         public string MotionPathSpec
@@ -26,9 +30,22 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
             set { mps = value; }
         }
 
+        /// <summary>
+        /// Optional repeat count. If unspecified or set to 0,
+        /// the motionpath will repeat endlessly.
+        /// </summary>
+        [Parameter()]
+        [ValidateRange(0,int.MaxValue)]
+        public int RepeatCount
+        {
+            get { return rep; }
+            set { rep = value; }
+        }
+
+
         protected override void EndProcessing()
         {
-            MotionPath mp = new MotionPath(mps);
+            MotionPath mp = new MotionPath(mps,rep);
             foreach (string s in mp.Errors) { WriteWarning(s); }
             WriteObject(mp, false);
         }

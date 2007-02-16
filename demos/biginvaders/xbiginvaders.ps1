@@ -26,13 +26,12 @@ $ErrorActionPreference="Stop"
 $script:endreason = $null; # will be set to a reason later
 $script:rnd = new-object Random
 
-cls
-init-console $maxwidth $maxheight
+init-console $maxwidth $maxheight -ea "Stop"
 
 #------------------------------------------------------------------------------
-# Create the invader sprites
+# Create the invader sprites.
 # Returns a tuple of the shared direction controller object and the 
-# sprite array
+# sprite array.
 #
 function create-invadersprites($images) {
   $sprites = new-object collections.arraylist # @()

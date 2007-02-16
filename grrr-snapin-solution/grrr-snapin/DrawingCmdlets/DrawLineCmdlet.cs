@@ -60,7 +60,7 @@ namespace Soapyfrog.Grrr.DrawingCmdlets
             // TODO: i think this could benefit from the
             // integer rasterising algorith.
             // can also use for rectangles/curves, etc
-            // .. also for producing deltas for a motionpath
+            // .. also for producing steps for a motionpath
             int dx = x2 - x1;
             int dy = y2 - y1;
 

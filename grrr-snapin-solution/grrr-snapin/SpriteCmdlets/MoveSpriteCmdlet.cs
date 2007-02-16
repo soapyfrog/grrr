@@ -32,7 +32,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
                 {
                     if (evenIfDead || s.Alive)
                     {
-                        s.StepMotionPath();
+                        s.StepMotion();
                     }
                 }
             }

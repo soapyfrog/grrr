@@ -41,21 +41,20 @@ namespace Soapyfrog.Grrr.Core
         public int Y { get { return y; } set { y = value; } }
         public int Z { get { return z; } set { z = value; } }
         public bool Alive { get { return alive; } set { alive = value; } }
-        public int AnimRate { get { return animSpeed; } set { animSpeed = value; } }
+        public int AnimRate { get { return animRate; } set { animRate = value; } }
         public Image[] Images { get { return images; } }
         public string Tag { get { return tag; } set { tag = value; } }
 
 
 
         // stuff for animation
-        private int animSpeed = 1;          // 1 means update every frame
+        private int animRate = 1;          // 1 means update every frame
         private int numAnimFrames;          
         private int nextAnimFrame = 0;      // frame sequence
-        private int animSpeedCounter = 0;   // when reaches animSpeed, nextAnimFrame++
+        private int animSpeedCounter = 0;   // when reaches animRate, nextAnimFrame++
 
         // stuff for motion path
-        private int nextMPDeltaIndex = 0;           // the index of the next delta to use
-        private int nextMPDeltaRepeatCount = 0;     // the repeat count for the specific delta
+        private System.Collections.Generic.IEnumerator<Delta> motionpathDeltaEnumerator;
 
         public SpriteHandler Handler
         {
@@ -69,8 +68,7 @@ namespace Soapyfrog.Grrr.Core
             set
             {
                 motionpath = value;
-                nextMPDeltaIndex = 0;
-                nextMPDeltaRepeatCount = 0;
+                motionpathDeltaEnumerator = motionpath.GetDeltaEnumerator();
             }
         }
 
@@ -81,10 +79,13 @@ namespace Soapyfrog.Grrr.Core
         /// This should be called after drawing as a common use for it is to reset
         /// the animation frames or sequence and this should be done after the last
         /// frame was drawn.
+        /// 
+        /// TODO: eventually, we might want to implement this as an image
+        /// Enumerator to provide for more general image sequencing.
         /// </summary>
         internal void StepAnim()
         {
-            if (++animSpeedCounter == animSpeed)
+            if (++animSpeedCounter == animRate)
             {
                 animSpeedCounter = 0;
                 nextAnimFrame = (nextAnimFrame + 1) % numAnimFrames;
@@ -94,35 +95,39 @@ namespace Soapyfrog.Grrr.Core
         }
 
         /// <summary>
-        /// Step along the motion path. We do this here because state is per sprite, not
-        /// per MotionPath.
+        /// Make a motion step of a motionpath has been specified.
+        /// Regardless, WillMove and DidMove handlers are fired if available.
         /// 
-        /// The sprite's position is updated and the motion path pointer stepped one forward
-        /// ready for next time. If the sequence came to an end and there is a DidEndMotion
-        /// handler, it will be called.
-        /// 
-        /// This should be called prior to drawing as you want to ensure that the sprite is
-        /// drawn in the current position (the position that this method changes). The
-        /// handler can safely change the motionpath if desired.
+        /// If a motionhandler comes to an end and DidEndMotion handler is available,
+        /// it will be fired.
         /// </summary>
-        internal void StepMotionPath()
+        internal void StepMotion()
         {
+            // always fire WillMove
             if (handler != null && handler.WillMove != null) handler.WillMove.InvokeReturnAsIs(this);
-            if (motionpath != null)
+            // if we have an Enumerator...
+            if (motionpathDeltaEnumerator != null)
             {
-                Delta d = motionpath.Deltas[nextMPDeltaIndex];
-                x += d.dx;
-                y += d.dy;
-                if (++nextMPDeltaRepeatCount == d.num)
+                if (motionpathDeltaEnumerator.MoveNext())
                 {
-                    nextMPDeltaRepeatCount = 0;
-                    nextMPDeltaIndex = (nextMPDeltaIndex + 1) % motionpath.Deltas.Count;
-                    if (nextMPDeltaIndex == 0 && handler != null && handler.DidEndMotion != null)
+                    Delta d = motionpathDeltaEnumerator.Current;
+                    x += d.dx;
+                    y += d.dy;
+                    z += d.dz;
+                }
+                else
+                {
+                    motionpathDeltaEnumerator = null; // prevent indefinite firing of DidEndMotion
+                    if (handler != null && handler.DidEndMotion != null)
                         handler.DidEndMotion.InvokeReturnAsIs(this);
                 }
-            }
+            }    
+            // always fire DidMove
             if (handler != null && handler.DidMove != null) handler.DidMove.InvokeReturnAsIs(this);
         }
+
+
+
         /// <summary>
         /// Call willDraw scriptblock if any
         /// </summary>
@@ -161,15 +166,21 @@ namespace Soapyfrog.Grrr.Core
         protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, SpriteHandler sh,MotionPath mp,string tag)
         {
             this.images = images;
+            this.animRate = animrate;
+            numAnimFrames = images.Length;
+
             this.x = x;
             this.y = y;
             this.z = z;
             this.alive = alive;
-            this.animSpeed = animrate;
-            this.handler = sh;
-            this.motionpath = mp;
             this.tag = tag;
-            numAnimFrames = images.Length;
+            
+            this.handler = sh;
+            
+            motionpath = mp;
+            if (mp != null) motionpathDeltaEnumerator = mp.GetDeltaEnumerator();
+            
+
             // FIXME: the following are a bit of hack - what if images are diff sizes?
             width = images[0].Width;
             height = images[0].Height;
