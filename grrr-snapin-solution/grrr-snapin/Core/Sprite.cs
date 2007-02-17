@@ -134,8 +134,12 @@ namespace Soapyfrog.Grrr.Core
                     Y += d.dy;
                     Y += d.dz;
                     // out of bounds check
-                    if (handler != null && handler.DidExceedBounds != null & OutOfBounds)
-                        handler.DidExceedBounds.InvokeReturnAsIs(this);
+                    if (handler != null && handler.DidExceedBounds != null)
+                    {
+                        Edge e = ExceededBounds;
+                        if (e != Edge.None)
+                            handler.DidExceedBounds.InvokeReturnAsIs(this, d,e); // pass the delta and edges
+                    }
                 }
                 else
                 {
@@ -239,10 +243,11 @@ namespace Soapyfrog.Grrr.Core
         /// Check if any part of the sprite has gone outside of the boundary. This takes into
         /// account the reference point, so a large 10 cell wide sprite with ref point of 5,0
         /// would be out of bounds if the X pos was 4.
+        /// Value type is a bitwise OR of Edge.
         /// </summary>
-        public bool OutOfBounds
+        public Edge ExceededBounds
         {
-            get { return bounds != null && !rect.Inside(bounds); }
+            get { return bounds == null ? Edge.None : rect.Inside(bounds); }
         }
 
     }

@@ -21,8 +21,9 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 
 $ErrorActionPreference="Stop"
 
-[int]$script:maxwidth = 120
-[int]$script:maxheight = 60
+# needs a bit screen. best to use 6x8 bitmap font
+[int]$script:maxwidth = 180
+[int]$script:maxheight = 100
 init-console $maxwidth $maxheight 
 
 $script:endreason = $null; # will be set to a reason later
@@ -34,12 +35,12 @@ $script:rnd = new-object Random
 # controller object and the sprite array.
 #
 function create-invadersprites($images) {
-  $b = new-object Soapyfrog.Grrr.Core.Rect 0,0,$maxwidth,$maxheight
+  $b = new-object Soapyfrog.Grrr.Core.Rect 2,0,($maxwidth-4),$maxheight
   $sprites = new-object collections.arraylist # @()
   [hashtable]$ctl = @{  # shared controller for all sprites
     mp1=(create-motionpath "e") # initially just right
-    mpdl=(create-motionpath "s2 200w" 1) # down and left
-    mpdr=(create-motionpath "s2 200e" 1) # down and right
+    mpdl=(create-motionpath "s2 200w2" 1) # down and left
+    mpdr=(create-motionpath "s2 200e2" 1) # down and right
     current = $null
     next = $null
   } 
@@ -58,44 +59,31 @@ function create-invadersprites($images) {
     # we may hit a missile, but the missile will handle it
   }
   $oob = { 
-    $s=$args[0]
+    $s=$args[0] # sprite
+    $delta=$args[1] # Delta
+    [soapyfrog.grrr.core.edge]$edges=$args[2] # Edge bitwise set
     $d = $s.state.controller
-    if ($s.Y -ge $maxheight) { $endreason="aliens have landed" }
-    else {
-      if ($s.X -gt 60) {
-        $s.x--
-        $d.next=$d.mpdl;
-      }
-      else {
-        $s.x++
-        $d.next=$d.mpdr;
-      }
+    if ($d.next -ne $null) { return;} # aleady dealt with the event
+
+    if ($delta.dy -ge 0 -and $edges -band [soapyfrog.grrr.core.edge]::bottom) { 
+      $script:endreason="aliens have landed"
     }
-  }
-  $move = { 
-    $s=$args[0]
-    $d = $s.state.controller
-    # lets drop a bomb!
-    if ($rnd.next(500) -eq 0) {
-      foreach ($b in $d.bombs) {
-        if (!$b.alive) {
-          $b.X = $s.X + 5
-          $b.Y = $s.Y + $s.Height
-          $b.alive = $true
-          break
-        }
-      }
+    elseif ($delta.dx -gt 0 -and $edges -band [soapyfrog.grrr.core.edge]::right) {
+      $d.next=$d.mpdl;
+    }
+    elseif ($delta.dx -lt 0 -and $edges -band [soapyfrog.grrr.core.edge]::left) {
+      $d.next=$d.mpdr;
     }
   }
 
-  $handlers = Create-SpriteHandler -DidInit $init -DidMove $move -DidOverlap $overlap -DidExceedBounds $oob
+  $handlers = Create-SpriteHandler -DidInit $init -DidOverlap $overlap -DidExceedBounds $oob
   $y = 0
   $xo = 2
   "inva","invb","invc" | foreach {
     $i = $_
-    for ($x=0; $x -lt 4; $x++) {
+    for ($x=0; $x -lt 6; $x++) {
       $ip = $images["$i"+"0"],$images["$i"+"1"]
-      $s = create-sprite -images $ip -x ($xo+10+18*$x) -y $y -handler $handlers -animrate 8 -bounds $b
+      $s = create-sprite -images $ip -x ($xo+10+18*$x) -y $y -handler $handlers -bounds $b
       $sprites += $s
     }
     $xo -= 1
@@ -188,13 +176,13 @@ function main {
   # load the alien images from the file
   $images = (gc images.txt | get-image )
   # create an alien hoard (well, a small gathering) 
-  $aliens_controller,$aliens = create-invadersprites $images
+  $aliens_controller,[array]$aliens = create-invadersprites $images
   # create a base ship
   $base = create-basesprite $images
   # prepare a missile
   $missile = create-missilesprite $images
   # prepare some bombs
-  $aliens_controller.bombs = create-bombsprites $images
+  $bombs = create-bombsprites $images
 
   # create a keyevent map
   $keymap = create-keyeventmap
@@ -224,13 +212,14 @@ function main {
       move-sprite $alien # just the current alien
       move-sprite $base
       move-sprite $missile
-      move-sprite $aliens_controller.bombs 
+      move-sprite $bombs 
 
       # draw everything
-      draw-sprite $pf $aliens 
+      draw-sprite $pf $aliens -NoAnim
+      animate-sprite $alien # only animate the current one
       draw-sprite $pf $base
       draw-sprite $pf $missile 
-      draw-sprite $pf $aliens_controller.bombs 
+      draw-sprite $pf $bombs 
 
       # draw a status line
       draw-string $pf $debugline 0 0 -fg "red"
@@ -241,15 +230,28 @@ function main {
       # test for collisions - note, if this is done to ensure sprites are not
       # out of bounds, you might want to do it before drawing
       test-spriteoverlap $aliens $base,$missile # check if aliens have hit base or missile
-      test-spriteoverlap $aliens_controller.bombs $base,$missile
+      test-spriteoverlap $bombs $base,$missile
 
       # update debug line for next frame
-      $debugline = "$($pf.fps) fps (target 50)   $($script:zzz)"
+      $debugline = "$($pf.fps) fps (target 50)   keydown: $($script:zzz)  "
       
       # cull dead aliens
       $aliens = ($aliens | where {$_.alive})
       if ($aliens -eq $null) { $script:endreason="all aliens dead!" }
       if ($script:endreason) { break }
+      
+      # lets drop a bomb!
+      if ($rnd.next(50) -eq 0) {
+        foreach ($b in $bombs) {
+          if (!$b.alive) {
+            $s = $aliens[$rnd.next($aliens.length)]
+            $b.X = $s.X + 5
+            $b.Y = $s.Y + $s.Height
+            $b.alive = $true
+            break
+          }
+        }
+      }
     }
     # update aliens controller state
     if ($aliens_controller.next) {

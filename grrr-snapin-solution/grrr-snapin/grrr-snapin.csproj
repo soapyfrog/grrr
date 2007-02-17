@@ -69,6 +69,7 @@
     <Compile Include="PlayfieldCmdlets\CreatePlayfieldCmdlet.cs" />
     <Compile Include="PlayfieldCmdlets\FlushPlayfieldCmdlet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpriteCmdlets\AnimateSpriteCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateMotionPathCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateSpriteCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateSpriteHandlerCmdlet.cs" />

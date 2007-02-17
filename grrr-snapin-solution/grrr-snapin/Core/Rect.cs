@@ -4,21 +4,11 @@ using System.Text;
 
 namespace Soapyfrog.Grrr.Core
 {
-    public interface IRect
-    {
-        int X { get;}
-        int Y { get;}
-        int Width { get;}
-        int Height { get;}
-        int X2 { get;}
-        int Y2 { get;}
-    }
-
     /// <summary>
     /// Rectangular reference, supports x,y,w,h as well as x,y,x2,y2
     /// and assignment to/from ps Rectangle
     /// </summary>
-    public class Rect : IRect
+    public class Rect
     {
         private int x;
         private int y;
@@ -61,12 +51,23 @@ namespace Soapyfrog.Grrr.Core
         }
 
         /// <summary>
-        /// Returns true if this Rect is entirely inside the
-        /// other one.
+        /// Determines if this rect is completely inside the other one.
         /// </summary>
-        public bool Inside(Rect other)
+        /// <param name="other"></param>
+        /// <returns>A bitwise OR of Edge of which edges this rect has exceeded 
+        /// (Edge.None if completely inside).
+        /// </returns>
+        public Edge Inside(Rect other)
         {
-            return x >= other.x && y >= other.y && X2 <= other.X2 && Y2 <= other.Y2;
+            Edge edges = Edge.None;
+            if (x < other.x) edges |= Edge.Left;
+            if (y < other.y) edges |= Edge.Top;
+            if (X2 > other.X2) edges |= Edge.Right;
+            if (Y2 > other.Y2) edges |= Edge.Bottom;
+            return edges;
+            //return x >= other.x && y >= other.y && X2 <= other.X2 && Y2 <= other.Y2;
         }
     }
+    [Flags]
+    public enum Edge { None = 0, Left = 1, Right = 2, Top = 4, Bottom = 8 }
 }
