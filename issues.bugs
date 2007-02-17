@@ -46,11 +46,6 @@ A variant of a sprite that has no drawn image, but occupies space and can be
 tested for collisions, moved, etc. Could also be useful for formation leaders
 where there is no real leader.
 
-[00011 | 15/02/2007 | Open | Bug | Boundary]
-
-DidExeedBounds is never fired because there is no basic bounds feature yet
-(see issue 00007).
-
 [00012 | 15/02/2007 | Open | Feature | Fine Grain collision detection]
 
 Overlap only when non-transparent cells overlap.
@@ -76,6 +71,11 @@ Also, introduce layering, so that collisions only occur in same
 layers... enables all sprites to be kept in one collection so no need
 to repeatedly call test-spriteoverlap
 
+
+[00015 | 17/02/2007 | Open | Feature | Disable keydown auto repeat]
+
+Fast autorepeat causes keydown events to be repeatedly fired.
+This can slow things down if the script handler is lengthy.
 
 
 
