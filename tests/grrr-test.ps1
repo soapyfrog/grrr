@@ -24,9 +24,9 @@ $ErrorActionPreference="Stop" # endless errors annoy me
 
 # load modules
 . ..\lib\psunit.ps1
-. ..\lib\grrr.ps1
 
 # init console
+cls
 init-console -w 120 -h 50 
 
 
@@ -35,18 +35,18 @@ init-console -w 120 -h 50
 #
 function test-create-playfield {
   $pf = create-playfield -width 30 -height 20 
-  assert-equal "x" 0 $pf.coord.X
-  assert-equal "y" 0 $pf.coord.Y
-  assert-equal "r" (30-1) $pf.rect.Right
-  assert-equal "b" (20-1) $pf.rect.Bottom
-  assert-equal "background" "black" $pf.buffer[0,0].BackgroundColor
+  assert-equal "x" 0 $pf.X
+  assert-equal "y" 0 $pf.Y
+  assert-equal "w" 30 $pf.Width
+  assert-equal "h" 20 $pf.Height
+  assert-equal "background" "black" $pf.Background
 
   $pf = create-playfield -width 30 -height 20 -x 5 -y 6 -bg "red"
-  assert-equal "x" 5 $pf.coord.X
-  assert-equal "y" 6 $pf.coord.Y
-  assert-equal "r" (5+30-1) $pf.rect.Right
-  assert-equal "b" (6+20-1) $pf.rect.Bottom
-  assert-equal "background" "red" $pf.buffer[0,0].BackgroundColor
+  assert-equal "x" 5 $pf.X
+  assert-equal "y" 6 $pf.Y
+  assert-equal "w" 30 $pf.Width
+  assert-equal "h" 20 $pf.Height
+  assert-equal "background" "red" $pf.Background
 
 }
 
@@ -101,16 +101,16 @@ function test-overlap-sprite {
   $img = create-image "ABC","DEF" # 3x2 image
   $s1 = create-sprite @($img) -x 1 -y 1 
   $s2 = create-sprite @($img) -x 1 -y 1 
-  assert-true "full overlap" (overlap-sprite? $s1 $s2)
+  assert-notnull "full overlap" (Test-SpriteOverlap $s1 $s2 -OutputPairs)
 
   $s2 = create-sprite @($img) -x 3 -y 1 
-  assert-true "partial x overlap" (overlap-sprite? $s1 $s2)
+  assert-notnull "partial x overlap" (test-spriteoverlap $s1 $s2 -outputpairs)
 
   $s2 = create-sprite @($img) -x 1 -y 2 
-  assert-true "partial y overlap" (overlap-sprite? $s1 $s2)
+  assert-notnull "partial y overlap" (test-spriteoverlap $s1 $s2 -outputpairs)
 
   $s2 = create-sprite @($img) -x 4 -y 1 
-  assert-false "no overlap" (overlap-sprite? $s1 $s2)
+  assert-null "no overlap" (test-spriteoverlap $s1 $s2 -outputpairs)
 
 }
 
@@ -121,8 +121,8 @@ function test-draw-sprite {
   $pf = create-playfield -x 70 -y 36 -width 20 -height 20 -bg "black"
 
   $img = create-image "ABC","DEF" -bg "red" -fg "yellow"
-  $h = create-spritehandlers -willdraw { param($s) $s.x++; $s.y++ }
-  $spr = create-sprite @($img) -x 1 -y 1 -handlers $h
+  $h = create-spritehandler -willdraw { $s=$args[0]; $s.x++; $s.y++ }
+  $spr = create-sprite @($img) -x 1 -y 1 -handler $h
 
   1..8 | foreach {
     clear-playfield $pf
@@ -144,7 +144,7 @@ function test-draw-tilemap {
   $lines = "AB  AB   BA",
            "AAA AAB AAA",
            "AAAAAAAAAAA"
-  $tilemap = create-tilemap -lines $lines -imagemap @{"A"=$imgA;"B"=$imgB} 3 2 
+  $tilemap = create-tilemap -lines $lines -imagemap @{"A"=$imgA;"B"=$imgB}  
 
   0..10 | foreach {
     clear-playfield $pf
@@ -153,13 +153,6 @@ function test-draw-tilemap {
   }
 }
 
-#----------------------------------------------------------------
-# test creating a motion path sprite handler
-#
-function test-create-spritehandlers-for-motionpath {
-  $h = create-spritehandlers-for-motionpath "e4 s3 w1 n3"
-  assert-equal "numdeltas" 11 $h.numdeltas
-}
 
 #----------------------------------------------------------------
 # test drawing lines
@@ -246,10 +239,6 @@ function test-scan-image {
   clear-playfield $pf
   draw-image $pf $img -x 1 -y 1
   flush-playfield $pf
-  # finally check that a fullsize scan is possible
-  $fimg = scan-image $tpf
-  assert-equal "fimg width" 10 $fimg.width
-  assert-equal "fimg height" 10 $fimg.height
 }
 
 

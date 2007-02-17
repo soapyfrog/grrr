@@ -23,13 +23,13 @@ $ErrorActionPreference="Stop" # endless errors annoy me
 
 # load modules
 . ..\lib\psunit.ps1
-. ..\lib\grrr.ps1
 
 $Kwidth = 120
 $Kheight = 50
 $Kiters = 150
 
 # init console
+cls
 init-console -w $Kwidth -h $Kheight 
 
 #----------------------------------------------------------------
