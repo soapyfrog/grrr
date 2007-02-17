@@ -20,9 +20,6 @@ $local:___globcheck___=2
 if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global scope"}
 
 
-# load modules
-. ..\lib\grrr.ps1
-
 
 
 function main {
@@ -63,12 +60,13 @@ function main {
     $minsY = $minsRadiusY * [Math]::Sin($minsAngle)
     draw-line $pf $midx $midy ($midx+$minsX) ($midy+$minsY) $minsImg
 
-    $secsAngle = $twopi * ($n.Second / 60) - $pd2
+    $s=($n.Second + ($n.Millisecond /1000) )
+    $secsAngle = $twopi * ( $s / 60 ) - $pd2
     $secsX = $secsRadiusX * [Math]::Cos($secsAngle)
     $secsY = $secsRadiusY * [Math]::Sin($secsAngle)
-    draw-line $pf $midx $midy ($midx+$secsX) ($midy+$secsY) $secsImg
+    draw-line $pf -x1 $midx -y1 $midy -x2 ($midx+$secsX) -y2 ($midy+$secsY) $secsImg
 
-    flush-playfield $pf -sync 1000
+    flush-playfield $pf -sync 40
   }
 }
 

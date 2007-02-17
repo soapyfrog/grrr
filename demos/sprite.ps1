@@ -20,11 +20,9 @@ $local:___globcheck___=2
 if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global scope"}
 
 
-# load modules
-. ..\lib\grrr.ps1
-
+cls
 init-console 120 50
-write-host "Sprites with manual (yellow) and path based (red) movement."
+write-host "Sprites with manual (yellow) and path based (red) movement. Collisions are counted."
 
 
 function main {
@@ -42,39 +40,50 @@ function main {
   # an array of sprites
   $sprites = @()
   # motion behaviour handlers - a somewhat manual approach - see below for alternative
-  $handlers = create-spritehandlers -didinit { param($s) $s.dx = 1 } -willdraw {
-            param($s)
-            if ($s.x -gt 72) { $s.y++; $s.dx=-1 }
-            elseif ($s.x -lt 4) { $s.y--; $s.dx=1 }
-            $s.x += $s.dx
+  $handler = create-spritehandler -didinit {$args[0].state.dx = 1 } -didmove {
+            $s = $args[0]; $st=$s.state
+            if ($s.x -gt 72) { $s.y++; $s.state.dx=-1 }
+            elseif ($s.x -lt 4) { $s.y--; $s.state.dx=1 }
+            $s.x += $s.state.dx
           }
   $images = @($imga1,$imga2,$imga3,$imga2)
   # build a load of them
-  0..15 | foreach {
+  0..31 | foreach {
     [int]$n=$_
     $x = [Math]::Floor($n / 4) * 7 + 4
     $y = ($n % 4) * 4 + 3
-    $sa = create-sprite -images $images -x $x -y $y -handlers $handlers -animrate 8
+    $sa = create-sprite -images $images -x $x -y $y -handler $handler -animrate 8
     $sprites += $sa
   }
 
+  $script:collisions = 0
+
   # create another one with different behaviour
   $imgb = create-image "/\","\/" -fg "red" -bg "black"
-  $h = create-spritehandlers-for-motionpath "e20 ne6 n20 ne4 e4 se4 s4 sw4 w8 s12 sw6 w20 h5"
-  $spr = create-sprite -images @($imgb) -x 10 -y 42 -handlers $h
-  $sprites += $spr
+  $mp = create-motionpath "20e 6ne 20n 4ne 4e 4se 4s 4sw 8w 12s 6sw 20w 5h" 3
+  $h = create-spritehandler -didoverlap {
+    $me = $args[0]; $other=$args[1];
+    $script:collisions++
+  } -didendmotion {
+    xqwqwex
+  }
+  $spr = create-sprite -images @($imgb) -x 10 -y 42  -motionpath $mp -handler $h
 
   # game loop
   $debugline=" "
-  [int]$fc = 0;
   while ($true) {
-    $fc++
     clear-playfield $pf
     draw-string $pf $debugline 0 0 red
-    draw-sprites $pf $sprites
-    flush-playfield $pf -sync 20 -stats
-    $fps = get-playfieldfps $pf
-    $debugline = "$fps fps (target 50)"
+    #move all
+    move-sprite $sprites
+    move-sprite $spr
+    #draw all
+    draw-sprite $pf $sprites
+    draw-sprite $pf $spr
+    test-spriteoverlap $spr $sprites 
+    flush-playfield $pf -sync 20 
+    $fps = $pf.FPS
+    $debugline = "$fps fps (target 50) collisions=$collisions"
   }
 }
 
