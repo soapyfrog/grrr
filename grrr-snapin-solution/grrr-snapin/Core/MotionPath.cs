@@ -69,7 +69,7 @@ namespace Soapyfrog.Grrr.Core
                 int repeat = 1; 
                 int distance = 1;
                 if (m.Groups[1].Length > 0) repeat = int.Parse(m.Groups[1].Value);
-                if (m.Groups[3].Length > 0) repeat = int.Parse(m.Groups[3].Value);
+                if (m.Groups[3].Length > 0) distance = int.Parse(m.Groups[3].Value);
                 string cmd = m.Groups[2].Value.ToUpper();
                 switch (cmd)
                 {

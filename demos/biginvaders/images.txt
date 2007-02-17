@@ -2,8 +2,9 @@
 
 #! translate I to a solid char
 #translate I 9608
+#!translate I 35
 #transparent 32
-#begin invc0 magenta black
+#begin invc0 green black
     IIII
  IIIIIIIIII
 IIIIIIIIIIII
@@ -13,7 +14,7 @@ IIIIIIIIIIII
   II II II
 II        II
 #end
-#begin invc1 magenta black
+#begin invc1 green black
     IIII
  IIIIIIIIII
 IIIIIIIIIIII
@@ -43,7 +44,7 @@ IIIIIIIIIII
   I     I
  I       I
 #end
-#begin inva0 cyan black
+#begin inva0 green black
    II
   IIII
  IIIIII
@@ -53,7 +54,7 @@ IIIIIIII
 I      I
  I    I
 #end
-#begin inva1 cyan black
+#begin inva1 green black
    II
   IIII
  IIIIII
@@ -63,7 +64,7 @@ IIIIIIII
  I II I
 I I  I I
 #end
-#begin base yellow red
+#begin base yellow black
      I
     III
  IIIIIIIII
@@ -85,23 +86,48 @@ I
   I
  I
 #end
-#begin bombb green black
+#begin bombb0 red black
  I
  I
 II
  II
  I
 #end
-#begin missile green black
+#begin bombb1 red black
+ I
+II
+ II
+ I
+ I
+#end
+#begin missile white black
 I
 I
 I
 #end
-#begin mothership green black
+#begin mothership0 green black
      IIIIII
    IIIIIIIIII
   IIIIIIIIIIII
  II II II II II
+IIIIIIIIIIIIIIII
+  III  II  III
+   I        I
+#end
+#begin mothership1 green black
+     IIIIII
+   IIIIIIIIII
+  IIIIIIIIIIII
+  II II II II I
+IIIIIIIIIIIIIIII
+  III  II  III
+   I        I
+#end
+#begin mothership2 green black
+     IIIIII
+   IIIIIIIIII
+  IIIIIIIIIIII
+ I II II II II 
 IIIIIIIIIIIIIIII
   III  II  III
    I        I

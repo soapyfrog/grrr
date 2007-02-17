@@ -71,7 +71,7 @@ namespace Soapyfrog.Grrr.ImageCmdlets
                             refx = 0; refy = 0;
                             id = m.Groups[1].Value;
                             fg = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), m.Groups[2].Value, true);
-                            bg = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), m.Groups[2].Value, true);
+                            bg = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), m.Groups[3].Value, true);
                             WriteDebug(string.Format("begin image {0} {1} {2}", id, fg, bg));
                         }
                         else if ((m = refxyRE.Match(p)).Success)

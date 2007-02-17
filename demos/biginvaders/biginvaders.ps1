@@ -38,9 +38,9 @@ function create-invadersprites($images) {
   $b = new-object Soapyfrog.Grrr.Core.Rect 2,0,($maxwidth-4),$maxheight
   $sprites = new-object collections.arraylist # @()
   [hashtable]$ctl = @{  # shared controller for all sprites
-    mp1=(create-motionpath "e") # initially just right
-    mpdl=(create-motionpath "s2 200w2" 1) # down and left
-    mpdr=(create-motionpath "s2 200e2" 1) # down and right
+    mp1=(create-motionpath "e2") # initially just right
+    mpdl=(create-motionpath "2s2 200w2" 1) # down and left
+    mpdr=(create-motionpath "2s2 200e2" 1) # down and right
     current = $null
     next = $null
   } 
@@ -77,9 +77,9 @@ function create-invadersprites($images) {
   }
 
   $handlers = Create-SpriteHandler -DidInit $init -DidOverlap $overlap -DidExceedBounds $oob
-  $y = 0
-  $xo = 2
-  "inva","invb","invc" | foreach {
+  $y = 8
+  $xo = 4
+  "inva","invb","invc","invc" | foreach {
     $i = $_
     for ($x=0; $x -lt 6; $x++) {
       $ip = $images["$i"+"0"],$images["$i"+"1"]
@@ -87,7 +87,7 @@ function create-invadersprites($images) {
       $sprites += $s
     }
     $xo -= 1
-    $y += 11
+    $y += 10
   }
   return $ctl,$sprites
 }
@@ -125,7 +125,7 @@ function create-missilesprite {
     $inv.alive = $false 
     $s.alive = $false
   }
-  $mp = create-motionpath "n" # just head north
+  $mp = create-motionpath "n2" # just head north
   $s = create-sprite -images $images.missile -handler $h -motionpath $mp -tag "missile" -bound $b
   # start it off dead; it gets set to alive when it's fired.
   $s.alive = $false
@@ -154,7 +154,7 @@ function create-bombsprites {
       $s.alive = $false;
     }
   }
-  $mp = create-motionpath "s h" # just head south slowly
+  $mp = create-motionpath "s" # just head south 
   # create a few
   1..3 | foreach {
     $s = create-sprite -images $images.bomba0,$images.bomba1 -handler $h -motionpath $mp -animrate 4 -tag "bomb" -bound $b
@@ -174,7 +174,7 @@ function main {
   $pf = create-playfield -x 0 -y 0 -width $maxwidth -height $maxheight -bg "black"
 
   # load the alien images from the file
-  $images = (gc images.txt | get-image )
+  $images = (gc ./images.txt | get-image )
   # create an alien hoard (well, a small gathering) 
   $aliens_controller,[array]$aliens = create-invadersprites $images
   # create a base ship
