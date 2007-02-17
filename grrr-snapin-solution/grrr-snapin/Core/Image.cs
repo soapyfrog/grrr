@@ -10,7 +10,7 @@ namespace Soapyfrog.Grrr.Core
 {
     /// <summary>
     /// Class used to represent the image - created by the cmdlet
-    /// It encapsulates an array of buffer cells, has a width and height
+    /// It encapsulates an array of buffer cells, has a effectiveWidth and effectiveHeight
     /// and reference point offset.
     /// If you draw an image at x,y, the reference point is at x,y which
     /// might not be topleft (could be in the middle).

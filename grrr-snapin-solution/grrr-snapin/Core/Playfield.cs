@@ -108,8 +108,8 @@ namespace Soapyfrog.Grrr.Core
             y -= img.RefY;
 
             // fast exclude images entirely outside of the buffer
-            int bw = Width; // playfield width
-            int iw = img.Width; // image width
+            int bw = Width; // playfield effectiveWidth
+            int iw = img.Width; // image effectiveWidth
             if (x >= bw || (x + iw < 0)) return count; // fast quit
 
             // heights
@@ -177,8 +177,8 @@ namespace Soapyfrog.Grrr.Core
         /// </summary>
         /// <param name="x">x position in playfield</param>
         /// <param name="y">y position in playfield</param>
-        /// <param name="w">width of image</param>
-        /// <param name="h">height of image</param>
+        /// <param name="w">effectiveWidth of image</param>
+        /// <param name="h">effectiveHeight of image</param>
         /// <param name="t">transparent character</param>
         /// <returns>an Image</returns>
         public Image ScanImage(int x, int y, int w, int h, char t,int refx,int refy)

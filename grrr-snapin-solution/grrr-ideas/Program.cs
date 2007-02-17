@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Soapyfrog.Grrr.Core;
 
 namespace grrr_ideas
 {
@@ -8,51 +9,18 @@ namespace grrr_ideas
     {
         static void Main(string[] args)
         {
-            Mover m = new Mover(10);
-            foreach (Delta d in m)
-            {
-                Console.WriteLine(d);
-            }
+            Rect r1 = new Rect(10, 10, 5, 3);
+            Rect r2 = new Rect(10, 10, 5, 3);
+
+            Console.WriteLine("r1=" + r1);
+            Console.WriteLine("r2=" + r2);
+
+            Console.WriteLine(r1.Overlaps(r2));
+            Console.WriteLine(r1.Inside(r2));
+
         }
     }
 
 
 
-    class Delta {
-        int dx,dy;
-        internal Delta(int x,int y){dx=x;dy=y;}
-        public override string ToString()
-        {
-            return dx + "," + dy;
-        }
-    }
-
-    class Mover : IEnumerable<Delta>
-    {
-        private int size;
-        internal Mover(int size)
-        {
-            this.size = size;
-        }
-
-        #region IEnumerable<Delta> Members
-
-        public IEnumerator<Delta> GetEnumerator()
-        {
-            for (int i=0;i<size;i++) {
-                yield return new Delta(1,1);
-            }
-        }
-
-        #endregion
-
-        #region IEnumerable Members
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        #endregion
-    }
 }

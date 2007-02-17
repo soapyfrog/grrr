@@ -4,11 +4,21 @@ using System.Text;
 
 namespace Soapyfrog.Grrr.Core
 {
+    public interface IRect
+    {
+        int X { get;}
+        int Y { get;}
+        int Width { get;}
+        int Height { get;}
+        int X2 { get;}
+        int Y2 { get;}
+    }
+
     /// <summary>
     /// Rectangular reference, supports x,y,w,h as well as x,y,x2,y2
     /// and assignment to/from ps Rectangle
     /// </summary>
-    public class Rect
+    public class Rect : IRect
     {
         private int x;
         private int y;
@@ -36,8 +46,27 @@ namespace Soapyfrog.Grrr.Core
 
         public override string ToString()
         {
-            return string.Format("x={0} y={1} w={2} h={3}", x, y, w, h);
+            return string.Format("x={0} y={1} w={2} h={3} x2={4} y2={5}",
+                x, y, w, h,X2,Y2);
         }
 
+
+        /// <summary>
+        /// Returns true if this Rect overlaps the other one.
+        /// </summary>
+        public bool Overlaps(Rect other)
+        {
+            return !(other.x >= X2 || other.X2 < x ||
+                other.y >= Y2 || other.Y2 < y);
+        }
+
+        /// <summary>
+        /// Returns true if this Rect is entirely inside the
+        /// other one.
+        /// </summary>
+        public bool Inside(Rect other)
+        {
+            return x >= other.x && y >= other.y && X2 <= other.X2 && Y2 <= other.Y2;
+        }
     }
 }

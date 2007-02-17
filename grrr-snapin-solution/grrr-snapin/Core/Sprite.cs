@@ -16,7 +16,6 @@ namespace Soapyfrog.Grrr.Core
     public class Sprite
     {
         private Image[] images;
-        private int width, height;
         private int x, y, z;
         private bool alive = true;
         private Hashtable state = new Hashtable(); // used by handlers to store their one state
@@ -24,6 +23,12 @@ namespace Soapyfrog.Grrr.Core
         private MotionPath motionpath;
         private string tag; // optional tag string
         private Rect bounds; // optional bounds
+
+        // This is the rectangle in which all images will be drawn. It's used for checking if
+        // the sprite goes out of bounds and for overlap tests.
+        private Rect rect = new Rect(0, 0, 0, 0);
+        private int refx, refy; // cache reference point offset
+
 
         /// <summary>
         /// User settable state properties. Saves mucking about with
@@ -35,22 +40,35 @@ namespace Soapyfrog.Grrr.Core
             set { state = value; }
         }
 
+        /// <summary>
+        /// The bounds in which this sprite will be drawn. If the
+        /// sprite is not completely within bounds, DidExceedBounds
+        /// handler is fired.
+        /// </summary>
         public Rect Bounds { get { return bounds; } set { bounds = value; } }
-        public int Width { get { return width; } set { width = value; } }
-        public int Height { get { return height; } set { height = value; } }
-        public int X { get { return x; } set { x = value; } }
-        public int Y { get { return y; } set { y = value; } }
+
+        /// <summary>
+        /// The rectangle used to draw the sprite, regardless of image used.
+        /// </summary>
+        public Rect Rect { get { return rect; } }
+
+        public int X { get { return x; } set { rect.X = value - refx; x = value; } }
+        public int Y { get { return y; } set { rect.Y = value - refy; y = value; } }
         public int Z { get { return z; } set { z = value; } }
+
         public bool Alive { get { return alive; } set { alive = value; } }
         public int AnimRate { get { return animRate; } set { animRate = value; } }
         public Image[] Images { get { return images; } }
         public string Tag { get { return tag; } set { tag = value; } }
 
+        // Width and Height properties are based on current image so can change.
+        public int Width { get { return CurrImage.Width; } }
+        public int Height { get { return CurrImage.Height; } }
 
 
         // stuff for animation
         private int animRate = 1;          // 1 means update every frame
-        private int numAnimFrames;          
+        private int numAnimFrames;
         private int nextAnimFrame = 0;      // frame sequence
         private int animSpeedCounter = 0;   // when reaches animRate, nextAnimFrame++
 
@@ -112,9 +130,9 @@ namespace Soapyfrog.Grrr.Core
                 if (motionpathDeltaEnumerator.MoveNext())
                 {
                     Delta d = motionpathDeltaEnumerator.Current;
-                    x += d.dx;
-                    y += d.dy;
-                    z += d.dz;
+                    X += d.dx;
+                    Y += d.dy;
+                    Y += d.dz;
                     // out of bounds check
                     if (handler != null && handler.DidExceedBounds != null & OutOfBounds)
                         handler.DidExceedBounds.InvokeReturnAsIs(this);
@@ -125,12 +143,10 @@ namespace Soapyfrog.Grrr.Core
                     if (handler != null && handler.DidEndMotion != null)
                         handler.DidEndMotion.InvokeReturnAsIs(this);
                 }
-            }    
+            }
             // always fire DidMove
             if (handler != null && handler.DidMove != null) handler.DidMove.InvokeReturnAsIs(this);
         }
-
-
 
         /// <summary>
         /// Call willDraw scriptblock if any
@@ -167,8 +183,8 @@ namespace Soapyfrog.Grrr.Core
             get { return images[nextAnimFrame]; }
         }
 
-        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate, 
-            SpriteHandler sh,MotionPath mp,string tag,Rect bounds)
+        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate,
+            SpriteHandler sh, MotionPath mp, string tag, Rect bounds)
         {
             this.images = images;
             this.animRate = animrate;
@@ -180,16 +196,27 @@ namespace Soapyfrog.Grrr.Core
             this.z = z;
             this.alive = alive;
             this.tag = tag;
-            
+
             this.handler = sh;
-            
+
             motionpath = mp;
             if (mp != null) motionpathDeltaEnumerator = mp.GetDeltaEnumerator();
-            
 
-            // FIXME: the following are a bit of hack - what if images are diff sizes?
-            width = images[0].Width;
-            height = images[0].Height;
+            // set up the rectangle in which the sprite will be drawn
+            // regardless of which image is being used.
+            fixDrawRect();
+        }
+
+
+        private void fixDrawRect()
+        {
+            Image i = images[0]; // TODO: should check sizes of all images
+            refx = i.RefX;
+            refy = i.RefY;
+            rect.X = x - refx;
+            rect.Y = y - refy;
+            rect.Width = i.Width;
+            rect.Height = i.Height;
         }
 
         /// <summary>
@@ -201,32 +228,21 @@ namespace Soapyfrog.Grrr.Core
         /// <param name="b">The b sprite to check</param>
         /// <param name="evenIfDead">Check even if not alive</param>
         /// <returns>true if overlapping, else false</returns>
-        public bool Overlaps(Sprite other,bool evenIfDead)
+        public bool Overlaps(Sprite other, bool evenIfDead)
         {
             if (!evenIfDead && !(alive && other.alive)) return false;
-
-            int right = x + width;
-            int otherRight = other.x + other.width;
-            int bottom = y + height;
-            int otherBottom = other.y + other.height;
-            return !(other.x >= right || otherRight < x
-                || other.y >= bottom || otherBottom < y);
+            return rect.Overlaps(other.rect);
         }
 
 
         /// <summary>
-        /// Check if sprite is entirely out of bounds (not just overlapping the
-        /// boundary).
+        /// Check if any part of the sprite has gone outside of the boundary. This takes into
+        /// account the reference point, so a large 10 cell wide sprite with ref point of 5,0
+        /// would be out of bounds if the X pos was 4.
         /// </summary>
-        /// <returns></returns>
         public bool OutOfBounds
         {
-            get
-            {
-
-                return bounds != null && (x + width >= bounds.X2 || y + height >= bounds.Y2 ||
-                    x < bounds.X || y < bounds.Y);
-            }
+            get { return bounds != null && !rect.Inside(bounds); }
         }
 
     }

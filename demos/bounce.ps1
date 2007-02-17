@@ -47,7 +47,9 @@ function main {
 
     move-sprite $sprite
 
-    draw-string $pf "invokecount=$script:invokecount x=$($sprite.X) y=$($sprite.Y) bounds=$bounds" 0 0 -fg "red"
+    draw-string $pf "invokecount=$script:invokecount x=$($sprite.X) y=$($sprite.Y)" 0 0 -fg "red"
+    draw-string $pf "bounds=$bounds" 0 1 -fg "cyan"
+    draw-string $pf "sprite rect=$($sprite.rect)" 0 2 -fg "yellow"
 
     draw-sprite $pf $sprite
 
