@@ -24,11 +24,13 @@ namespace Soapyfrog.Grrr.ImageCmdlets
         private List<char> translationSeq = new List<char>();
 
         private List<string> lines;
+        private int refx, refy;
         private string id;
         private ConsoleColor fg, bg;
         private char transparent;
 
         private Regex beginRE = new Regex(@"^#begin\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)");
+        private Regex refxyRE = new Regex(@"^#refxy\s+([+-]?\d+)\s+([+-]?\d+)");
         private Regex transparentRE = new Regex(@"^#transparent\s+([^\s]+)");
         private Regex translateRE = new Regex(@"^#translate\s+([^\s]+)\s+([^\s]+)");
         private Regex commentRE = new Regex(@"^#!");
@@ -66,10 +68,16 @@ namespace Soapyfrog.Grrr.ImageCmdlets
                         if ((m = beginRE.Match(p)).Success)
                         {
                             lines = new List<string>();
+                            refx = 0; refy = 0;
                             id = m.Groups[1].Value;
                             fg = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), m.Groups[2].Value, true);
                             bg = (ConsoleColor)Enum.Parse(typeof(ConsoleColor), m.Groups[2].Value, true);
                             WriteDebug(string.Format("begin image {0} {1} {2}", id, fg, bg));
+                        }
+                        else if ((m = refxyRE.Match(p)).Success)
+                        {
+                            refx = int.Parse(m.Groups[1].Value);
+                            refy = int.Parse(m.Groups[1].Value);
                         }
                         else if ((m = transparentRE.Match(p)).Success)
                         {
@@ -94,7 +102,7 @@ namespace Soapyfrog.Grrr.ImageCmdlets
                             {
                                 WriteDebug(string.Format("end image {0}", id));
                                 BufferCell[,] cells = Host.UI.RawUI.NewBufferCellArray(lines.ToArray(), fg, bg);
-                                images.Add(id, new Image(cells, transparent));
+                                images.Add(id, new Image(cells, transparent,refx,refy));
                                 id = null;
                             }
                             else

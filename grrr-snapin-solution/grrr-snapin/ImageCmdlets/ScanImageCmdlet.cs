@@ -15,6 +15,7 @@ namespace Soapyfrog.Grrr.ImageCmdlets
     {
         private Playfield pf;
         private int x, y, w, h;
+        private int refx, refy;
         private char t;
 
         [Parameter(Position = 0, Mandatory = true)]
@@ -54,9 +55,14 @@ namespace Soapyfrog.Grrr.ImageCmdlets
             set { t = value; }
             get { return t; }
         }
+        [Parameter()]
+        public int RefX { set { refx = value; } get { return refx; } }
+        [Parameter()]
+        public int RefY { set { refy = value; } get { return refy; } }
+
         protected override void EndProcessing()
         {
-            WriteObject(pf.ScanImage(x, y, w, h, t));
+            WriteObject(pf.ScanImage(x, y, w, h, t,refx,refy));
         }
     }
 

@@ -58,7 +58,9 @@ namespace Soapyfrog.Grrr.DrawingCmdlets
         protected override void EndProcessing()
         {
             BufferCell[,] cells = Host.UI.RawUI.NewBufferCellArray(new string[]{text}, fg, bg);
-            Image im = new Image(cells, '\0');
+            Image im = new Image(cells, '\0',0,0); 
+#warning "need to put an enum for alignment"
+
             pf.DrawImage(im, x, y);
         }
     }

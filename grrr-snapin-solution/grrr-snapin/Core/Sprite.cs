@@ -116,7 +116,7 @@ namespace Soapyfrog.Grrr.Core
                     y += d.dy;
                     z += d.dz;
                     // out of bounds check
-                    if (handler != null && handler.DidExceedBounds != null & OutOfBounds())
+                    if (handler != null && handler.DidExceedBounds != null & OutOfBounds)
                         handler.DidExceedBounds.InvokeReturnAsIs(this);
                 }
                 else
@@ -215,12 +215,18 @@ namespace Soapyfrog.Grrr.Core
 
 
         /// <summary>
-        /// check if sprite is entirely inside bounds (not same as overlap)
+        /// Check if sprite is entirely out of bounds (not just overlapping the
+        /// boundary).
         /// </summary>
         /// <returns></returns>
-        bool OutOfBounds() {
-            return bounds != null && (x + width >= bounds.X2 || y + height >= bounds.Y2 ||
-                x < bounds.X || y < bounds.Y);
+        public bool OutOfBounds
+        {
+            get
+            {
+
+                return bounds != null && (x + width >= bounds.X2 || y + height >= bounds.Y2 ||
+                    x < bounds.X || y < bounds.Y);
+            }
         }
 
     }

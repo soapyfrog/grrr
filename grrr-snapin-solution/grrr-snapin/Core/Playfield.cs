@@ -94,6 +94,7 @@ namespace Soapyfrog.Grrr.Core
         /// <summary>
         /// Draw an Image into the playfield buffer at the specified coords, clipping
         /// to the playfield boundary.
+        /// The image's reference point (RefX,RefY) is taken into account.
         /// </summary>
         /// <param name="img">The Image to draw</param>
         /// <param name="x">x coord (zero-based from left)</param>
@@ -102,6 +103,9 @@ namespace Soapyfrog.Grrr.Core
         public int DrawImage(Image img, int x, int y)
         {
             int count = 0; // number of cells drawn
+            // update for reference point
+            x -= img.RefX;
+            y -= img.RefY;
 
             // fast exclude images entirely outside of the buffer
             int bw = Width; // playfield width
@@ -177,7 +181,7 @@ namespace Soapyfrog.Grrr.Core
         /// <param name="h">height of image</param>
         /// <param name="t">transparent character</param>
         /// <returns>an Image</returns>
-        public Image ScanImage(int x, int y, int w, int h, char t)
+        public Image ScanImage(int x, int y, int w, int h, char t,int refx,int refy)
         {
             // determine intersecting rectangle
             // px,py->px2,py2 is playfield
@@ -197,7 +201,7 @@ namespace Soapyfrog.Grrr.Core
             for (int iy = 0; iy < oheight; iy++)
                 for (int ix = 0; ix < owidth; ix++)
                     cells[iy, ix] = buffer[y + iy, x+ix];
-            return new Image(cells, t);
+            return new Image(cells, t,refx,refy);
         }
 
     }

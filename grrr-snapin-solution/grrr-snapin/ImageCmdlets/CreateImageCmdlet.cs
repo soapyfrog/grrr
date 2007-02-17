@@ -20,6 +20,7 @@ namespace Soapyfrog.Grrr.ImageCmdlets
         private string[] lines;
         private ConsoleColor f = ConsoleColor.White, b = ConsoleColor.Black;
         private char t = '\0';
+        private int refx, refy;
 
         private List<string> allLines = new List<string>();
 
@@ -38,6 +39,11 @@ namespace Soapyfrog.Grrr.ImageCmdlets
         public char Transparent { set { t = value; } }
 
 
+        [Parameter()]
+        public int RefX { set { refx = value; } get { return refx; } }
+        [Parameter()]
+        public int RefY { set { refy = value; } get { return refy; } }
+
         protected override void ProcessRecord()
         {
             if (lines != null) allLines.AddRange(lines);
@@ -46,7 +52,7 @@ namespace Soapyfrog.Grrr.ImageCmdlets
         protected override void EndProcessing()
         {
             BufferCell[,] cells = Host.UI.RawUI.NewBufferCellArray(allLines.ToArray(), f, b);
-            Image img = new Image(cells, t);
+            Image img = new Image(cells, t,refx,refy);
             WriteObject(img, false);
 
         }
