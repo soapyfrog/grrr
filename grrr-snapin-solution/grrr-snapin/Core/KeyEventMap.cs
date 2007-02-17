@@ -8,31 +8,45 @@ namespace Soapyfrog.Grrr.Core
 {
     public class KeyEventMap
     {
-        private Dictionary<int,ScriptBlock> keydown = new Dictionary<int,ScriptBlock>();
-        private Dictionary<int,ScriptBlock> keyup = new Dictionary<int,ScriptBlock>();
+        private Dictionary<int, ScriptBlock> keydown = new Dictionary<int, ScriptBlock>();
+        private Dictionary<int, ScriptBlock> keyup = new Dictionary<int, ScriptBlock>();
 
-        protected internal KeyEventMap()
+        // this is to keep track of keys down to avoid invoking handlers on autorepeat.
+        private Dictionary<int, bool> downMap = new Dictionary<int, bool>();
+
+        private bool allowAutoRepeat;
+
+        protected internal KeyEventMap(bool allowAutoRepeat)
         {
-            // just to prevent someone from creating one manually
+            this.allowAutoRepeat = allowAutoRepeat;
         }
 
         public void RegisterKeyEvent(int keycode, ScriptBlock down, ScriptBlock up)
         {
-            if (down != null) keydown.Add(keycode,down);
-            if (up != null) keyup.Add(keycode,up);
+            if (down != null) keydown.Add(keycode, down);
+            if (up != null) keyup.Add(keycode, up);
         }
 
         public void ProcessKeyEvents(PSHostRawUserInterface ui)
         {
             while (ui.KeyAvailable)
             {
-                KeyInfo ki = ui.ReadKey(ReadKeyOptions.IncludeKeyDown | ReadKeyOptions.IncludeKeyUp| ReadKeyOptions.NoEcho);
+                KeyInfo ki = ui.ReadKey(ReadKeyOptions.IncludeKeyDown | ReadKeyOptions.IncludeKeyUp | ReadKeyOptions.NoEcho);
                 int vk = ki.VirtualKeyCode;
-                ScriptBlock sb;
+                ScriptBlock sb = null;
                 if (ki.KeyDown)
-                    keydown.TryGetValue(vk, out sb);
+                {
+                    if (allowAutoRepeat || !downMap.ContainsKey(vk))
+                    {
+                        keydown.TryGetValue(vk, out sb);
+                        downMap.Add(vk, true);
+                    }
+                }
                 else
+                {
+                    downMap.Remove(vk);
                     keyup.TryGetValue(vk, out sb);
+                }
 
                 if (sb != null) sb.Invoke();
             }

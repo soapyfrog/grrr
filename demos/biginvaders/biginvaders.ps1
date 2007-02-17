@@ -98,15 +98,16 @@ function create-invadersprites($images) {
 #
 function create-basesprite {
   param($images)
+  $b = new-object Soapyfrog.Grrr.Core.Rect 2,0,($maxwidth-4),$maxheight
   $handlers = create-spritehandler -DidInit {
     $s=$args[0]
     $s.x = 30; $s.y=$script:maxheight-6
-    $s.state.dx = 0
-  } -DidMove {
-    $s=$args[0]
-    $s.x += $s.state.dx
+    $s.state.mpleft = (create-motionpath "w")
+    $s.state.mpright = (create-motionpath "e")
+  } -DidExceedBounds {
+    $s=$args[0].motionpath = $null
   }
-  $base = create-sprite -images $images.base -handler $handlers -tag "base"
+  $base = create-sprite -images $images.base -handler $handlers -tag "base" -bounds $b
   return $base
 }
 
@@ -186,8 +187,8 @@ function main {
 
   # create a keyevent map
   $keymap = create-keyeventmap
-  register-keyevent $keymap 37 -keydown {$script:zzz++; $base.state.dx=-1} -keyup {$base.state.dx=0}
-  register-keyevent $keymap 39 -keydown {$base.state.dx=1} -keyup {$base.state.dx=0}
+  register-keyevent $keymap 37 -keydown {$base.motionpath=$base.state.mpleft} -keyup {$base.motionpath=$null}
+  register-keyevent $keymap 39 -keydown {$base.motionpath=$base.state.mpright} -keyup {$base.motionpath=$null}  
   register-keyevent $keymap 32 -keydown {
     if (! $missile.alive ) {
       $missile.X = $base.X + 5

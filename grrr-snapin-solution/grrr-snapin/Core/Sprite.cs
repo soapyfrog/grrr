@@ -87,7 +87,7 @@ namespace Soapyfrog.Grrr.Core
             set
             {
                 motionpath = value;
-                motionpathDeltaEnumerator = motionpath.GetDeltaEnumerator();
+                motionpathDeltaEnumerator = value==null ? null : motionpath.GetDeltaEnumerator();
             }
         }
 
