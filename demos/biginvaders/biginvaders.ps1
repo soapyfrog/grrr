@@ -23,10 +23,11 @@ $ErrorActionPreference="Stop"
 
 [int]$script:maxwidth = 120
 [int]$script:maxheight = 60
+init-console $maxwidth $maxheight 
+
 $script:endreason = $null; # will be set to a reason later
 $script:rnd = new-object Random
 
-init-console $maxwidth $maxheight -ea "Stop"
 
 #------------------------------------------------------------------------------
 # Create the invader sprites.  Returns a tuple of the shared direction
@@ -133,12 +134,9 @@ function create-basesprite {
 function create-missilesprite {
   param($images)
   # test boundary condition with a DidMove handler
-  # TODO replace this with boundary handler when supported
-  $handlers = create-spritehandler  -DidMove {
-    $s=$args[0]
-    if ($s.Y -lt 0) {
-      $s.alive = $false
-    }
+  $b = new-object Soapyfrog.Grrr.Core.Rect 0,(-$images.missile.height),$maxwidth,$maxheight
+  $h = create-spritehandler -DidExceedBounds {
+    $args[0].Alive = $false
   } -DidOverlap {
     $s=$args[0]
     $inv = $args[1] # the thing we hit (will be an invader)
@@ -146,7 +144,7 @@ function create-missilesprite {
     $s.alive = $false
   }
   $mp = create-motionpath "n" # just head north
-  $s = create-sprite -images $images.missile -handler $handlers -motionpath $mp -tag "missile"
+  $s = create-sprite -images $images.missile -handler $h -motionpath $mp -tag "missile" -bound $b
   # start it off dead; it gets set to alive when it's fired.
   $s.alive = $false
   return $s
