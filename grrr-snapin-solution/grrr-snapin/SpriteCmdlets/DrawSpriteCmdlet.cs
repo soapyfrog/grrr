@@ -23,7 +23,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
         [ValidateNotNull]
         public Playfield Playfield { set { pf = value; }  get { return pf; } }
 
-        [Parameter(Position = 1, Mandatory = true, ValueFromPipeline = true)]
+        [Parameter(Position=1,Mandatory = true, ValueFromPipeline = true)]
         [ValidateNotNull]
         public Sprite[] Sprites { get { return sprites; } set { sprites = value; } }
 

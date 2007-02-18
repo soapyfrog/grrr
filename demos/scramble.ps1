@@ -26,13 +26,14 @@ cls
 
 $cw = 78 # reqd for tile wrapping to work
 init-console $cw 50
-write-host "This is very fast with the cmdlet version :-)"
+write-host "Experimental tilemap support"
 
 #--------------------------------------------------------------------
 # Parallax scrolling demo
 #
 function main {
   $pf = create-playfield -x 0 -y 2 -width $cw -height 33 -Background "black"
+  $pf.showfps=$true
 
   $imga = create-image "'''","'''" -Foreground "blue" -Background "darkmagenta"
   $imgb = create-image "@@@","@@@" -Foreground "darkblue" -Background "darkmagenta"
@@ -45,10 +46,6 @@ function main {
   $imgy = create-image " | ","/%\" -Foreground "yellow" -Background "black" -transparent 32
 
   $map = @{"A"=$imga; "B"=$imgb; "C"=$imgc; "D"=$imgd; "E"=$imge; "X"=$imgx; "Y"=$imgy}
-
-echo $map.GetType()
-  echo ($map.A).GetType()
-
 
   $backlines  = "                   BA                                        BA     ",
                 "BBA        BA      BBA                BBBBBBA        BA      BBA    ",
@@ -80,7 +77,6 @@ echo $map.GetType()
   $sprites = $thrustsprite,$rocketsprite
 
   # game loop
-  $debugline=" "
   [int]$fc = 0;
   while ($true) {
     $fc++
@@ -92,10 +88,7 @@ echo $map.GetType()
     draw-tilemap $pf $fronttm -offsetx $fx -offsety 0 -x 0 -y 24 -w $cw -h 15
     move-sprite $sprites
     draw-sprite $pf $sprites
-    draw-string $pf $debugline 0 0 "red"
     flush-playfield $pf -sync 20
-    $fps = $pf.FPS
-    $debugline = "$fps fps (target 50)"
   }
 }
 

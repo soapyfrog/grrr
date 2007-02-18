@@ -26,6 +26,8 @@ namespace Soapyfrog.Grrr.Core
         private Size size;
         private Coordinates coord;
         private ConsoleColor background;
+        private bool showfps;
+
 
         private BufferCell[,] buffer, erasebuffer;
         private PSHostRawUserInterface ui;
@@ -35,13 +37,15 @@ namespace Soapyfrog.Grrr.Core
         public int X { get { return coord.X; } }
         public int Y { get { return coord.Y; } }
         public ConsoleColor Background { get { return background; } }
+        public bool ShowFPS { get { return showfps; } set { showfps = value; } }
 
 
         // stuff for fps stats
         private DateTime flushtime = DateTime.Now;
         private double[] stats = new double[20];
         private int nextstat = 0;
-        private int fps;
+        private int fps,lastfps;
+        private Image fpsimage;
 
         protected internal Playfield(PSHostRawUserInterface ui, int w, int h, int x, int y, ConsoleColor c)
         {
@@ -77,11 +81,20 @@ namespace Soapyfrog.Grrr.Core
                 }
                 if (num > 0) fps = (int)(1000.0 / (sum / num));
             }
+            if (showfps)
+            {
+                if (fps != lastfps || fpsimage == null)
+                {
+                    BufferCell[,] cells = ui.NewBufferCellArray(new string[] { fps+"fps" }, ConsoleColor.White, ConsoleColor.Black);
+                    fpsimage = new Image(cells, '\0', 0, 0);
+                }
+                DrawImage(fpsimage, Width-fpsimage.Width, 0);
+            }
             flushtime = thisflushtime;
             ui.SetBufferContents(coord, buffer);
         }
 
-        public int FPS { get {return fps;}}
+        public int FPS { get { return fps; } }
 
         /// <summary>
         /// Clear the playfield buffer to the original empty state 
@@ -158,7 +171,7 @@ namespace Soapyfrog.Grrr.Core
             {
                 int boffset = (y + startrow) * bw + x + startcol;
                 int ioffset = startcol;
-                
+
                 for (int i = 0; i < numrows; i++)
                 {
                     Array.Copy(icells, ioffset, buffer, boffset, numcols); //fast copy whole row
@@ -181,7 +194,7 @@ namespace Soapyfrog.Grrr.Core
         /// <param name="h">effectiveHeight of image</param>
         /// <param name="t">transparent character</param>
         /// <returns>an Image</returns>
-        public Image ScanImage(int x, int y, int w, int h, char t,int refx,int refy)
+        public Image ScanImage(int x, int y, int w, int h, char t, int refx, int refy)
         {
             // determine intersecting rectangle
             // px,py->px2,py2 is playfield
@@ -200,8 +213,8 @@ namespace Soapyfrog.Grrr.Core
             // do copying
             for (int iy = 0; iy < oheight; iy++)
                 for (int ix = 0; ix < owidth; ix++)
-                    cells[iy, ix] = buffer[y + iy, x+ix];
-            return new Image(cells, t,refx,refy);
+                    cells[iy, ix] = buffer[y + iy, x + ix];
+            return new Image(cells, t, refx, refy);
         }
 
     }

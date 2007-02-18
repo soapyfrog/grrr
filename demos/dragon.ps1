@@ -30,6 +30,7 @@ write-host "(image adapted from Joan Stark - jgs - at http://www.ascii-art.com/)
 
 function main {
   $pf = create-playfield -x 0 -y 3 -width 100 -height 48 -background "black"
+  $pf.showfps=$true
 
   # we use a 'here' string for ease of typing.
   $dragontxt = @"
@@ -84,16 +85,12 @@ function main {
     $sprites += $s
   }
 
-  $debugline=" "
   # game loop - ctrl+c to quit
   while ($true) {
     clear-playfield $pf
     move-sprite $sprites
     draw-sprite $pf $sprites
-    draw-string $pf $debugline 0 0 "red"
     flush-playfield $pf -sync 20 
-    $fps = $pf.FPS
-    $debugline = "$fps fps (target 50)"
   }
 }
 

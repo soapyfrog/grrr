@@ -9,8 +9,6 @@ using Soapyfrog.Grrr.Core;
 
 namespace Soapyfrog.Grrr.ImageCmdlets
 {
-
-
     /// <summary>
     /// Get Image(s) from a data stream. The format is a bit cheesy
     /// and definitely needs a bit of documentation.

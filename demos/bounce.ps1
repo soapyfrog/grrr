@@ -27,6 +27,7 @@ write-host "Bound sprites"
 
 function main {
   $pf = create-playfield -x 0 -y 2 -width 78 -height 48 -bg "black"
+  $pf.showfps=$true
 
   $img = create-image "Hello","World" -fg "yellow" -bg "blue"
   $bounds = new-object Soapyfrog.Grrr.Core.Rect 5,5,30,20

@@ -27,6 +27,7 @@ write-host "Sprites with manual (yellow) and path based (red) movement. Collisio
 
 function main {
   $pf = create-playfield -x 0 -y 2 -width 78 -height 48 -bg "black"
+  $pf.showfps=$true
 
   # create the anim frames for the yellow aliens
   $l1 = [char]0x2554 + [char]0x256a + [char]0x2557
@@ -57,6 +58,7 @@ function main {
   }
 
   $script:collisions = 0
+  $script:other=$null
 
   # create another one with different behaviour
   $imgb = create-image "/\","\/" -fg "red" -bg "black"
@@ -65,7 +67,7 @@ function main {
     $me = $args[0]; $other=$args[1];
     $script:collisions++
   } -didendmotion {
-    xqwqwex
+    $script:other="red motion ended"
   }
   $spr = create-sprite -images @($imgb) -x 10 -y 42  -motionpath $mp -handler $h
 
@@ -74,6 +76,7 @@ function main {
   while ($true) {
     clear-playfield $pf
     draw-string $pf $debugline 0 0 red
+    if ($script:other) { draw-string $pf $script:other 0 1 cyan }
     #move all
     move-sprite $sprites
     move-sprite $spr
@@ -82,8 +85,7 @@ function main {
     draw-sprite $pf $spr
     test-spriteoverlap $spr $sprites 
     flush-playfield $pf -sync 20 
-    $fps = $pf.FPS
-    $debugline = "$fps fps (target 50) collisions=$collisions"
+    $debugline = "collisions=$collisions"
   }
 }
 

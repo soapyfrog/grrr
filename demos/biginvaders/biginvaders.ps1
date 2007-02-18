@@ -193,9 +193,8 @@ function main {
       $missile.alive = $true
     }
   } 
-
-  $debugline = "big invaders!"
-  $script:zzz=0
+  register-keyevent $keymap 27 -keydown { $script:endreason="user quit" }
+  register-keyevent $keymap ([int][char]"F") -keydown { $pf.showfps = ! $pf.showfps; }
 
   # game loop
   while ($script:endreason -eq $null) {
@@ -207,19 +206,15 @@ function main {
       process-keyevents $keymap
 
       # move everything
-      move-sprite $alien # just the current alien
       move-sprite $base,$missile
       move-sprite $bombs 
+      move-sprite $alien # just the current alien
 
       # draw everything
+      draw-sprite $pf $base,$missile
+      draw-sprite $pf $bombs 
       draw-sprite $pf $aliens -NoAnim
       animate-sprite $alien # only animate the current one
-      draw-sprite $pf $base
-      draw-sprite $pf $missile 
-      draw-sprite $pf $bombs 
-
-      # draw a status line
-      draw-string $pf $debugline 0 0 -fg "red"
 
       # flush the playfield to the console
       flush-playfield $pf -sync 20 # to get 50 fps
@@ -229,9 +224,6 @@ function main {
       test-spriteoverlap $aliens $base,$missile # check if aliens have hit base or missile
       test-spriteoverlap $bombs $base,$missile
 
-      # update debug line for next frame
-      $debugline = "$($pf.fps) fps (target 50)"
-      
       # cull dead aliens
       $aliens = ($aliens | where {$_.alive})
       if ($aliens -eq $null) { $script:endreason="all aliens dead!" }

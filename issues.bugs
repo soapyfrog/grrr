@@ -74,3 +74,58 @@ to repeatedly call test-spriteoverlap
 [00015 | 17/02/2007 | Open | Feature | Incorporate banner/box scripts]
 
 Useful when doing highres text stuff with 4x6 pixel fonts
+
+[00016 | 18/02/2007 | Open | Feature | add timer and random virtual events]
+
+Prob re-use keyeventmap but use different names
+
+create-eventmap
+register-keyevent $map -key -block
+register-timerevent $map -every n -block
+process-eventmap
+
+[00017 | 18/02/2007 | Open | Feature | High-score capture]
+
+Persist to local registry, perhaps post to the internet.
+
+
+[00018 | 18/02/2007 | Open | Feature | Reading of 16-color gifs]
+
+Assume colour palette is same as that of console's.
+Recognise transparency and animation frames.
+
+A coloured pixel would be a single cell in the output.
+Mapping should be allowed, but default to solid block.
+
+[00019 | 18/02/2007 | Open | Feature | Better line drawing]
+
+Use integer line raster algorithm. 
+
+Support plotting points (although that is Draw-Image really)
+
+Draw-Line $pf $img x1 y1 x2 y2 
+Plot-Point is synonim for Draw-Image
+
+Support polygons, including rasterising solid fills.
+
+Draw-Poly $pf $img [point[]]$points [-Complete] [-Fill]
+
+    -Complete draws a line from last pt to first
+    -Fill fills the polygon (tiles the image)
+
+[00020 | 18/02/2007 | Open | Feature | Motion paths from lines ]
+
+Extend (poly)line drawing to emit a motionpath
+
+Create-MotionPath -poly [point[]]$points [-complete] [-repeat]
+
+
+[00021 | 18/02/2007 | Open | Feature | Target motion path ]
+
+A motionpath that moves a sprite toward another one. Eg, to move toward
+othersprite at 1 step per move:
+
+Create-MotionPath -follow $othersprite -rate 1
+
+Perhaps optionally specify acceleration and momentum (think black hole).
+
