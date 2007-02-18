@@ -235,7 +235,7 @@ function main {
           if (!$b.alive) {
             $s = $aliens[$rnd.next($aliens.length)]
             $b.X = $s.X
-            $b.Y = $s.Y + ($s.Height/2)
+            $b.Y = $s.Rect.Y
             $b.alive = $true
             break
           }

@@ -73,11 +73,6 @@ namespace Soapyfrog.Grrr.Core
         }
         public string Tag { get { return tag; } set { tag = value; } }
 
-        // Width and Height properties are based on current image so can change.
-        public int Width { get { return CurrImage.Width; } }
-        public int Height { get { return CurrImage.Height; } }
-
-
         // stuff for animation
         private int animRate = 1;          // 1 means update every frame
         private int numAnimFrames;
