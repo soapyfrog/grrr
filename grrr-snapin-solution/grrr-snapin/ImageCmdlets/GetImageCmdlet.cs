@@ -77,7 +77,7 @@ namespace Soapyfrog.Grrr.ImageCmdlets
                         else if ((m = refxyRE.Match(p)).Success)
                         {
                             refx = int.Parse(m.Groups[1].Value);
-                            refy = int.Parse(m.Groups[1].Value);
+                            refy = int.Parse(m.Groups[2].Value);
                         }
                         else if ((m = transparentRE.Match(p)).Success)
                         {

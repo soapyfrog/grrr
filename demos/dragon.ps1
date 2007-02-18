@@ -9,6 +9,8 @@
 # or send a letter to 
 # Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
 #------------------------------------------------------------------------------
+# Image adapted from work by Joan Stark (jgs) at http://www.ascii-art.com/ 
+#------------------------------------------------------------------------------
 
 # $Id$
 
@@ -20,13 +22,14 @@ $local:___globcheck___=2
 if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global scope"}
 
 
-init-console 100 50
+init-console 100 51
 cls
 write-host "dragon sprites with transparancy (ie not opaque rectangles)"
+write-host "(image adapted from Joan Stark - jgs - at http://www.ascii-art.com/)"
 
 
 function main {
-  $pf = create-playfield -x 0 -y 2 -width 100 -height 48 -background "black"
+  $pf = create-playfield -x 0 -y 3 -width 100 -height 48 -background "black"
 
   # we use a 'here' string for ease of typing.
   $dragontxt = @"
@@ -88,7 +91,7 @@ function main {
     move-sprite $sprites
     draw-sprite $pf $sprites
     draw-string $pf $debugline 0 0 "red"
-    flush-playfield $pf -sync 33 
+    flush-playfield $pf -sync 20 
     $fps = $pf.FPS
     $debugline = "$fps fps (target 50)"
   }

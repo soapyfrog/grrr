@@ -3,7 +3,6 @@
 Would be nice to be able to load tile map info from external files.
 Having an editor would really rock.
 
-
 [00004 | 10/12/2006 | Open | Feature | Buffer diffing/combining]
 
 Drawing an image to the playfield should have some alternate modes, eg same
@@ -72,12 +71,6 @@ layers... enables all sprites to be kept in one collection so no need
 to repeatedly call test-spriteoverlap
 
 
-[00015 | 17/02/2007 | Open | Feature | Disable keydown auto repeat]
+[00015 | 17/02/2007 | Open | Feature | Incorporate banner/box scripts]
 
-Fast autorepeat causes keydown events to be repeatedly fired.
-This can slow things down if the script handler is lengthy.
-
-
-
-
-
+Useful when doing highres text stuff with 4x6 pixel fonts

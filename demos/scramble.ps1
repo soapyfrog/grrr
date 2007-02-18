@@ -73,7 +73,7 @@ echo $map.GetType()
   $thrustimg2 = create-image @("=") -Foreground "red" -Background "black"
   $rocketimg = create-image " o  ","D#>-" -Foreground "white" -Background "black"
 
-  $mp = create-motionpath "h3 n5 h3 s5" 
+  $mp = create-motionpath "5n 5h 7e 2h 5sw 2h 2w" 
   $thrustsprite = create-sprite -images $thrustimg1,$thrustimg2 -x 4 -y 9 -motionpath $mp
   $rocketsprite = create-sprite -images @($rocketimg) -x 5 -y 8 -motionpath $mp
 
@@ -93,7 +93,7 @@ echo $map.GetType()
     move-sprite $sprites
     draw-sprite $pf $sprites
     draw-string $pf $debugline 0 0 "red"
-    flush-playfield $pf -sync 40
+    flush-playfield $pf -sync 20
     $fps = $pf.FPS
     $debugline = "$fps fps (target 50)"
   }

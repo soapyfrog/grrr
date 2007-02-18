@@ -5,6 +5,7 @@
 #!translate I 35
 #transparent 32
 #begin invc0 green black
+#refxy 6 3
     IIII
  IIIIIIIIII
 IIIIIIIIIIII
@@ -15,6 +16,7 @@ IIIIIIIIIIII
 II        II
 #end
 #begin invc1 green black
+#refxy 6 3
     IIII
  IIIIIIIIII
 IIIIIIIIIIII
@@ -25,6 +27,7 @@ IIIIIIIIIIII
   II    II
 #end
 #begin invb0 green black
+#refxy 5 3
   I     I
    I   I
   IIIIIII
@@ -35,6 +38,7 @@ I I     I I
    II II
 #end
 #begin invb1 green black
+#refxy 5 3
   I     I
 I  I   I  I
 I IIIIIII I
@@ -45,6 +49,7 @@ IIIIIIIIIII
  I       I
 #end
 #begin inva0 green black
+#refxy 3 3
    II
   IIII
  IIIIII
@@ -55,6 +60,7 @@ I      I
  I    I
 #end
 #begin inva1 green black
+#refxy 3 3
    II
   IIII
  IIIIII
@@ -65,6 +71,7 @@ IIIIIIII
 I I  I I
 #end
 #begin base yellow black
+#refxy 5 0
      I
     III
  IIIIIIIII
@@ -73,6 +80,7 @@ IIIIIIIIIII
 IIIIIIIIIII
 #end
 #begin bomba0 red black
+#refxy 1 0
  I
   I
  I
@@ -80,6 +88,7 @@ I
  I
 #end
 #begin bomba1 red black
+#refxy 1 0
  I
 I  
  I
@@ -87,6 +96,7 @@ I
  I
 #end
 #begin bombb0 red black
+#refxy 1 0
  I
  I
 II
@@ -94,6 +104,7 @@ II
  I
 #end
 #begin bombb1 red black
+#refxy 1 0
  I
 II
  II
@@ -101,11 +112,13 @@ II
  I
 #end
 #begin missile white black
+#refxy 0 2
 I
 I
 I
 #end
 #begin mothership0 green black
+#refxy 7 3
      IIIIII
    IIIIIIIIII
   IIIIIIIIIIII
@@ -115,6 +128,7 @@ IIIIIIIIIIIIIIII
    I        I
 #end
 #begin mothership1 green black
+#refxy 7 3
      IIIIII
    IIIIIIIIII
   IIIIIIIIIIII
@@ -124,6 +138,7 @@ IIIIIIIIIIIIIIII
    I        I
 #end
 #begin mothership2 green black
+#refxy 7 3
      IIIIII
    IIIIIIIIII
   IIIIIIIIIIII
