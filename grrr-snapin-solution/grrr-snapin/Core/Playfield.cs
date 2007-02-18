@@ -87,6 +87,7 @@ namespace Soapyfrog.Grrr.Core
                 {
                     BufferCell[,] cells = ui.NewBufferCellArray(new string[] { fps+"fps" }, ConsoleColor.White, ConsoleColor.Black);
                     fpsimage = new Image(cells, '\0', 0, 0);
+                    lastfps = fps;
                 }
                 DrawImage(fpsimage, Width-fpsimage.Width, 0);
             }
