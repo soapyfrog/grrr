@@ -58,7 +58,19 @@ namespace Soapyfrog.Grrr.Core
 
         public bool Alive { get { return alive; } set { alive = value; } }
         public int AnimRate { get { return animRate; } set { animRate = value; } }
-        public Image[] Images { get { return images; } }
+        public Image[] Images
+        {
+            get { return images; }
+            set
+            {
+                images = value;
+                // re-init the anim bit TODO: should be factored out really (AnimEnumerator?)
+                numAnimFrames = images.Length;
+                nextAnimFrame = 0;
+                animSpeedCounter = 0;
+                fixDrawRect();
+            }
+        }
         public string Tag { get { return tag; } set { tag = value; } }
 
         // Width and Height properties are based on current image so can change.
@@ -87,7 +99,7 @@ namespace Soapyfrog.Grrr.Core
             set
             {
                 motionpath = value;
-                motionpathDeltaEnumerator = value==null ? null : motionpath.GetDeltaEnumerator();
+                motionpathDeltaEnumerator = value == null ? null : motionpath.GetDeltaEnumerator();
             }
         }
 
@@ -138,7 +150,7 @@ namespace Soapyfrog.Grrr.Core
                     {
                         Edge e = ExceededBounds;
                         if (e != Edge.None)
-                            handler.DidExceedBounds.InvokeReturnAsIs(this, d,e); // pass the delta and edges
+                            handler.DidExceedBounds.InvokeReturnAsIs(this, d, e); // pass the delta and edges
                     }
                 }
                 else
