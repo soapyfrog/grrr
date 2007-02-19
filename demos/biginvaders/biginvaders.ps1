@@ -29,6 +29,17 @@ init-console $maxwidth $maxheight
 $script:endreason = $null; # will be set to a reason later
 $script:rnd = new-object Random
 
+#------------------------------------------------------------------------------
+# Create sounds for the game
+#
+function prepare-sounds {
+  $script:sounds = @{}
+  foreach ($i in 0..3) {
+    write-warning "duh${i}.wav"
+    $sounds["duh${i}"] = create-sound (resolve-path "duh${i}.wav")
+  }
+}
+
 
 #------------------------------------------------------------------------------
 # Create the invader sprites.  Returns a tuple of the shared direction
@@ -171,6 +182,8 @@ function main {
   # create a plafield to put it all on
   $pf = create-playfield -x 0 -y 0 -width $maxwidth -height $maxheight -bg "black"
 
+  prepare-sounds
+
   # load the alien images from the file
   $images = (gc ./images.txt | get-image )
   # create an alien hoard (well, a small gathering) 
@@ -197,6 +210,7 @@ function main {
   register-keyevent $keymap ([int][char]"F") -keydown { $pf.showfps = ! $pf.showfps; }
 
   # game loop
+  [int]$frame=0
   while ($script:endreason -eq $null) {
     foreach ($alien in $aliens) {
       if (! $alien.alive) { continue; }
@@ -218,6 +232,7 @@ function main {
 
       # flush the playfield to the console
       flush-playfield $pf -sync 20 # to get 50 fps
+
 
       # test for collisions - note, if this is done to ensure sprites are not
       # out of bounds, you might want to do it before drawing
@@ -242,6 +257,7 @@ function main {
         }
       }
     }
+    play-sound $script:sounds["duh"+(++$frame % 4)] -stop
     # processed block, so update aliens controller state
     if ($aliens_controller.mpnext) {
       foreach ($alien in $aliens) {

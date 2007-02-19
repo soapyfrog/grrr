@@ -49,6 +49,7 @@
     <Compile Include="Core\MotionPath.cs" />
     <Compile Include="Core\Playfield.cs" />
     <Compile Include="Core\Rect.cs" />
+    <Compile Include="Core\Sound.cs" />
     <Compile Include="Core\Sprite.cs" />
     <Compile Include="Core\SpriteHandler.cs" />
     <Compile Include="Core\Tilemap.cs" />
@@ -69,6 +70,10 @@
     <Compile Include="PlayfieldCmdlets\CreatePlayfieldCmdlet.cs" />
     <Compile Include="PlayfieldCmdlets\FlushPlayfieldCmdlet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SoundCmdlets\CreateSoundCmdlet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SoundCmdlets\PlaySoundCmdlet.cs" />
     <Compile Include="SpriteCmdlets\AnimateSpriteCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateMotionPathCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateSpriteCmdlet.cs" />

@@ -40,7 +40,8 @@ function main {
     $d = $args[1] # Delta
     $e = $args[2] # edges
 
-    #if ($s.MotionPath -eq $leftmp) { $s.MotionPath = $rightmp; } else { $s.MotionPath = $leftmp }
+    # Because we change the size of the sprite, we check both direction
+    # and edge to determine if we're going out of bounds. 
     if ($d.dx -lt 0 -and $e -band [soapyfrog.grrr.core.edge]::Left) { 
       $s.MotionPath = $rightmp; 
       $s.images = $img1;
