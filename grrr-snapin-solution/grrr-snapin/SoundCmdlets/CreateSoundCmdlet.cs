@@ -31,28 +31,7 @@ namespace Soapyfrog.Grrr.SoundCmdlets
         {
             foreach (string soundfile in soundfiles)
             {
-                // i have no idea how to easily access a com object in c# without
-                // messing about with interop import dlls and wotnot, so just use
-                // powershell itself.
-                ScriptBlock createPlayer = InvokeCommand.NewScriptBlock(@"
-$player = New-Object -ComObject 'wmplayer.ocx'
-$media = $player.NewMedia($args[0])
-[void]$player.CurrentPlaylist.AppendItem($media)
-return $player
-");
-                object player = createPlayer.InvokeReturnAsIs(soundfile);
-
-                // TODO: errors?
-
-                ScriptBlock play = InvokeCommand.NewScriptBlock(@"$args[0].Controls.Play()");
-                ScriptBlock stop = InvokeCommand.NewScriptBlock(@"$args[0].Controls.Stop()");
-                ScriptBlock pause = InvokeCommand.NewScriptBlock(@"$args[0].Controls.Pause()");
-                ScriptBlock replay = InvokeCommand.NewScriptBlock(@"$s=$args[0].Controls;$s.Stop();$s.Play()");
-
-
-                // wrap the resulting object in a Sound object and write 
-                // to the pipe.
-                WriteObject(new Sound(player,play,stop,pause,replay), false);
+                WriteObject(new Sound(soundfile), false);
             }
         }
     }

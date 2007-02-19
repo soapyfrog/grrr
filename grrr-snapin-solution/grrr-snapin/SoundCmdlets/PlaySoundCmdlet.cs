@@ -33,8 +33,7 @@ namespace Soapyfrog.Grrr.SoundCmdlets
 
         protected override void EndProcessing()
         {
-            ScriptBlock sb = stopExisting ? sound.replay : sound.play;
-            sb.InvokeReturnAsIs(sound.Player);
+            sound.Play(stopExisting); 
         }
     }
 }

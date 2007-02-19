@@ -38,6 +38,8 @@ function prepare-sounds {
     write-warning "duh${i}.wav"
     $sounds["duh${i}"] = create-sound (resolve-path "duh${i}.wav")
   }
+  $sounds.firemissile=create-sound (resolve-path "firemissile.wav")
+  $sounds.invaderexplode=create-sound (resolve-path "invaderexplode.wav")
 }
 
 
@@ -133,6 +135,7 @@ function create-missilesprite {
     $inv = $args[1] # the thing we hit (will be an invader)
     $inv.alive = $false 
     $s.alive = $false
+    play-sound $sounds.invaderexplode
   }
   $mp = create-motionpath "n2" # just head north
   $s = create-sprite -images $images.missile -handler $h -motionpath $mp -tag "missile" -bound $b
@@ -204,13 +207,14 @@ function main {
       $missile.X = $base.X
       $missile.Y = $base.Y+1
       $missile.alive = $true
+      play-sound $sounds.firemissile
     }
   } 
   register-keyevent $keymap 27 -keydown { $script:endreason="user quit" }
   register-keyevent $keymap ([int][char]"F") -keydown { $pf.showfps = ! $pf.showfps; }
 
   # game loop
-  [int]$frame=0
+  [int]$duhidx=0; [int]$duhcnt=0;
   while ($script:endreason -eq $null) {
     foreach ($alien in $aliens) {
       if (! $alien.alive) { continue; }
@@ -226,6 +230,7 @@ function main {
 
       # draw everything
       draw-sprite $pf $base,$missile
+
       draw-sprite $pf $bombs 
       draw-sprite $pf $aliens -NoAnim
       animate-sprite $alien # only animate the current one
@@ -257,7 +262,7 @@ function main {
         }
       }
     }
-    play-sound $script:sounds["duh"+(++$frame % 4)] -stop
+    if ( (++$duhcnt)%3 -eq 1) { play-sound $script:sounds["duh"+(++$duhidx % 4)] -stop }
     # processed block, so update aliens controller state
     if ($aliens_controller.mpnext) {
       foreach ($alien in $aliens) {
