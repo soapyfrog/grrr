@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Soapyfrog.Grrr.Core;
 using System.Threading;
-using WMPLib;
+using Microsoft.DirectX;
+using Microsoft.DirectX.DirectSound;
 using System.Runtime.InteropServices;
-using System.Media;
 
 namespace grrr_ideas
 {
@@ -13,89 +13,37 @@ namespace grrr_ideas
     {
         static void Main(string[] args)
         {
-            PlayWMPIOP();
-
+            PlayDirectX();
         }
 
-        // this is no better than the System.Media.SoundPlayer
-        [DllImport("winmm.dll", SetLastError = true,
-                              CallingConvention = CallingConvention.Winapi)]
-        static extern bool PlaySound(
-            string pszSound,
-            IntPtr hMod,
-            SoundFlags sf);
+        /// <summary>
+        /// DirectSound apps need a window handle so sound can be muted when lose focus or something.
+        /// This lets us use the desktop window handle.
+        /// </summary>
+        /// <returns></returns>
+        [DllImport("user32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        static extern IntPtr GetDesktopWindow();
 
-        public enum SoundFlags : int
+        static void PlayDirectX()
         {
-            SND_SYNC = 0x0000,  // play synchronously (default) 
-            SND_ASYNC = 0x0001,  // play asynchronously 
-            SND_NODEFAULT = 0x0002,  // silence (!default) if sound not found 
-            SND_MEMORY = 0x0004,  // pszSound points to a memory file
-            SND_LOOP = 0x0008,  // loop the sound until next sndPlaySound 
-            SND_NOSTOP = 0x0010,  // don't stop any currently playing sound 
-            SND_NOWAIT = 0x00002000, // don't wait if the driver is busy 
-            SND_ALIAS = 0x00010000, // name is a registry alias 
-            SND_ALIAS_ID = 0x00110000, // alias is a predefined ID
-            SND_FILENAME = 0x00020000, // name is file name 
-            SND_RESOURCE = 0x00040004  // name is resource name or atom 
-        }
+            // get a device
+            Device device = new Microsoft.DirectX.DirectSound.Device();
+            device.SetCooperativeLevel(GetDesktopWindow(), CooperativeLevel.Priority);
 
-        static void PlayMM()
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                PlaySound(@"c:\windows\media\tada.wav", IntPtr.Zero, SoundFlags.SND_ASYNC | SoundFlags.SND_FILENAME);
-                Thread.Sleep(100);
-            }
-            Thread.Sleep(1000);
-        }
+            // buffer description
+            BufferDescription bd = new BufferDescription();
+            bd.Control3D = false;
+            bd.ControlVolume = true;
+            bd.ControlFrequency = true;
+            bd.Flags |= BufferDescriptionFlags.GlobalFocus; // so always plays
 
-        static void PlayWMPIOP()
-        {
-            Type t = Type.GetTypeFromProgID("wmplayer.ocx");
-            object player = Activator.CreateInstance(t);
-            Console.WriteLine(player.GetType());
-            bool iscom=System.Runtime.InteropServices.Marshal.IsComObject(player);
-            Console.WriteLine("is com " + iscom);
+            // secondary buffer for wave file
+            SecondaryBuffer secbuf = new SecondaryBuffer(@"c:\windows\media\tada.wav", bd, device);
 
-            player = Marshal.GetActiveObject("wmplayer.ocx");
-             iscom=System.Runtime.InteropServices.Marshal.IsComObject(player);
-            Console.WriteLine("is com " + iscom);
-        }
+            secbuf.Play(0, BufferPlayFlags.Default);
 
-        static void PlayWMP()
-        {
-            WindowsMediaPlayerClass[] players = new WindowsMediaPlayerClass[4];
-            for (int i = 0; i < players.Length; i++)
-            {
-                players[i] = new WindowsMediaPlayerClass();
-                IWMPMedia tada = players[i].newMedia(@"c:\windows\media\tada.wav");
-                players[i].currentPlaylist.appendItem(tada);
+            // cool
 
-            }
-
-            for (int i = 0; i < players.Length; i++)
-            {
-                players[i].controls.play();
-                Thread.Sleep(100);
-            }
-            Thread.Sleep(1000);
-        }
-
-        static void PlaySP()
-        {
-            SoundPlayer[] players = new SoundPlayer[4];
-            for (int i = 0; i < players.Length; i++)
-            {
-                players[i] = new SoundPlayer(@"c:\windows\media\tada.wav");
-                players[i].Load();
-            }
-
-            for (int i = 0; i < players.Length; i++)
-            {
-                players[i].Play();
-                Thread.Sleep(100);
-            }
             Thread.Sleep(1000);
         }
 
