@@ -33,13 +33,19 @@ $script:rnd = new-object Random
 # Create sounds for the game
 #
 function prepare-sounds {
-  $script:sounds = @{}
-  foreach ($i in 0..3) {
-    write-warning "duh${i}.wav"
-    $sounds["duh${i}"] = create-sound (resolve-path "duh${i}.wav")
+  if ( [soapyfrog.grrr.core.sound]::SoundAvailable ) {
+    $script:sounds = @{}
+    foreach ($i in 0..3) {
+      write-warning "duh${i}.wav"
+      $sounds["duh${i}"] = create-sound (resolve-path "duh${i}.wav")
+    }
+    $sounds.firemissile=create-sound (resolve-path "firemissile.wav")
+    $sounds.invaderexplode=create-sound (resolve-path "invaderexplode.wav")
   }
-  $sounds.firemissile=create-sound (resolve-path "firemissile.wav")
-  $sounds.invaderexplode=create-sound (resolve-path "invaderexplode.wav")
+  else
+  {
+    $script:sounds = $null
+  }
 }
 
 
@@ -135,7 +141,7 @@ function create-missilesprite {
     $inv = $args[1] # the thing we hit (will be an invader)
     $inv.alive = $false 
     $s.alive = $false
-    play-sound $sounds.invaderexplode
+    if ($sounds) { play-sound $sounds.invaderexplode }
   }
   $mp = create-motionpath "n2" # just head north
   $s = create-sprite -images $images.missile -handler $h -motionpath $mp -tag "missile" -bound $b
@@ -207,7 +213,7 @@ function main {
       $missile.X = $base.X
       $missile.Y = $base.Y+1
       $missile.alive = $true
-      play-sound $sounds.firemissile
+      if ($sounds) { play-sound $sounds.firemissile }
     }
   } 
   register-keyevent $keymap 27 -keydown { $script:endreason="user quit" }
@@ -262,7 +268,8 @@ function main {
         }
       }
     }
-    if ( (++$duhcnt)%3 -eq 1) { play-sound $script:sounds["duh"+(++$duhidx % 4)] -stop }
+    #todo should try to find a better algorithm for sound speed
+    if ( (++$duhcnt)%2 -eq 1) { if ($sounds) { play-sound $script:sounds["duh"+(++$duhidx % 4)] -stop} }
     # processed block, so update aliens controller state
     if ($aliens_controller.mpnext) {
       foreach ($alien in $aliens) {
