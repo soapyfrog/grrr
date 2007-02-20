@@ -40,6 +40,7 @@ function prepare-sounds {
     }
     $sounds.firemissile=create-sound (resolve-path "firemissile.wav")
     $sounds.invaderexplode=create-sound (resolve-path "invaderexplode.wav")
+    $sounds.baseexplode=create-sound (resolve-path "baseexplode.wav")
   }
   else
   {
@@ -52,7 +53,7 @@ function prepare-sounds {
 # Create the invader sprites.  Returns a tuple of the shared direction
 # controller object and the sprite array.
 #
-function create-invadersprites($images) {
+function create-invadersprites {
   $b = new-object Soapyfrog.Grrr.Core.Rect 2,0,($maxwidth-4),$maxheight
   $sprites = new-object collections.arraylist # @()
   [hashtable]$ctl = @{  # shared controller for all sprites
@@ -99,7 +100,7 @@ function create-invadersprites($images) {
     $i = $_
     for ($x=0; $x -lt 6; $x++) {
       $ip = $images["$i"+"0"],$images["$i"+"1"]
-      $s = create-sprite -images $ip -x (10+18*$x) -y $y -handler $handlers -bounds $b
+      $s = create-sprite -images $ip -x (10+18*$x) -y $y -handler $handlers -bounds $b -tag "invader"
       $sprites += $s
     }
     $y += 10
@@ -112,14 +113,15 @@ function create-invadersprites($images) {
 # create base ship sprite
 #
 function create-basesprite {
-  param($images)
   $b = new-object Soapyfrog.Grrr.Core.Rect 2,0,($maxwidth-4),$maxheight
   $handlers = create-spritehandler -DidInit {
     $s=$args[0]
     $s.x = 30; $s.y=$script:maxheight-6
+    # set motionpaths for left/right - used by key handler
     $s.state.mpleft = (create-motionpath "w")
     $s.state.mpright = (create-motionpath "e")
   } -DidExceedBounds {
+    # just null the motionpath
     $s=$args[0].motionpath = $null
   }
   $base = create-sprite -images $images.base -handler $handlers -tag "base" -bounds $b
@@ -130,17 +132,27 @@ function create-basesprite {
 # create missile sprite
 #
 function create-missilesprite {
-  param($images)
   # test boundary condition with a DidMove handler
   $b = new-object Soapyfrog.Grrr.Core.Rect 0,0,$maxwidth,$maxheight
   $h = create-spritehandler -DidExceedBounds {
     $args[0].Active = $false
   } -DidOverlap {
     $s=$args[0]
-    $inv = $args[1] # the thing we hit (will be an invader)
-    $inv.Active = $false 
+    $other = $args[1]
+    switch ($other.tag) {
+      "invader" {
+        # change images to explode sequence (just one frame, but could be more)
+        $other.Images = $images.invexplode
+        # replace handler with one that just sets inactive at end of anim sequence
+        $other.handler = (create-spritehandler -DidEndAnim { $args[0].Active = $false })
+        # play sound
+        if ($sounds) { play-sound $sounds.invaderexplode }
+      }
+      "bomb" {
+        $other.Active = $false 
+      }
+    }
     $s.Active = $false
-    if ($sounds) { play-sound $sounds.invaderexplode }
   }
   $mp = create-motionpath "n2" # just head north
   $s = create-sprite -images $images.missile -handler $h -motionpath $mp -tag "missile" -bound $b
@@ -153,22 +165,21 @@ function create-missilesprite {
 # create bomb sprites
 #
 function create-bombsprites {
-  param($images)
   # test boundary condition with a DidMove handler
   $b = new-object Soapyfrog.Grrr.Core.Rect 0,0,$maxwidth,$maxheight
   $h = create-spritehandler -DidExceedBounds {
     $args[0].Active = $false
   } -DidOverlap {
     $s=$args[0]
-    $b = $args[1]
-    if ($b.tag -eq "base") {
+    $other = $args[1]
+    if ($other.tag -eq "base") {
+      # change images to explode sequence (just one frame, but could be more)
+      $other.Images = $images.baseexplode
+      # replace handler with one that just sets inactive at end of anim sequence
+      $other.handler = (create-spritehandler -DidEndAnim { $args[0].Active = $false; $script:endreason="bombed!" })
+      # play sound
+      if ($sounds) { play-sound $sounds.baseexplode }
       $s.Active = $false
-      $script:endreason="bombed by alien"
-    }
-    elseif ($b.tag -eq "missile") {
-      # cancel each other out
-      $b.Active = $false;
-      $s.Active = $false;
     }
   }
   $mp = create-motionpath "s" # just head south 
@@ -193,15 +204,15 @@ function main {
   prepare-sounds
 
   # load the alien images from the file
-  $images = (gc ./images.txt | get-image )
+  $script:images = (gc ./images.txt | get-image )
   # create an alien hoard (well, a small gathering) 
-  $aliens_controller,[array]$aliens = create-invadersprites $images
+  $aliens_controller,[array]$aliens = create-invadersprites 
   # create a base ship
-  $base = create-basesprite $images
+  $base = create-basesprite 
   # prepare a missile
-  $missile = create-missilesprite $images
+  $missile = create-missilesprite 
   # prepare some bombs
-  $bombs = create-bombsprites $images
+  $bombs = create-bombsprites 
 
   # create a keyevent map
   $keymap = create-keyeventmap
@@ -280,6 +291,7 @@ function main {
   }
   draw-string $pf "Demo ended: $script:endreason" 20 10 -fg "white" -bg "red"
   flush-playfield $pf 
+  start-sleep 1
 }
 
 # off we go

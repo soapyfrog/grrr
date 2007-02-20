@@ -147,3 +147,28 @@ IIIIIIIIIIIIIIII
   III  II  III
    I        I
 #end
+#begin invexplode green black
+#refxy 6 4
+    I   I    
+ I   I I   I 
+  I       I  
+   I     I   
+II         II
+   I     I   
+  I       I  
+ I   I I   I 
+    I   I    
+#end
+#!bit of a hack, base explosion just a yellow form of invexplode
+#begin baseexplode yellow black
+#refxy 6 4
+    I   I    
+ I   I I   I 
+  I       I  
+   I     I   
+II         II
+   I     I   
+  I       I  
+ I   I I   I 
+    I   I    
+#end
