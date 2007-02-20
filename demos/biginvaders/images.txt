@@ -172,3 +172,25 @@ II         II
  I   I I   I 
     I   I    
 #end
+#begin shield0 green black
+#refxy 0 0
+IIII
+IIII
+IIII
+IIII
+#end
+#begin shield1 green black
+#refxy 0 0
+I I 
+ I I
+I I 
+ I I
+#end
+#begin shield2 green black
+#refxy 0 0
+    
+ I I
+    
+ I I
+#end
+

@@ -147,6 +147,7 @@ function create-missilesprite {
         $other.handler = (create-spritehandler -DidEndAnim { $args[0].Active = $false })
         # play sound
         if ($sounds) { play-sound $sounds.invaderexplode }
+        break
       }
       "bomb" {
         $other.Active = $false 
@@ -184,13 +185,39 @@ function create-bombsprites {
   }
   $mp = create-motionpath "s" # just head south 
   # create a few
-  1..3 | foreach {
+  1..5 | foreach {
     $s = create-sprite -images $images.bomba0,$images.bomba1 -handler $h -motionpath $mp -animrate 4 -tag "bomb" -bound $b
     # start it off inactive; it gets set to Active when it's fired.
     $s.active = $false
     $s
   }
 }
+
+
+#------------------------------------------------------------------------------
+# create shield sprites
+#
+function create-shieldsprites {
+  $h = create-spritehandler -DidOverlap {
+    $s=$args[0] # me
+    $o=$args[1] # the other
+    switch ($o.tag) {
+      "invader" { $s.Active=$false; break }
+      "bomb" { animate-sprite $s; $o.Active=$false; break }
+      "missile" { animate-sprite $s; $o.Active=$false; break }
+    }
+  } -DidEndAnim {
+    $args[0].Active=$false
+  }
+  for ($i=10; $i -lt $maxwidth; $i+=36) {
+    for ($c=0; $c -lt 16; $c+=4) {
+      for ($r=80; $r -lt 88; $r+=4) {
+        create-sprite -images $images.shield0,$images.shield1,$images.shield2 -handler $h -X ($i+$c) -Y $r
+      }
+    }
+  }
+}
+
 
 
 #------------------------------------------------------------------------------
@@ -213,6 +240,8 @@ function main {
   $missile = create-missilesprite 
   # prepare some bombs
   $bombs = create-bombsprites 
+  # create shields
+  $shields = create-shieldsprites
 
   # create a keyevent map
   $keymap = create-keyeventmap
@@ -246,7 +275,7 @@ function main {
 
       # draw everything
       draw-sprite $pf $base,$missile
-
+      draw-sprite $pf $shields -NoAnim
       draw-sprite $pf $bombs 
       draw-sprite $pf $aliens -NoAnim
       animate-sprite $alien # only animate the current one
@@ -259,6 +288,9 @@ function main {
       # out of bounds, you might want to do it before drawing
       test-spriteoverlap $aliens $base,$missile # check if aliens have hit base or missile
       test-spriteoverlap $bombs $base,$missile
+      test-spriteoverlap $shields $bombs
+      test-spriteoverlap $shields $missile
+      test-spriteoverlap $shields $aliens
 
       # cull inactive aliens
       $aliens = ($aliens | where {$_.Active})
