@@ -13,13 +13,8 @@ namespace grrr_ideas
     {
         static void Main(string[] args)
         {
-            foreach (string ts in new string[]{"abcdefghi","jklmnopqr","stuvwxyz","0123456789","!@#$%^&*()",
-                "-_=+[{]}","\\|'\",.<>/?`~"})
-            {
-                Console.WriteLine(ts);
-                string[] ss = Banner.Render(ts);
-                foreach (string s in ss) Console.WriteLine(s);
-            }
+            bool b = Sound.SoundAvailable;
+            Console.WriteLine(b);
         }
     }
 }
