@@ -13,7 +13,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
     {
         private Image[] images;
         private int x, y, z;
-        bool alive = true;
+        bool active = true;
         int animrate = 1;
         private SpriteHandler sh;
         private MotionPath mp;
@@ -33,7 +33,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
         public int Z { get { return z; } set { z = value; } }
 
         [Parameter()]
-        public bool Alive { get { return alive; } set { alive = value; } }
+        public bool Active { get { return active; } set { active = value; } }
 
         [Parameter()]
         public int AnimRate { get { return animrate; } set { animrate = value; } }
@@ -71,7 +71,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
 
         protected override void EndProcessing()
         {
-            Sprite s = new Sprite(images, x, y, z, alive, animrate,sh,mp,tag,bounds);
+            Sprite s = new Sprite(images, x, y, z, active, animrate,sh,mp,tag,bounds);
             SpriteHandler h = s.Handler;
             if (h != null && h.DidInit != null) sh.DidInit.Invoke(s);
             WriteObject(s, false);

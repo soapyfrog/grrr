@@ -9,14 +9,14 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
 {
     /// <summary>
     /// Draw all passed sprites, calling their handlers if present, optionally drawing
-    /// dead sprites too.
+    /// inactive sprites too.
     /// </summary>
     [Cmdlet("Draw", "Sprite")]
     public class DrawSpriteCmdlet : PSCmdlet
     {
         private Playfield pf;
         private Sprite[] sprites;
-        private bool evenIfDead;
+        private bool evenIfInactive;
         private bool noAnim;
 
         [Parameter(Position = 0, Mandatory = true)]
@@ -28,7 +28,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
         public Sprite[] Sprites { get { return sprites; } set { sprites = value; } }
 
         [Parameter()]
-        public SwitchParameter EvenIfDead { get { return evenIfDead; } set { evenIfDead = value; } }
+        public SwitchParameter EvenIfInactive { get { return evenIfInactive; } set { evenIfInactive = value; } }
 
         /// <summary>
         /// If set, do not step to the next animation frame.
@@ -42,7 +42,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
             {
                 foreach (Sprite s in sprites)
                 {
-                    if (evenIfDead || s.Alive)
+                    if (evenIfInactive || s.Active)
                     {
                         s.PreDraw();
                         pf.DrawImage(s.CurrImage, s.X, s.Y);

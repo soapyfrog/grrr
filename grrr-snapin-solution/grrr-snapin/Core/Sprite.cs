@@ -17,7 +17,7 @@ namespace Soapyfrog.Grrr.Core
     {
         private Image[] images;
         private int x, y, z;
-        private bool alive = true;
+        private bool active = true;
         private Hashtable state = new Hashtable(); // used by handlers to store their one state
         private SpriteHandler handler;
         private MotionPath motionpath;
@@ -56,7 +56,7 @@ namespace Soapyfrog.Grrr.Core
         public int Y { get { return y; } set { rect.Y = value - refy; y = value; } }
         public int Z { get { return z; } set { z = value; } }
 
-        public bool Alive { get { return alive; } set { alive = value; } }
+        public bool Active { get { return active; } set { active = value; } }
         public int AnimRate { get { return animRate; } set { animRate = value; } }
         public Image[] Images
         {
@@ -194,7 +194,7 @@ namespace Soapyfrog.Grrr.Core
             get { return images[nextAnimFrame]; }
         }
 
-        protected internal Sprite(Image[] images, int x, int y, int z, bool alive, int animrate,
+        protected internal Sprite(Image[] images, int x, int y, int z, bool active, int animrate,
             SpriteHandler sh, MotionPath mp, string tag, Rect bounds)
         {
             this.images = images;
@@ -205,7 +205,7 @@ namespace Soapyfrog.Grrr.Core
             this.x = x;
             this.y = y;
             this.z = z;
-            this.alive = alive;
+            this.active = active;
             this.tag = tag;
 
             this.handler = sh;
@@ -234,14 +234,14 @@ namespace Soapyfrog.Grrr.Core
         /// Determines if this sprite's rectangle intersects with
         /// the b one.
         /// 
-        /// Both sprites need to be alive unless evenIfDead is true
+        /// Both sprites need to be active unless evenIfInactive is true
         /// </summary>
         /// <param name="b">The b sprite to check</param>
-        /// <param name="evenIfDead">Check even if not alive</param>
+        /// <param name="evenIfInactive">Check even if not active</param>
         /// <returns>true if overlapping, else false</returns>
-        public bool Overlaps(Sprite other, bool evenIfDead)
+        public bool Overlaps(Sprite other, bool evenIfInactive)
         {
-            if (!evenIfDead && !(alive && other.alive)) return false;
+            if (!evenIfInactive && !(active && other.active)) return false;
             return rect.Overlaps(other.rect);
         }
 

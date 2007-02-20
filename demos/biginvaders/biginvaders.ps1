@@ -36,7 +36,6 @@ function prepare-sounds {
   if ( [soapyfrog.grrr.core.sound]::SoundAvailable ) {
     $script:sounds = @{}
     foreach ($i in 0..3) {
-      write-warning "duh${i}.wav"
       $sounds["duh${i}"] = create-sound (resolve-path "duh${i}.wav")
     }
     $sounds.firemissile=create-sound (resolve-path "firemissile.wav")
@@ -135,18 +134,18 @@ function create-missilesprite {
   # test boundary condition with a DidMove handler
   $b = new-object Soapyfrog.Grrr.Core.Rect 0,0,$maxwidth,$maxheight
   $h = create-spritehandler -DidExceedBounds {
-    $args[0].Alive = $false
+    $args[0].Active = $false
   } -DidOverlap {
     $s=$args[0]
     $inv = $args[1] # the thing we hit (will be an invader)
-    $inv.alive = $false 
-    $s.alive = $false
+    $inv.Active = $false 
+    $s.Active = $false
     if ($sounds) { play-sound $sounds.invaderexplode }
   }
   $mp = create-motionpath "n2" # just head north
   $s = create-sprite -images $images.missile -handler $h -motionpath $mp -tag "missile" -bound $b
-  # start it off dead; it gets set to alive when it's fired.
-  $s.alive = $false
+  # start it off inactive; it gets set to Active when it's fired.
+  $s.active = $false
   return $s
 }
 
@@ -158,26 +157,26 @@ function create-bombsprites {
   # test boundary condition with a DidMove handler
   $b = new-object Soapyfrog.Grrr.Core.Rect 0,0,$maxwidth,$maxheight
   $h = create-spritehandler -DidExceedBounds {
-    $args[0].Alive = $false
+    $args[0].Active = $false
   } -DidOverlap {
     $s=$args[0]
     $b = $args[1]
     if ($b.tag -eq "base") {
-      $s.alive = $false
+      $s.Active = $false
       $script:endreason="bombed by alien"
     }
     elseif ($b.tag -eq "missile") {
       # cancel each other out
-      $b.alive = $false;
-      $s.alive = $false;
+      $b.Active = $false;
+      $s.Active = $false;
     }
   }
   $mp = create-motionpath "s" # just head south 
   # create a few
   1..3 | foreach {
     $s = create-sprite -images $images.bomba0,$images.bomba1 -handler $h -motionpath $mp -animrate 4 -tag "bomb" -bound $b
-    # start it off dead; it gets set to alive when it's fired.
-    $s.alive = $false
+    # start it off inactive; it gets set to Active when it's fired.
+    $s.active = $false
     $s
   }
 }
@@ -209,10 +208,10 @@ function main {
   register-keyevent $keymap 37 -keydown {$base.motionpath=$base.state.mpleft} -keyup {$base.motionpath=$null}
   register-keyevent $keymap 39 -keydown {$base.motionpath=$base.state.mpright} -keyup {$base.motionpath=$null}  
   register-keyevent $keymap 32 -keydown {
-    if (! $missile.alive ) {
+    if (! $missile.Active ) {
       $missile.X = $base.X
       $missile.Y = $base.Y+1
-      $missile.alive = $true
+      $missile.Active = $true
       if ($sounds) { play-sound $sounds.firemissile }
     }
   } 
@@ -223,7 +222,7 @@ function main {
   [int]$duhidx=0; [int]$duhcnt=0;
   while ($script:endreason -eq $null) {
     foreach ($alien in $aliens) {
-      if (! $alien.alive) { continue; }
+      if (! $alien.Active) { continue; }
       clear-playfield $pf
 
       # process key events
@@ -250,19 +249,19 @@ function main {
       test-spriteoverlap $aliens $base,$missile # check if aliens have hit base or missile
       test-spriteoverlap $bombs $base,$missile
 
-      # cull dead aliens
-      $aliens = ($aliens | where {$_.alive})
-      if ($aliens -eq $null) { $script:endreason="all aliens dead!" }
+      # cull inactive aliens
+      $aliens = ($aliens | where {$_.Active})
+      if ($aliens -eq $null) { $script:endreason="all invaders dead!" }
       if ($script:endreason) { break }
       
       # lets drop a bomb!
       if ($rnd.next(50) -eq 0) {
         foreach ($b in $bombs) {
-          if (!$b.alive) {
+          if (!$b.Active) {
             $s = $aliens[$rnd.next($aliens.length)]
             $b.X = $s.X
             $b.Y = $s.Rect.Y
-            $b.alive = $true
+            $b.Active = $true
             break
           }
         }

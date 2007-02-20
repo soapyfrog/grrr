@@ -12,8 +12,8 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
     /// Determine if any sprites in set a overlap any sprites in set b.
     /// Calls their DidOverlap handlers if so.
     /// If OutputPairs switch is set, returns them also.
-    /// By default, will not test dead sprites, but this can be overriden
-    /// with EvenIfDead switch.
+    /// By default, will not test inactive sprites, but this can be overriden
+    /// with EvenIfInactive switch.
     /// 
     /// TODO: add option for cell-level overlap
     /// </summary>
@@ -40,13 +40,13 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
             set { spritesB = value; }
         }
 
-        private bool evenIfDead = false;
+        private bool evenIfInactive = false;
 
         [Parameter(Position = 2)]
-        public SwitchParameter EvenIfDead
+        public SwitchParameter EvenIfInactive
         {
-            get { return evenIfDead; }
-            set { evenIfDead = value; }
+            get { return evenIfInactive; }
+            set { evenIfInactive = value; }
         }
 
         private bool outputPairs = false;
@@ -69,7 +69,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
             {
                 foreach (Sprite b in spritesB)
                 {
-                    if (a != b && a.Overlaps(b, evenIfDead))
+                    if (a != b && a.Overlaps(b, evenIfInactive))
                     {
                         // notify both parties
                         a.DidOverlap(b);
