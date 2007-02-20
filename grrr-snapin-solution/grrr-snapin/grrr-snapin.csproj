@@ -44,6 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BannerResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BannerResource.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Core\Banner.cs" />
     <Compile Include="Core\Delta.cs" />
     <Compile Include="Core\Pair.cs" />
     <Compile Include="Core\Image.cs" />
@@ -67,7 +73,10 @@
     <Compile Include="Meta\Snapin.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="MiscCmdlets\InitConsoleCmdlet.cs" />
+    <Compile Include="MiscCmdlets\InitConsoleCmdlet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MiscCmdlets\OutBannerCmdlet.cs" />
     <Compile Include="PlayfieldCmdlets\ClearPlayfieldCmdlet.cs" />
     <Compile Include="PlayfieldCmdlets\CreatePlayfieldCmdlet.cs" />
     <Compile Include="PlayfieldCmdlets\FlushPlayfieldCmdlet.cs" />
@@ -90,7 +99,14 @@
     <Compile Include="TilemapCmdlets\GetTilemapCmdlet.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="grrr.ps1" />
+    <EmbeddedResource Include="BannerResource.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>BannerResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\charmap.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
