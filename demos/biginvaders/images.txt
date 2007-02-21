@@ -79,6 +79,15 @@ IIIIIIIIIII
 IIIIIIIIIII
 IIIIIIIIIII
 #end
+#begin baseblank yellow black
+#refxy 5 0
+      
+       
+          
+           
+           
+           
+#end
 #begin bomba0 red black
 #refxy 1 0
  I
@@ -172,6 +181,7 @@ II         II
  I   I I   I 
     I   I    
 #end
+#transparent 33
 #begin shield0 green black
 #refxy 0 0
 IIII

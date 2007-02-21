@@ -12,7 +12,9 @@
 
 # $Id$
 
-# demo for grrr.ps1
+# Space Invaders-style demo for Soapyfrog.Grrr Snap-In
+# Once the Snap-In is installed, add it with Add-PSSnapin Soapyfrog.Grrr
+
 # run this as a script - do not 'source' it with '.'
 
 $global:___globcheck___=1
@@ -28,6 +30,8 @@ init-console $maxwidth $maxheight
 
 $script:endreason = $null; # will be set to a reason later
 $script:rnd = new-object Random
+$script:scorevalues=@{inva=30;invb=20;invc=10;mother=@(50,100,150)}
+$script:extralife=2000
 
 #------------------------------------------------------------------------------
 # Create sounds for the game
@@ -72,9 +76,8 @@ function create-invadersprites {
     $s=$args[0] 
     $o=$args[1] # what we hit
     if ($o -eq $base) {
-      $script:endreason="Aliens hit base";
+      $script:endreason="Aliens hit base"; # game over, regardless of lives
     }
-    # we may hit a missile, but the missile will handle it
   }
   $oob = { 
     $s=$args[0] # sprite
@@ -101,6 +104,7 @@ function create-invadersprites {
     for ($x=0; $x -lt 6; $x++) {
       $ip = $images["$i"+"0"],$images["$i"+"1"]
       $s = create-sprite -images $ip -x (10+18*$x) -y $y -handler $handlers -bounds $b -tag "invader"
+      $s.state.score = $script:scorevalues[$i]
       $sprites += $s
     }
     $y += 10
@@ -114,7 +118,9 @@ function create-invadersprites {
 #
 function create-basesprite {
   $b = new-object Soapyfrog.Grrr.Core.Rect 2,0,($maxwidth-4),$maxheight
-  $handlers = create-spritehandler -DidInit {
+  # make this handler script scope as we will need it again when
+  # the base gets resurrected
+  $script:basehandler = create-spritehandler -DidInit {
     $s=$args[0]
     $s.x = 30; $s.y=$script:maxheight-6
     # set motionpaths for left/right - used by event map key handlers
@@ -124,7 +130,10 @@ function create-basesprite {
     # just null the motionpath
     $s=$args[0].motionpath = $null
   }
-  $base = create-sprite -images $images.base -handler $handlers -tag "base" -bounds $b
+  $base = create-sprite -images $images.base -handler $script:basehandler -tag "base" -bounds $b
+  $base.state.invincible=$false
+  $base.state.resurrecting=$false
+
   return $base
 }
 
@@ -145,6 +154,7 @@ function create-missilesprite {
         $other.Images = $images.invexplode
         # replace handler with one that just sets inactive at end of anim sequence
         $other.handler = (create-spritehandler -DidEndAnim { $args[0].Active = $false })
+        $script:score += $other.state.score; update-scoreimg
         # play sound
         if ($sounds) { play-sound $sounds.invaderexplode }
         break
@@ -174,10 +184,40 @@ function create-bombsprites {
     $s=$args[0]
     $other = $args[1]
     if ($other.tag -eq "base") {
-      # change images to explode sequence (just one frame, but could be more)
-      $other.Images = $images.baseexplode
-      # replace handler with one that just sets inactive at end of anim sequence
-      $other.handler = (create-spritehandler -DidEndAnim { $args[0].Active = $false; $script:endreason="bombed!" })
+      if ($script:base.state.invincible) { continue }
+      # change images to explode sequence 
+      # make it invincible whilst exploding
+      $script:base.Images = $images.baseexplode,$images.baseblank
+      $script:base.animrate = 2
+      $script:base.state.invincible=$true
+      $script:base.state.resurrecting=$true # so can't move/fire
+
+      $script:lives-- ; update-livesimg
+
+      # at end of explosion sequence, determine its fate
+      register-event $eventmap -after 8 {
+        if ($script:lives -eq 0) {
+          $script:base.Active = $false; 
+          $script:endreason="bombed!" 
+        }
+        else {
+          # make base invisible for a bit, then reinstate it flashing
+          # (still invincible) then reinstate it fully.
+          $script:base.images=$images.baseblank
+          register-event $eventmap -after 100 {
+            # and flash the image to give user a clue.
+            $script:base.images = $images.base,$images.baseblank
+            $script:base.animrate = 6
+            $script:base.X=30
+            $script:base.state.resurrecting=$false # can move/fire again now
+          }
+          register-event $eventmap -after 200 { 
+            # back to normal
+            $script:base.images=$images.base
+            $script:base.state.invincible=$false
+          }
+        }
+      }
       # play sound
       if ($sounds) { play-sound $sounds.baseexplode }
       $s.Active = $false
@@ -223,6 +263,39 @@ function create-shieldsprites {
 }
 
 
+#------------------------------------------------------------------------------
+# Update the image used to show the score if it doesn't exist
+# or the score has changed.
+#
+function update-scoreimg {
+  if ($script:scoreimg -eq $null) {
+    $script:lastscore = -1
+  }
+  if ($script:lastscore -ne $script:score) {
+    
+    $script:scoreimg = create-image (out-banner ("1UP {0:000000}" -f $script:score)) -fg "darkgreen" -bg "black"
+    $script:lastscore=$script:score
+  }
+}
+
+#------------------------------------------------------------------------------
+# Update the image used to show the lives if it doesn't exist
+# or the lives counter has changed.
+#
+function update-livesimg {
+  if ($script:livesimg -eq $null) {
+    $script:lastlives = -1
+  }
+  if ($script:lastlives -ne $script:lives) {
+    
+    $script:livesimg = create-image (out-banner ("LIVES {0}" -f $script:lives)) -fg "darkgreen" -bg "black"
+    $script:lastlives=$script:lives
+    $script:livesx=$script:maxwidth-$livesimg.Width
+  }
+}
+
+
+
 
 #------------------------------------------------------------------------------
 # demo starts here
@@ -238,8 +311,8 @@ function main {
   $script:images = (gc ./images.txt | get-image )
   # create an alien hoard (well, a small gathering) 
   $aliens_controller,[array]$aliens = create-invadersprites 
-  # create a base ship
-  $base = create-basesprite 
+  # create a base ship (script scope as it's used from assorted handlers)
+  $script:base = create-basesprite 
   # prepare a missile
   $missile = create-missilesprite 
   # prepare some bombs
@@ -248,13 +321,13 @@ function main {
   $shields = create-shieldsprites
 
   # create an event map
-  $eventmap = create-eventmap
-  register-event $eventmap -keydown 37 {$base.motionpath=$base.state.mpleft} 
+  $script:eventmap = create-eventmap
+  register-event $eventmap -keydown 37 {if (!$base.state.resurrecting){ $base.motionpath=$base.state.mpleft}} 
   register-event $eventmap -keyup 37  {$base.motionpath=$null}
-  register-event $eventmap -keydown 39 {$base.motionpath=$base.state.mpright} 
+  register-event $eventmap -keydown 39 {if (!$base.state.resurrecting){ $base.motionpath=$base.state.mpright}}
   register-event $eventmap -keyup 39 {$base.motionpath=$null}  
   register-event $eventmap -keydown 32 {
-    if (! $missile.Active ) {
+    if (! $base.state.resurrecting -and ! $missile.Active ) {
       $missile.X = $base.X
       $missile.Y = $base.Y+1
       $missile.Active = $true
@@ -264,12 +337,23 @@ function main {
   register-event $eventmap -keydown 27 { $script:endreason="user quit" }
   register-event $eventmap -keydown ([int][char]"F") { $pf.showfps = ! $pf.showfps; }
 
+  [int]$script:score = 0
+  [int]$script:lives = 3
+  $script:scoreimg = $null
+  $script:livesimg = $null
+
+  update-scoreimg
+  update-livesimg
+
   # game loop
   [int]$duhidx=0; [int]$duhcnt=0;
   while ($script:endreason -eq $null) {
     foreach ($alien in $aliens) {
       if (! $alien.Active) { continue; }
       clear-playfield $pf
+
+      draw-image $pf $scoreimg 0 1
+      draw-image $pf $livesimg $livesx 1
 
       # process events
       process-eventmap $eventmap
