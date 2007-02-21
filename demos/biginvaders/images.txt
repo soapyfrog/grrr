@@ -70,6 +70,7 @@ IIIIIIII
  I II I
 I I  I I
 #end
+
 #begin base yellow black
 #refxy 5 0
      I
@@ -77,6 +78,24 @@ I I  I I
  IIIIIIIII
 IIIIIIIIIII
 IIIIIIIIIII
+IIIIIIIIIII
+#end
+#begin baseexplode0 yellow black
+#refxy 5 0
+          I
+I    I 
+  I II I I
+ III III II
+II IIIIIIII
+IIIIIIIIIII
+#end
+#begin baseexplode1 yellow black
+#refxy 5 0
+I       I
+ I  I I 
+  I II I I
+ I II II I 
+IIIII IIIII
 IIIIIIIIIII
 #end
 #begin baseblank yellow black
@@ -126,7 +145,7 @@ I
 I
 I
 #end
-#begin mothership0 green black
+#begin mothership0 yellow black
 #refxy 7 3
      IIIIII
    IIIIIIIIII
@@ -136,7 +155,7 @@ IIIIIIIIIIIIIIII
   III  II  III
    I        I
 #end
-#begin mothership1 green black
+#begin mothership1 yellow black
 #refxy 7 3
      IIIIII
    IIIIIIIIII
@@ -146,7 +165,7 @@ IIIIIIIIIIIIIIII
   III  II  III
    I        I
 #end
-#begin mothership2 green black
+#begin mothership2 yellow black
 #refxy 7 3
      IIIIII
    IIIIIIIIII
@@ -168,20 +187,7 @@ II         II
  I   I I   I 
     I   I    
 #end
-#!bit of a hack, base explosion just a yellow form of invexplode
-#begin baseexplode yellow black
-#refxy 6 4
-    I   I    
- I   I I   I 
-  I       I  
-   I     I   
-II         II
-   I     I   
-  I       I  
- I   I I   I 
-    I   I    
-#end
-#transparent 33
+
 #begin shield0 green black
 #refxy 0 0
 IIII

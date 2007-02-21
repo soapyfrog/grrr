@@ -45,6 +45,8 @@ function prepare-sounds {
     $sounds.firemissile=create-sound (resolve-path "firemissile.wav")
     $sounds.invaderexplode=create-sound (resolve-path "invaderexplode.wav")
     $sounds.baseexplode=create-sound (resolve-path "baseexplode.wav")
+    $sounds.mothershiploop=create-sound (resolve-path "mothershiploop.wav")
+    $sounds.mothershipexplode=create-sound (resolve-path "mothershipexplode.wav")
   }
   else
   {
@@ -187,7 +189,7 @@ function create-bombsprites {
       if ($script:base.state.invincible) { continue }
       # change images to explode sequence 
       # make it invincible whilst exploding
-      $script:base.Images = $images.baseexplode,$images.baseblank
+      $script:base.Images = $images.baseexplode0,$images.baseexplode1
       $script:base.animrate = 2
       $script:base.state.invincible=$true
       $script:base.state.resurrecting=$true # so can't move/fire
@@ -195,7 +197,7 @@ function create-bombsprites {
       $script:lives-- ; update-livesimg
 
       # at end of explosion sequence, determine its fate
-      register-event $eventmap -after 8 {
+      register-event $eventmap -after 20 {
         if ($script:lives -eq 0) {
           $script:base.Active = $false; 
           $script:endreason="bombed!" 
@@ -261,6 +263,23 @@ function create-shieldsprites {
     }
   }
 }
+#------------------------------------------------------------------------------
+# create mothership sprite
+#
+function create-mothershipsprite {
+  $mp = create-motionpath "e h"
+  $h = create-spritehandler -DidOverlap {
+  } -DidEndMotion {
+    $args[0].Active = $false
+  }
+  $s = create-sprite -Images $images.mothership0,$images.mothership1,$images.mothership2
+  $s.Active = $false
+  $s.AnimRate = 4
+  $s.Handler = $h
+  $s.MotionPath = $mp
+  $s.Y=5
+  $s
+}
 
 
 #------------------------------------------------------------------------------
@@ -320,6 +339,9 @@ function main {
   # create shields
   $shields = create-shieldsprites
 
+  # create mothership
+  $script:mothership = create-mothershipsprite
+
   # create an event map
   $script:eventmap = create-eventmap
   register-event $eventmap -keydown 37 {if (!$base.state.resurrecting){ $base.motionpath=$base.state.mpleft}} 
@@ -331,6 +353,13 @@ function main {
       $missile.X = $base.X
       $missile.Y = $base.Y+1
       $missile.Active = $true
+      if (--$script:mothershipcountdown -eq 0) {
+        $script:mothership.Active = $true
+        $script:mothership.X = -20
+        $script:mothershipcountdown = 20 + $rnd.next(10)
+        if ($sounds) { play-sound $sounds.mothershiploop }
+      }
+
       if ($sounds) { play-sound $sounds.firemissile }
     }
   } 
@@ -344,6 +373,8 @@ function main {
 
   update-scoreimg
   update-livesimg
+
+  $script:mothershipcountdown=10
 
   # game loop
   [int]$duhidx=0; [int]$duhcnt=0;
@@ -359,12 +390,12 @@ function main {
       process-eventmap $eventmap
 
       # move everything
-      move-sprite $base,$missile
+      move-sprite $base,$missile,$mothership
       move-sprite $bombs 
       move-sprite $alien # just the current alien
 
       # draw everything
-      draw-sprite $pf $base,$missile
+      draw-sprite $pf $base,$missile,$mothership
       draw-sprite $pf $shields -NoAnim
       draw-sprite $pf $bombs 
       draw-sprite $pf $aliens -NoAnim
@@ -381,6 +412,7 @@ function main {
       test-spriteoverlap $shields $bombs
       test-spriteoverlap $shields $missile
       test-spriteoverlap $shields $aliens
+      test-spriteoverlap $mothership $missile
 
       # cull inactive aliens
       $aliens = ($aliens | where {$_.Active})
