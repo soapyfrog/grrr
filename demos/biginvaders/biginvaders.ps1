@@ -272,7 +272,7 @@ function main {
       clear-playfield $pf
 
       # process events
-      process-event $eventmap
+      process-eventmap $eventmap
 
       # move everything
       move-sprite $base,$missile
