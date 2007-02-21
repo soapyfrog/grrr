@@ -117,7 +117,7 @@ function create-basesprite {
   $handlers = create-spritehandler -DidInit {
     $s=$args[0]
     $s.x = 30; $s.y=$script:maxheight-6
-    # set motionpaths for left/right - used by key handler
+    # set motionpaths for left/right - used by event map key handlers
     $s.state.mpleft = (create-motionpath "w")
     $s.state.mpright = (create-motionpath "e")
   } -DidExceedBounds {
@@ -210,6 +210,7 @@ function create-shieldsprites {
     $args[0].Active=$false
   }
   # we want 4x2 block shields about 36 cells apart
+  # this is a bit hacky, but this is only a demo :-)
   $oy=80
   for ($ox=10; $ox -lt $maxwidth; $ox+=36) {
     for ($c=0; $c -lt 4; $c++) {
@@ -246,11 +247,13 @@ function main {
   # create shields
   $shields = create-shieldsprites
 
-  # create a keyevent map
-  $keymap = create-keyeventmap
-  register-keyevent $keymap 37 -keydown {$base.motionpath=$base.state.mpleft} -keyup {$base.motionpath=$null}
-  register-keyevent $keymap 39 -keydown {$base.motionpath=$base.state.mpright} -keyup {$base.motionpath=$null}  
-  register-keyevent $keymap 32 -keydown {
+  # create an event map
+  $eventmap = create-eventmap
+  register-event $eventmap -keydown 37 {$base.motionpath=$base.state.mpleft} 
+  register-event $eventmap -keyup 37  {$base.motionpath=$null}
+  register-event $eventmap -keydown 39 {$base.motionpath=$base.state.mpright} 
+  register-event $eventmap -keyup 39 {$base.motionpath=$null}  
+  register-event $eventmap -keydown 32 {
     if (! $missile.Active ) {
       $missile.X = $base.X
       $missile.Y = $base.Y+1
@@ -258,8 +261,8 @@ function main {
       if ($sounds) { play-sound $sounds.firemissile }
     }
   } 
-  register-keyevent $keymap 27 -keydown { $script:endreason="user quit" }
-  register-keyevent $keymap ([int][char]"F") -keydown { $pf.showfps = ! $pf.showfps; }
+  register-event $eventmap -keydown 27 { $script:endreason="user quit" }
+  register-event $eventmap -keydown ([int][char]"F") { $pf.showfps = ! $pf.showfps; }
 
   # game loop
   [int]$duhidx=0; [int]$duhcnt=0;
@@ -268,8 +271,8 @@ function main {
       if (! $alien.Active) { continue; }
       clear-playfield $pf
 
-      # process key events
-      process-keyevents $keymap
+      # process events
+      process-event $eventmap
 
       # move everything
       move-sprite $base,$missile

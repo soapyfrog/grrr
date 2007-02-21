@@ -6,51 +6,75 @@ using System.Management.Automation.Host;
 
 namespace Soapyfrog.Grrr.Core
 {
-    public class KeyEventMap
+    public class EventMap
     {
-        private Dictionary<int, ScriptBlock> keydown = new Dictionary<int, ScriptBlock>();
-        private Dictionary<int, ScriptBlock> keyup = new Dictionary<int, ScriptBlock>();
+        private Dictionary<int, ScriptBlock> keyDownScripts = new Dictionary<int, ScriptBlock>();
+        private Dictionary<int, ScriptBlock> keyUpScripts = new Dictionary<int, ScriptBlock>();
+        private List<Tuple<int,ScriptBlock>> afterScripts = new List<Tuple<int,ScriptBlock>>();
 
         // this is to keep track of keys down to avoid invoking handlers on autorepeat.
-        private Dictionary<int, bool> downMap = new Dictionary<int, bool>();
+        private Dictionary<int, bool> keyDownState = new Dictionary<int, bool>();
 
         private bool allowAutoRepeat;
 
-        protected internal KeyEventMap(bool allowAutoRepeat)
+        private int eventNum = 0; // used for "after" events
+
+        protected internal EventMap(bool allowAutoRepeat)
         {
             this.allowAutoRepeat = allowAutoRepeat;
         }
 
-        public void RegisterKeyEvent(int keycode, ScriptBlock down, ScriptBlock up)
+        public void ProcessEvents(PSHostRawUserInterface ui)
         {
-            if (down != null) keydown.Add(keycode, down);
-            if (up != null) keyup.Add(keycode, up);
-        }
-
-        public void ProcessKeyEvents(PSHostRawUserInterface ui)
-        {
+            // key events first
+            ScriptBlock sb;
             while (ui.KeyAvailable)
             {
                 KeyInfo ki = ui.ReadKey(ReadKeyOptions.IncludeKeyDown | ReadKeyOptions.IncludeKeyUp | ReadKeyOptions.NoEcho);
                 int vk = ki.VirtualKeyCode;
-                ScriptBlock sb = null;
+                sb = null;
                 if (ki.KeyDown)
                 {
-                    if (allowAutoRepeat || !downMap.ContainsKey(vk))
+                    if (allowAutoRepeat || !keyDownState.ContainsKey(vk))
                     {
-                        keydown.TryGetValue(vk, out sb);
-                        downMap.Add(vk, true);
+                        keyDownScripts.TryGetValue(vk, out sb);
+                        keyDownState.Add(vk, true);
                     }
                 }
                 else
                 {
-                    downMap.Remove(vk);
-                    keyup.TryGetValue(vk, out sb);
+                    keyDownState.Remove(vk);
+                    keyUpScripts.TryGetValue(vk, out sb);
                 }
-
-                if (sb != null) sb.Invoke();
+                // invoke the script passing this and the keyinfo in
+                if (sb != null) sb.InvokeReturnAsIs(this,ki);
+            }
+            // not check if there are any timed events
+            eventNum++;
+            while (afterScripts.Count > 0 && afterScripts[0].A == eventNum)
+            {
+                // if found, pass this and the eventnum in
+                afterScripts[0].B.InvokeReturnAsIs(this, eventNum);
+                afterScripts.RemoveAt(0);
             }
         }
 
+
+        internal void RegisterKeyDownEvent(int keyDown, ScriptBlock sb)
+        {
+            keyDownScripts.Add(keyDown, sb);
+        }
+
+        internal void RegisterKeyUpEvent(int keyUp, ScriptBlock sb)
+        {
+            keyUpScripts.Add(keyUp, sb);
+        }
+
+        internal void RegisterAfterEvent(int after, ScriptBlock sb)
+        {
+            afterScripts.Add(new Tuple<int, ScriptBlock>(eventNum + after, sb));
+            // keep it sorted in ascending target eventNum order
+            afterScripts.Sort(delegate(Tuple<int, ScriptBlock> a, Tuple<int, ScriptBlock> b) { return a.A.CompareTo(b.A); });
+        }
     }
 }

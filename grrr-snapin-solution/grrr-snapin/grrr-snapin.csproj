@@ -51,9 +51,9 @@
     </Compile>
     <Compile Include="Core\Banner.cs" />
     <Compile Include="Core\Delta.cs" />
+    <Compile Include="Core\EventMap.cs" />
     <Compile Include="Core\Pair.cs" />
     <Compile Include="Core\Image.cs" />
-    <Compile Include="Core\KeyEventMap.cs" />
     <Compile Include="Core\MotionPath.cs" />
     <Compile Include="Core\Playfield.cs" />
     <Compile Include="Core\Rect.cs" />
@@ -63,13 +63,13 @@
     <Compile Include="Core\Tilemap.cs" />
     <Compile Include="DrawingCmdlets\DrawLineCmdlet.cs" />
     <Compile Include="DrawingCmdlets\DrawStringCmdlet.cs" />
+    <Compile Include="EventCmdlets\CreateEventMapCmdlet.cs" />
+    <Compile Include="EventCmdlets\ProcessEventsCmdlet.cs" />
+    <Compile Include="EventCmdlets\RegisterEventCmdlet.cs" />
     <Compile Include="ImageCmdlets\CreateImageCmdlet.cs" />
     <Compile Include="ImageCmdlets\DrawImageCmdlet.cs" />
     <Compile Include="ImageCmdlets\GetImageCmdlet.cs" />
     <Compile Include="ImageCmdlets\ScanImageCmdlet.cs" />
-    <Compile Include="KeyEventCmdlets\CreateKeyEventMapCmdlet.cs" />
-    <Compile Include="KeyEventCmdlets\ProcessKeyEventsCmdlet.cs" />
-    <Compile Include="KeyEventCmdlets\RegisterKeyEventCmdlet.cs" />
     <Compile Include="Meta\Snapin.cs">
       <SubType>Component</SubType>
     </Compile>

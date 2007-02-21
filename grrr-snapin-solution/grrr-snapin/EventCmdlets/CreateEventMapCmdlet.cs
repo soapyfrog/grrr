@@ -5,13 +5,13 @@ using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
 
-namespace Soapyfrog.Grrr.KeyEventCmdlets
+namespace Soapyfrog.Grrr.EventCmdlets
 {
     /// <summary>
     /// Create a key event map.
     /// </summary>
-    [Cmdlet("Create","KeyEventMap")]
-    public class CreateKeyEventMapCmdlet : PSCmdlet
+    [Cmdlet("Create","EventMap")]
+    public class CreateEventMapCmdlet : PSCmdlet
     {
         private bool allowAutoRepeat;
 
@@ -29,7 +29,7 @@ namespace Soapyfrog.Grrr.KeyEventCmdlets
 	
         protected override void EndProcessing()
         {
-            WriteObject(new KeyEventMap(allowAutoRepeat), false);
+            WriteObject(new EventMap(allowAutoRepeat), false);
         }
     }
 }

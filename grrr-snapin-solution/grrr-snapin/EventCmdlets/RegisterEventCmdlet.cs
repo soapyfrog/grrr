@@ -5,56 +5,59 @@ using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
 
-namespace Soapyfrog.Grrr.KeyEventCmdlets
+namespace Soapyfrog.Grrr.EventCmdlets
 {
     /// <summary>
-    /// Create a key event map.
+    /// Register an event.
     /// </summary>
-    [Cmdlet("Register","KeyEvent")]
-    public class RegisterKeyEventCmdlet : PSCmdlet
+    [Cmdlet("Register", "Event")]
+    public class RegisterEventCmdlet : PSCmdlet
     {
-        private KeyEventMap keyeventmap;
+        private EventMap eventmap;
+        private ScriptBlock sb;
+        private int keyDown = -1, keyUp = -1, after = -1;
 
-        [Parameter(Position=0,Mandatory=true)]
+        [Parameter(Position = 0, Mandatory = true)]
         [ValidateNotNull]
-        public KeyEventMap KeyEventMap
+        public EventMap EventMap
         {
-            get { return keyeventmap; }
-            set { keyeventmap = value; }
+            get { return eventmap; }
+            set { eventmap = value; }
         }
-
-        private int keyCode;
 
         [Parameter(Position=1,Mandatory=true)]
-        public int KeyCode
+        [ValidateNotNull]
+        public ScriptBlock ScriptBlock { set { sb = value; } get { return sb; } }
+
+        [Parameter()]
+        [ValidateRange(1,65535)]
+        public int KeyDown
         {
-            get { return keyCode; }
-            set { keyCode = value; }
+            get { return keyDown; }
+            set { keyDown = value; }
+        }
+        [Parameter()]
+        [ValidateRange(1, 65535)]
+        public int KeyUp
+        {
+            get { return keyUp; }
+            set { keyUp = value; }
         }
 
-        private ScriptBlock up;
-
-        [Parameter(Position=2)]
-        [ValidateNotNull]
-        public ScriptBlock KeyUp
+        [Parameter()]
+        [ValidateRange(1, int.MaxValue)]
+        public int After
         {
-            get { return up; }
-            set { up = value; }
-        }
-
-        private ScriptBlock down;
-
-        [Parameter(Position = 3)]
-        [ValidateNotNull]
-        public ScriptBlock KeyDown
-        {
-            get { return down; }
-            set { down = value; }
+            get { return after; }
+            set { after = value; }
         }
 
         protected override void EndProcessing()
         {
-            keyeventmap.RegisterKeyEvent(keyCode, down, up);
+            if (keyDown > 0) eventmap.RegisterKeyDownEvent(keyDown, sb);
+            else if (keyUp > 0) eventmap.RegisterKeyUpEvent(keyUp, sb);
+            else if (after > 0) eventmap.RegisterAfterEvent(after, sb);
+            else throw new Exception("Should specify exactly one of KeyUp,KeyDown or After parameters");
         }
     }
 }

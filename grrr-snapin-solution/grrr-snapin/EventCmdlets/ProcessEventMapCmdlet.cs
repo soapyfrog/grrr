@@ -5,27 +5,27 @@ using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
 
-namespace Soapyfrog.Grrr.KeyEventCmdlets
+namespace Soapyfrog.Grrr.EventCmdlets
 {
     /// <summary>
     /// Create a key event map.
     /// </summary>
-    [Cmdlet("Process","KeyEvents")]
-    public class ProcessKeyEventsCmdlet : PSCmdlet
+    [Cmdlet("Process","EventMap")]
+    public class ProcessEventMapCmdlet : PSCmdlet
     {
-        private KeyEventMap keyeventmap;
+        private EventMap eventmap;
 
         [Parameter(Position=0,Mandatory=true)]
         [ValidateNotNull]
-        public KeyEventMap KeyEventMap
+        public EventMap EventMap
         {
-            get { return keyeventmap; }
-            set { keyeventmap = value; }
+            get { return eventmap; }
+            set { eventmap = value; }
         }
 
         protected override void EndProcessing()
         {
-            keyeventmap.ProcessKeyEvents(Host.UI.RawUI);
+            eventmap.ProcessEvents(Host.UI.RawUI);
         }
     }
 }
