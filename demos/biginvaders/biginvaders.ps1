@@ -209,10 +209,13 @@ function create-shieldsprites {
   } -DidEndAnim {
     $args[0].Active=$false
   }
-  for ($i=10; $i -lt $maxwidth; $i+=36) {
-    for ($c=0; $c -lt 16; $c+=4) {
-      for ($r=80; $r -lt 88; $r+=4) {
-        create-sprite -images $images.shield0,$images.shield1,$images.shield2 -handler $h -X ($i+$c) -Y $r
+  # we want 4x2 block shields about 36 cells apart
+  $oy=80
+  for ($ox=10; $ox -lt $maxwidth; $ox+=36) {
+    for ($c=0; $c -lt 4; $c++) {
+      for ($r=0; $r -lt 2; $r++) {
+        if ($r -eq 1 -and 1,2 -eq $c) { continue; } # gap on underside
+        create-sprite -images $images.shield0,$images.shield1,$images.shield2 -handler $h -X ($ox+$c*4) -Y ($oy+$r*4)
       }
     }
   }
