@@ -102,12 +102,12 @@ namespace Soapyfrog.Grrr.Core
             }
         }
 
-        public void Play(bool stopExisting)
+        public void Play(bool stopExisting,bool loop)
         {
             if (secbuf != null)
             {
                 if (stopExisting) secbuf.Stop();
-                secbuf.Play(0, BufferPlayFlags.Default);
+                secbuf.Play(0, loop ? BufferPlayFlags.Looping : BufferPlayFlags.Default);
             }
         }
 

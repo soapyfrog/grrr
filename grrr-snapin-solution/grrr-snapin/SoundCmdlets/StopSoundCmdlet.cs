@@ -8,14 +8,12 @@ using Soapyfrog.Grrr.Core;
 namespace Soapyfrog.Grrr.SoundCmdlets
 {
     /// <summary>
-    /// Play a Sound created by Create-Sound cmdlet.
+    /// Stop a Sound created by Create-Sound cmdlet.
     /// </summary>
-    [Cmdlet("Play", "Sound")]
-    public class PlaySoundCmdlet : PSCmdlet
+    [Cmdlet("Stop", "Sound")]
+    public class StopSoundCmdlet : PSCmdlet
     {
         private Sound sound;
-        private bool stopExisting;
-        private bool loop;
 
         [Parameter(Position = 0, Mandatory = true)]
         [ValidateNotNull]
@@ -25,23 +23,9 @@ namespace Soapyfrog.Grrr.SoundCmdlets
             set { sound = value; }
         }
 
-        [Parameter()]
-        public SwitchParameter StopExisting
-        {
-            set { stopExisting = value; }
-            get { return stopExisting; }
-        }
-
-        [Parameter()]
-        public SwitchParameter Loop
-        {
-            set { loop = value; }
-            get { return loop; }
-        }
-
         protected override void EndProcessing()
         {
-            sound.Play(stopExisting,loop); 
+            sound.Stop(); 
         }
     }
 }

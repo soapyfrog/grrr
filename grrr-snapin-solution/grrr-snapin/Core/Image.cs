@@ -24,8 +24,8 @@ namespace Soapyfrog.Grrr.Core
 
         public int Width { get { return width; } }
         public int Height { get { return height; } }
-        public int RefX { get { return refx; } }
-        public int RefY { get { return refy; } }
+        public int RefX { get { return refx; } set { refx = value; } }
+        public int RefY { get { return refy; } set { refy = value; } }
         public char Transparent { get { return t; } }
         public BufferCell[,] Cells { get { return cells; } }
 

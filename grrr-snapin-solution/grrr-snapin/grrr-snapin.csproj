@@ -64,7 +64,7 @@
     <Compile Include="DrawingCmdlets\DrawLineCmdlet.cs" />
     <Compile Include="DrawingCmdlets\DrawStringCmdlet.cs" />
     <Compile Include="EventCmdlets\CreateEventMapCmdlet.cs" />
-    <Compile Include="EventCmdlets\ProcessEventsCmdlet.cs" />
+    <Compile Include="EventCmdlets\ProcessEventMapCmdlet.cs" />
     <Compile Include="EventCmdlets\RegisterEventCmdlet.cs" />
     <Compile Include="ImageCmdlets\CreateImageCmdlet.cs" />
     <Compile Include="ImageCmdlets\DrawImageCmdlet.cs" />
@@ -84,7 +84,10 @@
     <Compile Include="SoundCmdlets\CreateSoundCmdlet.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SoundCmdlets\PlaySoundCmdlet.cs" />
+    <Compile Include="SoundCmdlets\PlaySoundCmdlet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SoundCmdlets\StopSoundCmdlet.cs" />
     <Compile Include="SpriteCmdlets\AnimateSpriteCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateMotionPathCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateSpriteCmdlet.cs" />

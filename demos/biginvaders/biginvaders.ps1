@@ -161,6 +161,22 @@ function create-missilesprite {
         if ($sounds) { play-sound $sounds.invaderexplode }
         break
       }
+      "mothership" {
+        if ($other.state.invincible) { break }
+        # change images to one showing the score
+        $score = $scorevalues.mother[$rnd.next($scorevalues.mother.length)]
+        $other.Images = $script:mothershipscoreimages[$score]
+        $script:score += $score; update-scoreimg
+        $other.state.invincible = $true # stop being hit again
+        $other.motionpath=$null
+        register-event $eventmap -after 100 {
+          # easy reset
+          $script:mothership = create-mothershipsprite 
+        }
+        # play sound
+        if ($sounds) { stop-sound $sounds.mothershiploop; play-sound $sounds.mothershipexplode }
+        break
+      }
       "bomb" {
         $other.Active = $false 
       }
@@ -268,11 +284,11 @@ function create-shieldsprites {
 #
 function create-mothershipsprite {
   $mp = create-motionpath "e h"
-  $h = create-spritehandler -DidOverlap {
-  } -DidEndMotion {
+  $h = create-spritehandler -DidEndMotion {
     $args[0].Active = $false
+    stop-sound $sounds.mothershiploop;
   }
-  $s = create-sprite -Images $images.mothership0,$images.mothership1,$images.mothership2
+  $s = create-sprite -Images $images.mothership0,$images.mothership1,$images.mothership2 -tag "mothership"
   $s.Active = $false
   $s.AnimRate = 4
   $s.Handler = $h
@@ -314,6 +330,18 @@ function update-livesimg {
 }
 
 
+#------------------------------------------------------------------------------
+# cache mothership score images
+#
+function cache-mothershipscoreimages {
+  $script:mothershipscoreimages=@{}
+  foreach ($s in $script:scorevalues.mother) {
+    $img = create-image (out-banner "$s") -fg yellow -bg black
+    $img.refx=$img.width/2; $img.refy=$img.height/2
+    $mothershipscoreimages[[int]$s]=$img
+  }
+}
+
 
 
 #------------------------------------------------------------------------------
@@ -340,6 +368,7 @@ function main {
   $shields = create-shieldsprites
 
   # create mothership
+  cache-mothershipscoreimages
   $script:mothership = create-mothershipsprite
 
   # create an event map
@@ -357,7 +386,7 @@ function main {
         $script:mothership.Active = $true
         $script:mothership.X = -20
         $script:mothershipcountdown = 20 + $rnd.next(10)
-        if ($sounds) { play-sound $sounds.mothershiploop }
+        if ($sounds) { play-sound $sounds.mothershiploop -loop }
       }
 
       if ($sounds) { play-sound $sounds.firemissile }
@@ -374,7 +403,7 @@ function main {
   update-scoreimg
   update-livesimg
 
-  $script:mothershipcountdown=10
+  $script:mothershipcountdown=20
 
   # game loop
   [int]$duhidx=0; [int]$duhcnt=0;
