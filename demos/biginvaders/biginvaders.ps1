@@ -89,7 +89,7 @@ function create-invadersprites {
     if ($d.mpnext -ne $null) { return;} # aleady dealt with the event
 
     if ($delta.dy -ge 0 -and $edges -band [soapyfrog.grrr.core.edge]::bottom) { 
-      $script:endreason="aliens have landed"
+      $script:endreason="invaders have landed"
     }
     elseif ($delta.dx -gt 0 -and $edges -band [soapyfrog.grrr.core.edge]::right) {
       $d.mpnext=$d.mpdl;
@@ -353,7 +353,7 @@ function cache-mothershipscoreimages {
 function init-stuff {
   # load/cache sounds
   prepare-sounds
-  # load the alien images from the file
+  # load the invader images from the file
   $script:images = (gc ./images.txt | get-image )
 
   $script:rnd = new-object Random
@@ -373,8 +373,8 @@ function init-stuff {
 function run-game {
   $script:endreason = $null; # will be set to a reason later
 
-  # create an alien hoard (well, a small gathering) 
-  $aliens_controller,[array]$aliens = create-invadersprites 
+  # create an invader hoard (well, a small gathering) 
+  $invaders_controller,[array]$invaders = create-invadersprites 
   # create a base ship (script scope as it's used from assorted handlers)
   $script:base = create-basesprite 
   # prepare a missile
@@ -420,74 +420,84 @@ function run-game {
   update-scoreimg
   update-livesimg
 
-  $script:mothershipcountdown=20
+  # invaders come in waves
+  for ([int]$wave=0;$script:endreason -eq $null;$wave++) {
 
-  # game loop
-  [int]$duhidx=0; [int]$duhcnt=0;
-  while ($script:endreason -eq $null) {
-    foreach ($alien in $aliens) {
-      if (! $alien.Active) { continue; }
-      clear-playfield $pf
+    # set up invader positions TODO
+    # reset shields TODO
+    # prepare bombs TODO
 
-      draw-image $pf $scoreimg 0 1
-      draw-image $pf $livesimg $livesx 1
+    $script:mothershipcountdown=20
 
-      # process events
-      process-eventmap $eventmap
+    # game loop
+    [int]$duhidx=0; [int]$duhcnt=0;
+    while ($script:endreason -eq $null) {
+      foreach ($invader in $invaders) {
+        if (! $invader.Active) { continue; }
+        clear-playfield $pf
 
-      # move everything
-      move-sprite $base,$missile,$mothership
-      move-sprite $bombs 
-      move-sprite $alien # just the current alien
+        draw-image $pf $scoreimg 0 1
+        draw-image $pf $livesimg $livesx 1
 
-      # draw everything
-      draw-sprite $pf $base,$missile,$mothership
-      draw-sprite $pf $shields -NoAnim
-      draw-sprite $pf $bombs 
-      draw-sprite $pf $aliens -NoAnim
-      animate-sprite $alien # only animate the current one
+        # process events
+        process-eventmap $eventmap
 
-      # flush the playfield to the console
-      flush-playfield $pf -sync $sync 
+        # move everything
+        move-sprite $base,$missile,$mothership
+        move-sprite $bombs 
+        move-sprite $invader # just the current invader
+
+        # draw everything
+        draw-sprite $pf $base,$missile,$mothership
+        draw-sprite $pf $shields -NoAnim
+        draw-sprite $pf $bombs 
+        draw-sprite $pf $invaders -NoAnim
+        animate-sprite $invader # only animate the current one
+
+        # flush the playfield to the console
+        flush-playfield $pf -sync $sync 
 
 
-      # test for collisions - note, if this is done to ensure sprites are not
-      # out of bounds, you might want to do it before drawing
-      test-spriteoverlap $aliens $base,$missile # check if aliens have hit base or missile
-      test-spriteoverlap $bombs $base,$missile
-      test-spriteoverlap $shields $bombs
-      test-spriteoverlap $shields $missile
-      test-spriteoverlap $shields $aliens
-      test-spriteoverlap $mothership $missile
+        # test for collisions - note, if this is done to ensure sprites are not
+        # out of bounds, you might want to do it before drawing
+        test-spriteoverlap $invaders $base,$missile # check if invaders have hit base or missile
+        test-spriteoverlap $bombs $base,$missile
+        test-spriteoverlap $shields $bombs
+        test-spriteoverlap $shields $missile
+        test-spriteoverlap $shields $invaders
+        test-spriteoverlap $mothership $missile
 
-      # cull inactive aliens
-      $aliens = ($aliens | where {$_.Active})
-      if ($aliens -eq $null) { $script:endreason="all invaders dead!" }
-      if ($script:endreason) { break }
-      
-      # lets drop a bomb!
-      if ($rnd.next(50) -eq 0) {
-        foreach ($b in $bombs) {
-          if (!$b.Active) {
-            $s = $aliens[$rnd.next($aliens.length)]
-            $b.X = $s.X
-            $b.Y = $s.Rect.Y
-            $b.Active = $true
-            break
+        # cull inactive invaders
+        $invaders = ($invaders | where {$_.Active})
+        if ($invaders -eq $null) { $script:endreason="all invaders dead!" }
+        if ($script:endreason) { break }
+        
+        # lets drop a bomb!
+        if ($rnd.next(50) -eq 0) {
+          foreach ($b in $bombs) {
+            if (!$b.Active) {
+              $s = $invaders[$rnd.next($invaders.length)]
+              $b.X = $s.X
+              $b.Y = $s.Rect.Y
+              $b.Active = $true
+              break
+            }
           }
         }
       }
-    }
-    #todo should try to find a better algorithm for sound speed
-    if ( ($sounds -and (++$duhcnt)%2 -eq 1)) { play-sound $script:sounds["duh"+(++$duhidx % 4)] -stop} 
-    # processed block, so update aliens controller state
-    if ($aliens_controller.mpnext) {
-      foreach ($alien in $aliens) {
-        $alien.motionpath = $aliens_controller.mpnext;
+      #todo should try to find a better algorithm for sound speed
+      if ( ($sounds -and (++$duhcnt)%2 -eq 1)) { play-sound $script:sounds["duh"+(++$duhidx % 4)] -stop} 
+      # processed block, so update invaders controller state
+      if ($invaders_controller.mpnext) {
+        foreach ($invader in $invaders) {
+          $invader.motionpath = $invaders_controller.mpnext;
+        }
+        $invaders_controller.mpnext = $null
       }
-      $aliens_controller.mpnext = $null
+       
     }
-     
+    # end of wave!
+    # TODO: anything to do here?
   }
   if ($sounds) { stop-sound $sounds.mothershiploop }
   draw-string $pf "Demo ended: $script:endreason" 20 10 -fg "white" -bg "red"
@@ -511,7 +521,7 @@ function run-intro {
     $infoimgs+=(create-image (out-banner ("last score {0:0000}" -f $script:score) ) -fg "blue")
     $infoimgs+=$infoimgs[-1]
   }
-  $infoimgs+=(create-image (out-banner "grrr framework demo" ) -fg "white")
+  $infoimgs+=(create-image (out-banner "grrr pssnapin demo" ) -fg "white")
   $infoimgs+=$infoimgs[-1]
   $infoimgs+=(create-image (out-banner "from ps1.soapyfrog.com") -fg "white")
   $infoimgs+=$infoimgs[-1]
@@ -579,6 +589,10 @@ function run-outro {
 # Clean up
 #
 function cleanup-stuff {
+  # not really necessary, but always good to clean up
+  if ($sounds) {
+    foreach ($s in $sounds.Values) { $s.Dispose() }
+  }
   clear-host
 }
 
