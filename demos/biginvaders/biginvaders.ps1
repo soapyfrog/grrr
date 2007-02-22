@@ -27,7 +27,7 @@ $ErrorActionPreference="Stop"
 # needs a bit screen. best to use 6x8 bitmap font
 [int]$script:maxwidth = 180
 [int]$script:maxheight = 100
-[int]$script:sync = 1000/50  # target 50fps
+[int]$script:sync = 1000/40  # target 50fps
 
 
 init-console $maxwidth $maxheight 
@@ -59,7 +59,7 @@ function prepare-sounds {
 # Create the invader sprites.  Returns a tuple of the shared direction
 # controller object and the sprite array.
 #
-function create-invadersprites {
+function create-invadersprites([int]$wave) {
   $b = new-object Soapyfrog.Grrr.Core.Rect 2,0,($maxwidth-4),$maxheight
   $sprites = new-object collections.arraylist # @()
   [hashtable]$ctl = @{  # shared controller for all sprites
@@ -100,10 +100,10 @@ function create-invadersprites {
   }
 
   $handlers = Create-SpriteHandler -DidInit $init -DidOverlap $overlap -DidExceedBounds $oob
-  $y = 12
+  $y = [Math]::Min(42, 12+5*$wave)
   "inva","invb","invc","invc" | foreach {
     $i = $_
-    for ($x=0; $x -lt 6; $x++) {
+    for ($x=0; $x -lt 6; $x++) { 
       $ip = $images["$i"+"0"],$images["$i"+"1"]
       $s = create-sprite -images $ip -x (10+18*$x) -y $y -handler $handlers -bounds $b -tag "invader"
       $s.state.score = $script:scorevalues[$i]
@@ -193,7 +193,7 @@ function create-missilesprite {
 #------------------------------------------------------------------------------
 # create bomb sprites
 #
-function create-bombsprites {
+function create-bombsprites([int]$wave) {
   # test boundary condition with a DidMove handler
   $b = new-object Soapyfrog.Grrr.Core.Rect 0,0,$maxwidth,$maxheight
   $h = create-spritehandler -DidExceedBounds {
@@ -243,7 +243,8 @@ function create-bombsprites {
   }
   $mp = create-motionpath "s1" # just head south 
   # create a few
-  1..5 | foreach {
+  $numbombs = [Math]::Max(10,5 + $wave)
+  1..$numbombs | foreach {
     $s = create-sprite -images $images.bomba0,$images.bomba1 -handler $h -motionpath $mp -animrate 4 -tag "bomb" -bound $b
     # start it off inactive; it gets set to Active when it's fired.
     $s.active = $false
@@ -373,16 +374,10 @@ function init-stuff {
 function run-game {
   $script:endreason = $null; # will be set to a reason later
 
-  # create an invader hoard (well, a small gathering) 
-  $invaders_controller,[array]$invaders = create-invadersprites 
   # create a base ship (script scope as it's used from assorted handlers)
   $script:base = create-basesprite 
   # prepare a missile
   $missile = create-missilesprite 
-  # prepare some bombs
-  $bombs = create-bombsprites 
-  # create shields
-  $shields = create-shieldsprites
 
   # create mothership
   cache-mothershipscoreimages
@@ -411,7 +406,7 @@ function run-game {
   } 
   register-event $eventmap -keydown 27 { $script:endreason="user quit" }
   register-event $eventmap -keydown ([int][char]"F") { $pf.showfps = ! $pf.showfps; }
-
+  
   [int]$script:score = 0
   [int]$script:lives = 3
   $script:scoreimg = $null
@@ -423,86 +418,124 @@ function run-game {
   # invaders come in waves
   for ([int]$wave=0;$script:endreason -eq $null;$wave++) {
 
-    # set up invader positions TODO
-    # reset shields TODO
-    # prepare bombs TODO
+    # create an invader hoard (well, a small gathering) 
+    $invaders_controller,[array]$invaders = create-invadersprites $wave 
+
+    # create shields
+    $shields = create-shieldsprites
+
+    # prepare some bombs
+    $bombs = create-bombsprites $wave
+    $bombchance=[Math]::Min(25,50-3*$wave)
 
     $script:mothershipcountdown=20
 
+    $script:endofwave = $false
+    $script:endingwave = $false
+
     # game loop
     [int]$duhidx=0; [int]$duhcnt=0;
-    while ($script:endreason -eq $null) {
-      foreach ($invader in $invaders) {
-        if (! $invader.Active) { continue; }
+    while (!$script:endofwave -and $script:endreason -eq $null) {
+      if (!$invaders) {
+        # all invaders dead (or not yet alive) so just keep the drawing/event loop going
         clear-playfield $pf
-
         draw-image $pf $scoreimg 0 1
         draw-image $pf $livesimg $livesx 1
-
         # process events
         process-eventmap $eventmap
-
         # move everything
         move-sprite $base,$missile,$mothership
         move-sprite $bombs 
-        move-sprite $invader # just the current invader
-
         # draw everything
         draw-sprite $pf $base,$missile,$mothership
         draw-sprite $pf $shields -NoAnim
         draw-sprite $pf $bombs 
-        draw-sprite $pf $invaders -NoAnim
-        animate-sprite $invader # only animate the current one
-
         # flush the playfield to the console
         flush-playfield $pf -sync $sync 
-
-
-        # test for collisions - note, if this is done to ensure sprites are not
-        # out of bounds, you might want to do it before drawing
-        test-spriteoverlap $invaders $base,$missile # check if invaders have hit base or missile
-        test-spriteoverlap $bombs $base,$missile
+        # handle any residual bombs
         test-spriteoverlap $shields $bombs
-        test-spriteoverlap $shields $missile
-        test-spriteoverlap $shields $invaders
-        test-spriteoverlap $mothership $missile
+        test-spriteoverlap $base $bombs
+      }
+      else {
+        # some invaders around, so draw everything and handle the block
+        foreach ($invader in $invaders) {
+          if (! $invader.Active) { continue; }
+          clear-playfield $pf
 
-        # cull inactive invaders
-        $invaders = ($invaders | where {$_.Active})
-        if ($invaders -eq $null) { $script:endreason="all invaders dead!" }
-        if ($script:endreason) { break }
-        
-        # lets drop a bomb!
-        if ($rnd.next(50) -eq 0) {
-          foreach ($b in $bombs) {
-            if (!$b.Active) {
-              $s = $invaders[$rnd.next($invaders.length)]
-              $b.X = $s.X
-              $b.Y = $s.Rect.Y
-              $b.Active = $true
-              break
+          draw-image $pf $scoreimg 0 1
+          draw-image $pf $livesimg $livesx 1
+
+          # process events
+          process-eventmap $eventmap
+
+          # move everything
+          move-sprite $base,$missile,$mothership
+          move-sprite $bombs 
+          move-sprite $invader # just the current invader
+
+          # draw everything
+          draw-sprite $pf $base,$missile,$mothership
+          draw-sprite $pf $shields -NoAnim
+          draw-sprite $pf $bombs 
+          draw-sprite $pf $invaders -NoAnim
+          animate-sprite $invader # only animate the current one
+
+          # flush the playfield to the console
+          flush-playfield $pf -sync $sync 
+
+
+          # test for collisions - note, if this is done to ensure sprites are not
+          # out of bounds, you might want to do it before drawing
+          test-spriteoverlap $invaders $base,$missile # check if invaders have hit base or missile
+          test-spriteoverlap $bombs $base,$missile
+          test-spriteoverlap $shields $bombs
+          test-spriteoverlap $shields $missile
+          test-spriteoverlap $shields $invaders
+          test-spriteoverlap $mothership $missile
+
+          # lets drop a bomb!
+          if ($rnd.next($bombchance) -eq 0) {
+            foreach ($b in $bombs) {
+              if (!$b.Active) {
+                $s=$null; while ($s -eq $null) {
+                  $s = $invaders[$rnd.next($invaders.length)]
+                  if (!$s.active) { $s=$null }
+                }
+                $b.X = $s.X
+                $b.Y = $s.Rect.Y
+                $b.Active = $true
+                break
+              }
             }
           }
+        }#foreach invader
+        # make the duh, duh, duh sound!
+        #todo should try to find a better algorithm for sound speed
+        if ( (!$endingwave -and $sounds -and (++$duhcnt)%2 -eq 1)) { play-sound $script:sounds["duh"+(++$duhidx % 4)] -stop} 
+        
+        # processed block of invaders, so update invaders controller state
+        # if required
+        if ($invaders_controller.mpnext) {
+          foreach ($invader in $invaders) {
+            $invader.motionpath = $invaders_controller.mpnext;
+          }
+          $invaders_controller.mpnext = $null
         }
-      }
-      #todo should try to find a better algorithm for sound speed
-      if ( ($sounds -and (++$duhcnt)%2 -eq 1)) { play-sound $script:sounds["duh"+(++$duhidx % 4)] -stop} 
-      # processed block, so update invaders controller state
-      if ($invaders_controller.mpnext) {
-        foreach ($invader in $invaders) {
-          $invader.motionpath = $invaders_controller.mpnext;
+        # cull inactive invaders to reduce enumeration waste
+        $invaders = ($invaders | where {$_.Active})
+        if ($invaders -eq $null) { 
+          if (!$script:endingwave) {
+            $script:endingwave=$true
+            # in 3 seconds, go to next wave
+            register-event $eventmap -after 150 { $script:endofwave=$true }
+          }
         }
-        $invaders_controller.mpnext = $null
-      }
-       
+      } # if there were invaders to process
     }
     # end of wave!
     # TODO: anything to do here?
   }
   if ($sounds) { stop-sound $sounds.mothershiploop }
-  draw-string $pf "Demo ended: $script:endreason" 20 10 -fg "white" -bg "red"
-  flush-playfield $pf 
-  start-sleep 1
 }
 
 
