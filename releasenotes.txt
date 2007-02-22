@@ -1,8 +1,8 @@
-Version 1.1.0.?? | ??? 2007
+Version 1.1.0.5 | 22 Feb 2007
 
 New Features
 
-* Now 100% Cmdlet! (well, except for sound)
+* Now 100% Cmdlet! 
 
 * Sprites now have DidOverlap handlers, called by Test-SpriteOverlap
   cmdlet.
@@ -18,12 +18,20 @@ New Features
 * Added a "Tag" property to each sprite for easy identification
   of sprite types (eg missile, bomb, alien) from handlers.
 
+* Can dynamically change images on sprites
 
+* DirectX, multi-channel, looping sound (needs DirectX though)
+
+* Changed 'alive' property on Sprite to 'active' 
+
+* Incorporated banner script as out-banner cmdlet.
+
+* Added 'timer' events; made keymap a generic eventmap.
 
 
 ------------------------------------------------------------------
 
-Version 1,1,beta | 9 Feb 2007
+Version 1,1,alpha | 9 Feb 2007
 
 New Features:
 
