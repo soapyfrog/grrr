@@ -16,6 +16,7 @@
 # Once the Snap-In is installed, add it with Add-PSSnapin Soapyfrog.Grrr
 
 # run this as a script - do not 'source' it with '.'
+param([switch]$nosound)
 
 $global:___globcheck___=1
 $local:___globcheck___=2
@@ -28,10 +29,6 @@ $ErrorActionPreference="Stop"
 [int]$script:maxheight = 100
 init-console $maxwidth $maxheight 
 
-$script:endreason = $null; # will be set to a reason later
-$script:rnd = new-object Random
-$script:scorevalues=@{inva=30;invb=20;invc=10;mother=@(50,100,150)}
-$script:extralife=2000
 
 #------------------------------------------------------------------------------
 # Create sounds for the game
@@ -284,11 +281,15 @@ function create-shieldsprites {
 #
 function create-mothershipsprite {
   $mp = create-motionpath "e h"
-  $h = create-spritehandler -DidEndMotion {
-    $args[0].Active = $false
+  $h = create-spritehandler -DidExceedBounds {
+    $s=$args[0] # sprite
+    $delta=$args[1] # Delta
+    [soapyfrog.grrr.core.edge]$edges=$args[2] # Edge bitwise set
+    $s.Active = $false
     stop-sound $sounds.mothershiploop;
   }
-  $s = create-sprite -Images $images.mothership0,$images.mothership1,$images.mothership2 -tag "mothership"
+  $b = new-object Soapyfrog.Grrr.Core.Rect -20,0,($maxwidth+40),$maxheight
+  $s = create-sprite -Images $images.mothership0,$images.mothership1,$images.mothership2 -tag "mothership" -Bound $b
   $s.Active = $false
   $s.AnimRate = 4
   $s.Handler = $h
@@ -342,20 +343,33 @@ function cache-mothershipscoreimages {
   }
 }
 
+#------------------------------------------------------------------------------
+# initialise stuff that only need be done once, like sounds image loading
+# high score reading and wotnot
+#
+function init-stuff {
+  # load/cache sounds
+  prepare-sounds
+  # load the alien images from the file
+  $script:images = (gc ./images.txt | get-image )
+
+  $script:rnd = new-object Random
+  $script:scorevalues=@{inva=30;invb=20;invc=10;mother=@(50,100,150)}
+  $script:extralife=2000
+}
 
 
 #------------------------------------------------------------------------------
-# demo starts here
+# Set up and play one game with n lives, etc.
+# Exits when the game is over or if used presses ESC to quit.
 #
-function main {
+function run-game {
+  $script:endreason = $null; # will be set to a reason later
 
   # create a plafield to put it all on
   $pf = create-playfield -x 0 -y 0 -width $maxwidth -height $maxheight -bg "black"
 
-  prepare-sounds
 
-  # load the alien images from the file
-  $script:images = (gc ./images.txt | get-image )
   # create an alien hoard (well, a small gathering) 
   $aliens_controller,[array]$aliens = create-invadersprites 
   # create a base ship (script scope as it's used from assorted handlers)
@@ -384,7 +398,7 @@ function main {
       $missile.Active = $true
       if (--$script:mothershipcountdown -eq 0) {
         $script:mothership.Active = $true
-        $script:mothership.X = -20
+        $script:mothership.X = -10
         $script:mothershipcountdown = 20 + $rnd.next(10)
         if ($sounds) { play-sound $sounds.mothershiploop -loop }
       }
@@ -462,7 +476,7 @@ function main {
       }
     }
     #todo should try to find a better algorithm for sound speed
-    if ( (++$duhcnt)%2 -eq 1) { if ($sounds) { play-sound $script:sounds["duh"+(++$duhidx % 4)] -stop} }
+    if ( ($sounds -and (++$duhcnt)%2 -eq 1)) { play-sound $script:sounds["duh"+(++$duhidx % 4)] -stop} 
     # processed block, so update aliens controller state
     if ($aliens_controller.mpnext) {
       foreach ($alien in $aliens) {
@@ -477,6 +491,46 @@ function main {
   start-sleep 1
 }
 
+
+#------------------------------------------------------------------------------
+# Run an intro sequence.
+# Shows credits/last score etc
+# returns $true if game should be played, else $false if script should quit.
+#
+function run-intro {
+  $true
+}
+
+
+#------------------------------------------------------------------------------
+# Run an intro sequence.
+# Potentially would tell you how great you were, ask you for
+# high score name and wotnot, but that isn't supported yet, so we do nothing.
+#
+function run-outro {
+
+}
+
+
+#------------------------------------------------------------------------------
+# Clean up
+#
+function cleanup-stuff {
+  clear-host
+}
+
+
+
+
 # off we go
-main
+init-stuff
+for (;;) {
+  if (run-intro) {
+    run-game
+    run-outro
+  }
+  else { break }
+}
+cleanup-stuff
+
 
