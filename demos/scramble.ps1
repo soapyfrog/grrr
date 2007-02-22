@@ -25,7 +25,7 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 cls
 
 $cw = 78 # reqd for tile wrapping to work
-init-console $cw 50
+init-console 80 50
 write-host "Experimental tilemap support"
 
 #--------------------------------------------------------------------

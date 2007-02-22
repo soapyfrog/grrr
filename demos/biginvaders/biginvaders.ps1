@@ -27,7 +27,7 @@ $ErrorActionPreference="Stop"
 # needs a bit screen. best to use 6x8 bitmap font
 [int]$script:maxwidth = 180
 [int]$script:maxheight = 100
-[int]$script:sync = 1000/40  # target 50fps
+[int]$script:sync = 1000/33  # target 33fps
 
 
 init-console $maxwidth $maxheight 
@@ -243,7 +243,7 @@ function create-bombsprites([int]$wave) {
   }
   $mp = create-motionpath "s1" # just head south 
   # create a few
-  $numbombs = [Math]::Max(10,5 + $wave)
+  $numbombs = [Math]::Min(10,5 + $wave)
   1..$numbombs | foreach {
     $s = create-sprite -images $images.bomba0,$images.bomba1 -handler $h -motionpath $mp -animrate 4 -tag "bomb" -bound $b
     # start it off inactive; it gets set to Active when it's fired.
