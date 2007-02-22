@@ -312,7 +312,7 @@ function update-scoreimg {
   }
   if ($script:lastscore -ne $script:score) {
     
-    $script:scoreimg = create-image (out-banner ("1UP {0:000000}" -f $script:score)) -fg "darkgreen" -bg "black"
+    $script:scoreimg = create-image (out-banner ("1UP {0:0000}" -f $script:score)) -fg "darkgreen" -bg "black"
     $script:lastscore=$script:score
   }
 }
@@ -358,7 +358,11 @@ function init-stuff {
 
   $script:rnd = new-object Random
   $script:scorevalues=@{inva=30;invb=20;invc=10;mother=@(50,100,150)}
-  $script:extralife=2000
+  [int]$script:extralife=2000
+  [int]$script:score = 0
+
+  # create a plafield to put it all on
+  $script:pf = create-playfield -x 0 -y 0 -width $maxwidth -height $maxheight -bg "black"
 }
 
 
@@ -368,10 +372,6 @@ function init-stuff {
 #
 function run-game {
   $script:endreason = $null; # will be set to a reason later
-
-  # create a plafield to put it all on
-  $pf = create-playfield -x 0 -y 0 -width $maxwidth -height $maxheight -bg "black"
-
 
   # create an alien hoard (well, a small gathering) 
   $aliens_controller,[array]$aliens = create-invadersprites 
@@ -502,7 +502,66 @@ function run-game {
 # returns $true if game should be played, else $false if script should quit.
 #
 function run-intro {
-  $true
+  $midx=$maxwidth/2
+  $psimg = create-image (out-banner "powershell" ) -fg "white"
+  $biimg = create-image (out-banner "big invaders") -fg "white"
+
+  $infoimgs=@()
+  if ($script:score -gt 0) {
+    $infoimgs+=(create-image (out-banner ("last score {0:0000}" -f $script:score) ) -fg "blue")
+    $infoimgs+=$infoimgs[-1]
+  }
+  $infoimgs+=(create-image (out-banner "grrr framework demo" ) -fg "white")
+  $infoimgs+=$infoimgs[-1]
+  $infoimgs+=(create-image (out-banner "from ps1.soapyfrog.com") -fg "white")
+  $infoimgs+=$infoimgs[-1]
+  $infoimgs+=(create-image (out-banner "press space to play" ) -fg "yellow")
+  $infoimgs+=(create-image (out-banner "press esc to quit" ) -fg "white")
+
+  # set x reference point to midpoint
+  $allimgs = $infoimgs; $allimgs+=($psimg,$biimg);
+  foreach ($img in $allimgs) { $img.refx = $img.width/2 }
+
+  # make sprites
+  $pssprite=create-sprite $psimg -X $midx -Y 10
+  $bisprite=create-sprite $biimg -X $midx -Y 18
+  $infosprite=create-sprite $infoimgs -animrate 60 -X $midx -Y ($maxheight-16)
+  
+  # group them for easy move/draw
+  $sprites=$infosprite,$bisprite,$pssprite
+
+
+  # make the score advance table
+  $y=34
+  foreach ($t in "mothership","inva","invb","invc") {
+    if ($t -eq "mothership") {
+      $s = "=? mystery"
+    } 
+    else {
+      $s = "={0} points" -f $script:scorevalues[$t]
+    }
+    $simg = create-image (out-banner $s) -fg "darkgreen"
+    $simg.refy = $simg.height/2
+    $sprites+=(create-sprite $simg -Y $y -X ($midx-24))
+    $sprites+=(create-sprite $images["${t}0"] -Y $y -X ($midx-36))
+    $y+=11
+  }
+
+  # create an eventmap to control the animation and user input
+  $em = create-eventmap
+  register-event $em -keydown 32 { $script:showintro=$false }
+  register-event $em -keydown 27 { $script:showintro=$false; $script:shouldplay=$false }
+
+  # enter the playfield display loop
+  $script:showintro=$true
+  while ($showintro) {
+    clear-playfield $pf
+
+    draw-sprite $pf $sprites
+
+    process-eventmap $em
+    flush-playfield $pf -sync $sync
+  }
 }
 
 
@@ -528,12 +587,13 @@ function cleanup-stuff {
 
 # off we go
 init-stuff
-for (;;) {
-  if (run-intro) {
+$script:shouldplay=$true
+while($script:shouldplay) {
+  run-intro
+  if ($shouldplay) {
     run-game
     run-outro
   }
-  else { break }
 }
 cleanup-stuff
 
