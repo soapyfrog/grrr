@@ -16,7 +16,7 @@
 # Once the Snap-In is installed, add it with Add-PSSnapin Soapyfrog.Grrr
 
 # run this as a script - do not 'source' it with '.'
-param([switch]$nosound)
+param([switch]$nosound,[switch]$fast)
 
 $global:___globcheck___=1
 $local:___globcheck___=2
@@ -27,6 +27,12 @@ $ErrorActionPreference="Stop"
 # needs a bit screen. best to use 6x8 bitmap font
 [int]$script:maxwidth = 180
 [int]$script:maxheight = 100
+
+# if user says they have a fast pc, go for 50fps target else 25
+if ($fast) { $script:sync = 1000/50 }
+else { $script:sync = 1000/25 }
+
+
 init-console $maxwidth $maxheight 
 
 
@@ -34,7 +40,7 @@ init-console $maxwidth $maxheight
 # Create sounds for the game
 #
 function prepare-sounds {
-  if ( [soapyfrog.grrr.core.sound]::SoundAvailable ) {
+  if ( !$nosound -and [soapyfrog.grrr.core.sound]::SoundAvailable ) {
     $script:sounds = @{}
     foreach ($i in 0..3) {
       $sounds["duh${i}"] = create-sound (resolve-path "duh${i}.wav")
@@ -60,9 +66,9 @@ function create-invadersprites {
   $b = new-object Soapyfrog.Grrr.Core.Rect 2,0,($maxwidth-4),$maxheight
   $sprites = new-object collections.arraylist # @()
   [hashtable]$ctl = @{  # shared controller for all sprites
-    mp1=(create-motionpath "e2") # initially just right
-    mpdl=(create-motionpath "2s2 200w2" 1) # down and left
-    mpdr=(create-motionpath "2s2 200e2" 1) # down and right
+    mp1=(create-motionpath $(if ($fast) {"e2"}else{"e4"})) # initially just right
+    mpdl=(create-motionpath $(if ($fast) {"2s2 200w2"}else{"1s4 100w4"}) 1) # down and left
+    mpdr=(create-motionpath $(if ($fast) {"2s2 200e2"}else{"1s4 100e4"}) 1) # down and right
     mpnext = $null
   } 
   # handlers for motion
@@ -123,8 +129,8 @@ function create-basesprite {
     $s=$args[0]
     $s.x = 30; $s.y=$script:maxheight-6
     # set motionpaths for left/right - used by event map key handlers
-    $s.state.mpleft = (create-motionpath "w")
-    $s.state.mpright = (create-motionpath "e")
+    $s.state.mpleft = (create-motionpath $(if ($fast) {"w1"}else{"w2"}))
+    $s.state.mpright = (create-motionpath $(if ($fast) {"e1"}else{"e2"}))
   } -DidExceedBounds {
     # just null the motionpath
     $s=$args[0].motionpath = $null
@@ -180,7 +186,7 @@ function create-missilesprite {
     }
     $s.Active = $false
   }
-  $mp = create-motionpath "n2" # just head north
+  $mp = create-motionpath $(if($fast){"n2"}else{"n4"}) # just head north
   $s = create-sprite -images $images.missile -handler $h -motionpath $mp -tag "missile" -bound $b
   # start it off inactive; it gets set to Active when it's fired.
   $s.active = $false
@@ -238,7 +244,7 @@ function create-bombsprites {
       $s.Active = $false
     }
   }
-  $mp = create-motionpath "s" # just head south 
+  $mp = create-motionpath $(if($fast){"s1"}else{"s2"}) # just head south 
   # create a few
   1..5 | foreach {
     $s = create-sprite -images $images.bomba0,$images.bomba1 -handler $h -motionpath $mp -animrate 4 -tag "bomb" -bound $b
@@ -280,7 +286,7 @@ function create-shieldsprites {
 # create mothership sprite
 #
 function create-mothershipsprite {
-  $mp = create-motionpath "e h"
+  $mp = create-motionpath $(if ($fast){"e h"}else{"e"})
   $h = create-spritehandler -DidExceedBounds {
     $s=$args[0] # sprite
     $delta=$args[1] # Delta
@@ -445,7 +451,7 @@ function run-game {
       animate-sprite $alien # only animate the current one
 
       # flush the playfield to the console
-      flush-playfield $pf -sync 20 # to get 50 fps
+      flush-playfield $pf -sync $sync 
 
 
       # test for collisions - note, if this is done to ensure sprites are not
@@ -486,6 +492,7 @@ function run-game {
     }
      
   }
+  if ($sounds) { stop-sound $sounds.mothershiploop }
   draw-string $pf "Demo ended: $script:endreason" 20 10 -fg "white" -bg "red"
   flush-playfield $pf 
   start-sleep 1
