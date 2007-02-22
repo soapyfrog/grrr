@@ -14,7 +14,7 @@ namespace Soapyfrog.Grrr.PlayfieldCmdlets
         private int x, y, w, h;
         private ConsoleColor c;
 
-        [Parameter(Position = 0)]
+        [Parameter(Position = 0,HelpMessage="Hello!")]
         [ValidateRange(1, 1000)]
         public int Width { set { w = value; } }
         [Parameter(Position = 1)]

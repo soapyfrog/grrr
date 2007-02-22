@@ -9,6 +9,12 @@ using System.Runtime.InteropServices;
 
 namespace Soapyfrog.Grrr.Core 
 {
+    /// <summary>
+    /// Represents a wave-based sound that can be played, looped and stopped.
+    /// This implementation uses DirectX DirectSound.
+    /// Downloaded from:
+    /// http://www.microsoft.com/downloads/details.aspx?FamilyId=2DA43D38-DB71-4C1B-BC6A-9B6652CD92A3&displaylang=en
+    /// </summary>
     public class Sound : IDisposable
     {
         #region static content
