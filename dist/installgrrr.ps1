@@ -12,7 +12,7 @@ if ($reregister -or !$registered) {
   write-host -f cyan "Registering..." 
   $iupath = (resolve-path $env:windir\Microsoft.NET\Framework\v2*\installutil.exe | sort path | select -last 1)
   if (!$iupath) { write-error "Can't find installutil.exe" }
-  & $iupath "C:\Documents and Settings\adrian\My Documents\Projects\grrr-trunk\grrr-snapin-solution\grrr-snapin\bin\Release\Soapyfrog.Grrr.dll" }
+  & $iupath ".\Soapyfrog.Grrr.dll" }
 
 $added = Get-PSSnapin | where {$_.name -ieq "soapyfrog.grrr" }
 if (!$added) {
