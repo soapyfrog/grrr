@@ -7,6 +7,9 @@ using Soapyfrog.Grrr.Core;
 
 namespace Soapyfrog.Grrr.TilemapCmdlets
 {
+    /// <summary>
+    /// This commandlet draws a tilemap onto the playfield.
+    /// </summary>
     [Cmdlet("Draw", "Tilemap")]
     public class DrawTilemapCmdlet : PSCmdlet
     {
@@ -18,30 +21,57 @@ namespace Soapyfrog.Grrr.TilemapCmdlets
         private int x, y;
         private int w, h;
 
+        /// <summary>
+        /// The playfield to draw on.
+        /// </summary>
         [Parameter(Position = 0, Mandatory = true)]
         [ValidateNotNull]
         public Playfield Playfield { set { pf = value; } get { return pf; } }
 
+        /// <summary>
+        /// The tilemap to draw.
+        /// </summary>
         [Parameter(Position = 1, Mandatory = true)]
         [ValidateNotNull]
         public Tilemap Tilemap { get { return tilemap; } set { tilemap = value; } }
 
+        /// <summary>
+        /// The x offset in cells into the tilemap to start drawing.
+        /// </summary>
         [Parameter(Position = 2, Mandatory = true)]
         public int OffsetX { get { return offsetX; } set { offsetX = value; } }
+        /// <summary>
+        /// The y offset in cells into the tilemap to start drawing.
+        /// </summary>
         [Parameter(Position = 3, Mandatory = true)]
         public int OffsetY { get { return offsetY; } set { offsetY = value; } }
 
+        /// <summary>
+        /// The x position in the playfield to draw
+        /// </summary>
         [Parameter(Position = 3, Mandatory = true)]
         public int X { get { return x; } set { x = value; } }
+        /// <summary>
+        /// The y position in the playfield to draw
+        /// </summary>
         [Parameter(Position = 4, Mandatory = true)]
         public int Y { get { return y; } set { y = value; } }
 
+        /// <summary>
+        /// The width in cells of the block to draw into the playfield
+        /// </summary>
         [Parameter(Position = 5)]
         public int Width { get { return w; } set { w = value; } }
+        /// <summary>
+        /// The height in cells of the block to draw into the playfield
+        /// </summary>
         [Parameter(Position = 6)]
         public int Height { get { return h; } set { h = value; } }
 
-        // FIXME: processing should probably not be in here.
+        /// <summary>
+        /// Draw the tilemap. 
+        /// FIXME: this should probably be delegated to the TileMap class.
+        /// </summary>
         protected override void EndProcessing()
         {
             // optimisations?

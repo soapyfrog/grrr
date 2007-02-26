@@ -8,13 +8,16 @@ using Soapyfrog.Grrr.Core;
 namespace Soapyfrog.Grrr.EventCmdlets
 {
     /// <summary>
-    /// Create a key event map.
+    /// Create an event map.
     /// </summary>
     [Cmdlet("Process","EventMap")]
     public class ProcessEventMapCmdlet : PSCmdlet
     {
         private EventMap eventmap;
 
+        /// <summary>
+        /// The eventmap to process
+        /// </summary>
         [Parameter(Position=0,Mandatory=true)]
         [ValidateNotNull]
         public EventMap EventMap
@@ -22,7 +25,9 @@ namespace Soapyfrog.Grrr.EventCmdlets
             get { return eventmap; }
             set { eventmap = value; }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         protected override void EndProcessing()
         {
             eventmap.ProcessEvents(Host.UI.RawUI);

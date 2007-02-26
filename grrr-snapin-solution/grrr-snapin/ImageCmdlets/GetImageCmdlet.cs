@@ -43,6 +43,9 @@ namespace Soapyfrog.Grrr.ImageCmdlets
         [Parameter(ValueFromPipeline = true,Mandatory=true)]
         public object[] InputStrings { get { return input; } set { input = value; } }
 
+        /// <summary>
+        /// Do the work
+        /// </summary>
         protected override void ProcessRecord()
         {
             if (input == null) {
@@ -132,6 +135,9 @@ namespace Soapyfrog.Grrr.ImageCmdlets
                 }
             }
         }
+        /// <summary>
+        /// Write out the images.
+        /// </summary>
         protected override void EndProcessing()
         {
             WriteObject(images, false);

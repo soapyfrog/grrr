@@ -22,13 +22,38 @@ namespace Soapyfrog.Grrr.Core
         private BufferCell[,] cells;
         private char t;
 
+        /// <summary>
+        /// width of the image in cells
+        /// </summary>
         public int Width { get { return width; } }
+        /// <summary>
+        /// height of the image in cells
+        /// </summary>
         public int Height { get { return height; } }
+        /// <summary>
+        /// X reference point of the image (ie which cell is drawn at the target x,y point)
+        /// </summary>
         public int RefX { get { return refx; } set { refx = value; } }
+        /// <summary>
+        /// X reference point of the image (ie which cell is drawn at the target x,y point)
+        /// </summary>
         public int RefY { get { return refy; } set { refy = value; } }
+        /// <summary>
+        /// The character designated as transparent. No cell will be drawn with this value.
+        /// </summary>
         public char Transparent { get { return t; } }
+        /// <summary>
+        /// The 2d array of cells representing this image.
+        /// </summary>
         public BufferCell[,] Cells { get { return cells; } }
 
+        /// <summary>
+        /// Construct an Image
+        /// </summary>
+        /// <param name="cells"></param>
+        /// <param name="t"></param>
+        /// <param name="refx"></param>
+        /// <param name="refy"></param>
         protected internal Image(BufferCell[,] cells, char t,int refx,int refy)
         {
             this.cells = cells;

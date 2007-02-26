@@ -10,6 +10,9 @@ using Soapyfrog.Grrr.Core;
 namespace Soapyfrog.Grrr.ImageCmdlets
 {
 
+    /// <summary>
+    /// Scan an image from an existing playfield.
+    /// </summary>
     [Cmdlet("Scan", "Image")]
     public class ScanImageCmdlet : PSCmdlet
     {

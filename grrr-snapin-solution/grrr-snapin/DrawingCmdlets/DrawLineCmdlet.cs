@@ -9,6 +9,9 @@ namespace Soapyfrog.Grrr.DrawingCmdlets
 {
     using Core;
 
+    /// <summary>
+    /// Draw a line in the playfield using an image as the rendering tool.
+    /// </summary>
     [Cmdlet("Draw", "Line")]
     public class DrawLineCmdlet : PSCmdlet
     {
@@ -16,6 +19,9 @@ namespace Soapyfrog.Grrr.DrawingCmdlets
         private Image img;
         private int x1, y1, x2, y2;
 
+        /// <summary>
+        /// The playfield to draw into.
+        /// </summary>
         [Parameter(Position = 0, Mandatory = true)]
         [ValidateNotNullOrEmpty]
         public Playfield Playfield
@@ -23,30 +29,45 @@ namespace Soapyfrog.Grrr.DrawingCmdlets
             set { pf = value; }
             get { return pf; }
         }
+        /// <summary>
+        /// The start x position
+        /// </summary>
         [Parameter(Position = 1, Mandatory = true)]
         public int X1
         {
             set { x1 = value; }
             get { return x1; }
         }
+        /// <summary>
+        /// The start y position
+        /// </summary>
         [Parameter(Position = 2, Mandatory = true)]
         public int Y1
         {
             set { y1 = value; }
             get { return y1; }
         }
+        /// <summary>
+        /// The end x position
+        /// </summary>
         [Parameter(Position = 3, Mandatory = true)]
         public int X2
         {
             set { x2 = value; }
             get { return x2; }
         }
+        /// <summary>
+        /// The end y position
+        /// </summary>
         [Parameter(Position = 4, Mandatory = true)]
         public int Y2
         {
             set { y2 = value; }
             get { return y2; }
         }
+        /// <summary>
+        /// The image to use for drawing.
+        /// </summary>
         [Parameter(Position = 5, Mandatory = true)]
         [ValidateNotNullOrEmpty]
         public Image Image
@@ -55,6 +76,10 @@ namespace Soapyfrog.Grrr.DrawingCmdlets
             get { return img; }
         }
 
+        /// <summary>
+        /// Do the drawing.
+        /// TODO: probably should be delegated to another class.
+        /// </summary>
         protected override void EndProcessing()
         {
             // TODO: i think this could benefit from the

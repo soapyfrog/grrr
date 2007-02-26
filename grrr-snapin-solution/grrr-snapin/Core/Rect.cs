@@ -15,12 +15,30 @@ namespace Soapyfrog.Grrr.Core
         private int w;
         private int h;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int X { get { return x; } set { x = value; } }
+        /// <summary>
+        /// 
+        /// </summary>
         public int Y { get { return y; } set { y = value; } }
+        /// <summary>
+        /// 
+        /// </summary>
         public int Width { get { return w; } set { w = value; } }
+        /// <summary>
+        /// 
+        /// </summary>
         public int Height { get { return h; } set { h = value; } }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int X2 { get { return x + w; } }  // last column+1
+        /// <summary>
+        /// 
+        /// </summary>
         public int Y2 { get { return y + h; } } // last row + 1
 
         /// <summary>
@@ -34,6 +52,10 @@ namespace Soapyfrog.Grrr.Core
             this.h = h;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return string.Format("x={0} y={1} w={2} h={3} x2={4} y2={5}",
@@ -68,6 +90,30 @@ namespace Soapyfrog.Grrr.Core
             //return x >= other.x && y >= other.y && X2 <= other.X2 && Y2 <= other.Y2;
         }
     }
+    /// <summary>
+    /// A flag-style enum of edges, representing the sides of rectangle.
+    /// </summary>
     [Flags]
-    public enum Edge { None = 0, Left = 1, Right = 2, Top = 4, Bottom = 8 }
+    public enum Edge { 
+        /// <summary>
+        /// 
+        /// </summary>
+        None = 0, 
+        /// <summary>
+        /// 
+        /// </summary>
+        Left = 1, 
+        /// <summary>
+        /// 
+        /// </summary>
+        Right = 2, 
+        /// <summary>
+        /// 
+        /// </summary>
+        Top = 4, 
+        /// <summary>
+        /// 
+        /// </summary>
+        Bottom = 8 
+    }
 }
