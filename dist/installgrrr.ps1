@@ -1,10 +1,6 @@
-param([switch]$reregister)
+param([switch]$reregister,[string]$dllname="soapyfrog.grrr.dll")
 $DebugPreference="continue"
 $ErrorActionPreference="stop"
-
-
-
-cd 'C:\Documents and Settings\adrian\My documents\Projects\grrr-trunk\demos\biginvaders'
 
 $registered = Get-PSSnapin -registered | where {$_.name -ieq "soapyfrog.grrr"}
 if ($reregister -or !$registered) {
@@ -12,7 +8,7 @@ if ($reregister -or !$registered) {
   write-host -f cyan "Registering..." 
   $iupath = (resolve-path $env:windir\Microsoft.NET\Framework\v2*\installutil.exe | sort path | select -last 1)
   if (!$iupath) { write-error "Can't find installutil.exe" }
-  & $iupath ".\Soapyfrog.Grrr.dll" }
+  & $iupath $dllname }
 
 $added = Get-PSSnapin | where {$_.name -ieq "soapyfrog.grrr" }
 if (!$added) {

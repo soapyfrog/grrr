@@ -1,6 +1,10 @@
 using System.Diagnostics;
 using System.Management.Automation;
 using System.ComponentModel;
+using System.Security;
+
+[assembly: AllowPartiallyTrustedCallers]
+
 
 namespace Soapyfrog.Grrr.Meta
 {
