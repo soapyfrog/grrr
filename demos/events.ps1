@@ -21,13 +21,17 @@ if ($global:___globcheck___ -eq 2) {throw "This should not be sourced in global 
 # create an event map and set a script variable to false
 $em = create-eventmap
 $script:fired = $false
+$script:context = $null
 
 # after 5 processings, run the script to set the fired var to true
-register-event $em -after 5 { 
+register-event $em -after 5 -Context "hello" { 
   $em2 = $args[0] # the event map
   $num = $args[1] # the event number (ever incrementing counter)
+  $ctx = $args[2] # the context passed in
   if ($script:em -ne $em2) { write-warning "map is not right" }
-  $script:fired = $true; write-host -f "yellow" "bang!" 
+  $script:fired = $true
+  $script:context = $ctx
+  write-host -f "yellow" "bang! $ctx " 
   }
 
 # do 4 and verify it hasn't fired yet
@@ -38,7 +42,7 @@ if ($fired) { write-warning "shouldn't be fired yet" }
 process-eventmap $em
 
 if ($fired) {
-  write-host "event fired, all is well" 
+  write-host "event fired, context='$context', all is well" 
 }
 else { 
   write-warning "should be fired by now" 

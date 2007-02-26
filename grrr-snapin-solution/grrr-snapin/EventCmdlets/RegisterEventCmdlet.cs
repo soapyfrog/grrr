@@ -16,6 +16,7 @@ namespace Soapyfrog.Grrr.EventCmdlets
         private EventMap eventmap;
         private ScriptBlock sb;
         private int keyDown = -1, keyUp = -1, after = -1;
+        private object context = null;
 
         [Parameter(Position = 0, Mandatory = true)]
         [ValidateNotNull]
@@ -25,12 +26,16 @@ namespace Soapyfrog.Grrr.EventCmdlets
             set { eventmap = value; }
         }
 
-        [Parameter(Position=1,Mandatory=true)]
+        [Parameter(Position = 1, Mandatory = true)]
         [ValidateNotNull]
         public ScriptBlock ScriptBlock { set { sb = value; } get { return sb; } }
 
+        [Parameter(Position = 2)]
+        [ValidateNotNull]
+        public object Context { set { context = value; } get { return context; } }
+
         [Parameter()]
-        [ValidateRange(1,65535)]
+        [ValidateRange(1, 65535)]
         public int KeyDown
         {
             get { return keyDown; }
@@ -54,9 +59,9 @@ namespace Soapyfrog.Grrr.EventCmdlets
 
         protected override void EndProcessing()
         {
-            if (keyDown > 0) eventmap.RegisterKeyDownEvent(keyDown, sb);
-            else if (keyUp > 0) eventmap.RegisterKeyUpEvent(keyUp, sb);
-            else if (after > 0) eventmap.RegisterAfterEvent(after, sb);
+            if (keyDown > 0) eventmap.RegisterKeyDownEvent(keyDown, sb, context);
+            else if (keyUp > 0) eventmap.RegisterKeyUpEvent(keyUp, sb, context);
+            else if (after > 0) eventmap.RegisterAfterEvent(after, sb, context);
             else throw new Exception("Should specify exactly one of KeyUp,KeyDown or After parameters");
         }
     }
