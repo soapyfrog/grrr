@@ -50,7 +50,7 @@ namespace Soapyfrog.Grrr.Core
             }
             // not check if there are any timed events
             eventNum++;
-            while (afterScripts.Count > 0 && afterScripts[0].A >= eventNum)
+            while (afterScripts.Count > 0 && eventNum >= afterScripts[0].A)
             {
                 // if found, pass this and the eventnum in
                 afterScripts[0].B.InvokeReturnAsIs(this, eventNum,afterScripts[0].C);
