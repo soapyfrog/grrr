@@ -18,7 +18,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>hello.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -27,7 +28,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>hello.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.DirectX.DirectSound, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
@@ -91,6 +93,7 @@
     </Compile>
     <Compile Include="SoundCmdlets\StopSoundCmdlet.cs" />
     <Compile Include="SpriteCmdlets\AnimateSpriteCmdlet.cs" />
+    <Compile Include="SpriteCmdlets\ChooseSpriteCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateMotionPathCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateSpriteCmdlet.cs" />
     <Compile Include="SpriteCmdlets\CreateSpriteHandlerCmdlet.cs" />

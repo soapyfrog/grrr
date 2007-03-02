@@ -27,7 +27,7 @@ $ErrorActionPreference="Stop"
 # needs a bit screen. best to use 6x8 bitmap font
 [int]$script:maxwidth = 180
 [int]$script:maxheight = 100
-[int]$script:sync = 1000/33  # target 33fps
+[int]$script:sync = 1000/50  # target 50
 
 
 init-console $maxwidth $maxheight 
@@ -495,17 +495,12 @@ function run-game {
 
           # lets drop a bomb!
           if ($rnd.next($bombchance) -eq 0) {
-            foreach ($b in $bombs) {
-              if (!$b.Active) {
-                $s=$null; while ($s -eq $null) {
-                  $s = $invaders[$rnd.next($invaders.length)]
-                  if (!$s.active) { $s=$null }
-                }
+            $b = choose-sprite -first -inactive $bombs
+            $s = choose-sprite -any -active $invaders
+            if ($s -and $b) {
                 $b.X = $s.X
                 $b.Y = $s.Rect.Y
                 $b.Active = $true
-                break
-              }
             }
           }
         }#foreach invader
