@@ -6,6 +6,8 @@ using System.Threading;
 using Microsoft.DirectX;
 using Microsoft.DirectX.DirectSound;
 using System.Runtime.InteropServices;
+using System.IO.Ports;
+using System.IO;
 
 namespace grrr_ideas
 {
@@ -14,17 +16,21 @@ namespace grrr_ideas
         static void Main(string[] args)
 
         {
-            List<Tuple<int, string>> x = new List<Tuple<int, string>>();
-            x.Add(new Tuple<int,string>(10, "hello"));
-            x.Add(new Tuple<int, string>(15, "chips"));
-
-            x.Add(new Tuple<int, string>(10, "goodbye"));
-            x.Add(new Tuple<int, string>(5, "fish"));
-            x.Sort(delegate(Tuple<int, string> a, Tuple<int, string> b) { return a.A.CompareTo(b.A); });
-            foreach (Tuple<int, string> t in x)
+            FileStream fs = new FileStream   ( @"C:\Documents and Settings\adrian\_viminfo",FileMode.Open);
+            byte[] buf = new byte[30];
+            AsyncCallback cb = delegate(IAsyncResult res)
             {
-                Console.WriteLine("key={0}, value={1}", t.A,t.B);
-            }
+                Console.WriteLine("callback:" + Thread.CurrentThread.ManagedThreadId);
+                foreach (byte b in buf)
+                {
+                    Console.Write((char)b);
+                }
+                fs.EndRead(res);
+            };
+            Console.WriteLine("main:"+Thread.CurrentThread.ManagedThreadId);
+            fs.BeginRead(buf, 0, 30, cb, "hello");
+
+
         }
     }
 }
