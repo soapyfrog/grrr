@@ -24,5 +24,6 @@ http://www.microsoft.com/downloads/details.aspx?FamilyId=2DA43D38-DB71-4C1B-BC6A
 .. or start biginvaders with the -nosound switch. This has had limited testing
 as I don't have any XP machines without it installed :-)
 
+TODO: update this for Vista.
 
 ps1@soapyfrog.com   /   http://ps1.soapyfrog.com/category/grrr
