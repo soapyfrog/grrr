@@ -1,3 +1,13 @@
+Grrr
+
+A plaything from http://ps1.soapyfrog.com - doing inappropriate things with PowerShell.
+
+Grrr is a Windows Console-based sprite and animation add on for PowerShell
+and includes some samples scripts, like space invaders.
+
+
+------ original README.txt -----
+
 Grrr is a PowerShell snapin and so must be registered and added to your 
 PowerShell session.
 
