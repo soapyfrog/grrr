@@ -36,4 +36,4 @@ as I don't have any XP machines without it installed :-)
 
 TODO: update this for Vista.
 
-postmaster@soapyfrog.com   /   http://ps1.soapyfrog.com/category/grrr
+postmaster@soapyfrog.com   /   https://ps1.soapyfrog.com/category/grrr
