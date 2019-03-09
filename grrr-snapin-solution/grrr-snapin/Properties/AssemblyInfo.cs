@@ -36,4 +36,4 @@ using System.Security;
 [assembly: AssemblyFileVersion("2.0.0.0")]
 
 
-[assembly:SecurityTransparent]
+[assembly: SecurityTransparent]

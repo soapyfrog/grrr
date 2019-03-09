@@ -14,7 +14,7 @@ namespace Soapyfrog.Grrr.DrawingCmdlets
     /// Draw a line in the playfield using an image as the rendering tool.
     /// </summary>
     [Cmdlet("Draw", "Line")]
-    [SecurityCritical]
+//    [SecurityCritical]
     public class DrawLineCmdlet : PSCmdlet
     {
         private Playfield pf;

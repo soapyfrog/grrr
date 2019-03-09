@@ -10,7 +10,7 @@ namespace Soapyfrog.Grrr.PlayfieldCmdlets
 {
 
     [Cmdlet("Flush", "Playfield")]
-    [SecurityCritical]
+//    [SecurityCritical]
     public class FlushPlayfieldCmdlet : PSCmdlet
     {
         private Playfield pf;
