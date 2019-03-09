@@ -13,19 +13,13 @@ namespace Soapyfrog.Grrr.SoundCmdlets
     [Cmdlet("Stop", "Sound")]
     public class StopSoundCmdlet : PSCmdlet
     {
-        private Sound sound;
-
         [Parameter(Position = 0, Mandatory = true)]
         [ValidateNotNull]
-        public Sound Sound
-        {
-            get { return sound; }
-            set { sound = value; }
-        }
+        public Sound Sound { get; set; }
 
         protected override void EndProcessing()
         {
-            sound.Stop(); 
+            Sound.Stop(); 
         }
     }
 }

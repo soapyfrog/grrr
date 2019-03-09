@@ -1,106 +1,27 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Management.Automation;
-using Microsoft.DirectX;
-using Microsoft.DirectX.DirectSound;
-using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Media;
 
-
-namespace Soapyfrog.Grrr.Core 
+namespace Soapyfrog.Grrr.Core
 {
-    /// <summary>
-    /// Represents a wave-based sound that can be played, looped and stopped.
-    /// This implementation uses DirectX DirectSound.
-    /// Downloaded from:
-    /// http://www.microsoft.com/downloads/details.aspx?FamilyId=2DA43D38-DB71-4C1B-BC6A-9B6652CD92A3&displaylang=en
-    /// </summary>
     public class Sound : IDisposable
     {
-        #region static content
-        private static Device device;
-        private static int bufCount = 0;
-        private static bool available;
-
-        /// <summary>
-        /// DirectSound apps need a window handle so sound can be muted when lose focus or something.
-        /// This lets us use the desktop window handle.
-        /// </summary>
-        /// <returns></returns>
-        [DllImport("user32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
-        static extern IntPtr GetDesktopWindow();
-
-        public static bool SoundAvailable { get { return available; } }
-
-        static Sound()
-        {
-            // Not sure what the equiv of java's Class.forName() is for testing availability...
-            try
-            {
-                Device d = new Microsoft.DirectX.DirectSound.Device();
-                d.Dispose();
-                available = true;
-            }
-            catch (Exception e){
-                // to avoid warning on e not being used. 
-                // is there a [SuppressWarning] attribute?
-                available = (e == null); 
-            }
-
-        }
-
-        /// <summary>
-        /// Lets you see how many buffers exist. If non-zero, the device will be held open.
-        /// You should explicitly Dispose of sounds you create when you're done, other wise
-        /// the GC will deal with it eventually.
-        /// </summary>
-        public static int BufferCount { get { return bufCount; } }
-
-
-        /// <summary>
-        /// Get the Device to use
-        /// </summary>
-        private static Device AudioDevice
-        {
-            get {
-                if (!available) throw new Exception("DirectX DirectSound not available");
-                if (device == null)
-                {
-                    try
-                    {
-                        device = new Microsoft.DirectX.DirectSound.Device();
-                        device.SetCooperativeLevel(GetDesktopWindow(), CooperativeLevel.Priority);
-                        return device;
-                    }
-                    catch (Exception e)
-                    {
-                        throw new Exception("Error getting sound device", e);
-                    }
-                }
-                return device;
-            }
-        }
-
-        #endregion
-
-        private SecondaryBuffer secbuf;
-
+        private SoundPlayer player;
 
         protected internal Sound(string fileName)
         {
-            // buffer description
-            BufferDescription bd = new BufferDescription();
-            bd.Control3D = false;
-            bd.ControlVolume = true;
-            bd.ControlFrequency = true;
-            bd.Flags |= BufferDescriptionFlags.GlobalFocus; // so always plays
 
-            // secondary buffer for wave file
+            player = new SoundPlayer();
+            //player.LoadCompleted += new AsyncCompletedEventHandler(player_LoadCompleted);
+
             try
             {
-                Device dev = AudioDevice;
-                bufCount++;
-                secbuf = new SecondaryBuffer(fileName, bd, dev);
+                player.SoundLocation = fileName;
+                player.Load();
+
             }
             catch (Exception e)
             {
@@ -108,45 +29,39 @@ namespace Soapyfrog.Grrr.Core
             }
         }
 
-        public void Play(bool stopExisting,bool loop)
+        public void Play(bool stopExisting, bool loop)
         {
-            if (secbuf != null)
+            if (stopExisting)
             {
-                if (stopExisting) secbuf.Stop();
-                secbuf.Play(0, loop ? BufferPlayFlags.Looping : BufferPlayFlags.Default);
+                Stop();
             }
+            if (loop)
+            {
+                player.PlayLooping();
+            }
+            else
+            {
+                player.Play();
+            }
+
         }
 
         public void Stop()
         {
-            if (secbuf != null) {
-                secbuf.Stop();
-            }
+            player.Stop();
         }
 
 
 
         ~Sound()
         {
-            Dispose(false);
+            Dispose();
         }
 
-
-        #region IDisposable Members
-
-        internal void Dispose(bool disposing)
+        public void Dispose()
         {
-            if (secbuf != null)
-                secbuf.Dispose();
-            if (--bufCount == 0)
-            {
-                device.Dispose();
-                device = null;
-            }
+            player.Dispose();
         }
-
-        public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
-
-        #endregion
     }
+
 }

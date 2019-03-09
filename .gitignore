@@ -1,0 +1,9 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/dist
+/grrr-snapin-solution/Backup
+/grrr-snapin-solution/grrr-snapin/obj
+/grrr-snapin-solution/grrr-snapin/bin
+/grrr-snapin-solution/grrr-ideas/obj
