@@ -11,9 +11,9 @@ namespace Soapyfrog.Grrr.Meta
     [RunInstaller(true)]
     public class GrrrSnapin : PSSnapIn
     {
-        public GrrrSnapin()
+        public GrrrSnapin() 
             : base()
-        {
+        { 
         }
 
         public override string Name
@@ -46,7 +46,7 @@ namespace Soapyfrog.Grrr.Meta
         {
             get
             {
-                return "GrrrSnapin,This is a PowerShell snap-in that high performance graphics and animation in the console.";
+                return "GrrrSnapin. This is a PowerShell snap-in that high performance graphics and animation in the console.";
             }
         }
 

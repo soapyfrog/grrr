@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.ImageCmdlets
 {
@@ -14,6 +15,7 @@ namespace Soapyfrog.Grrr.ImageCmdlets
     /// Draw an image onto the specified playfield at specific coord
     /// </summary>
     [Cmdlet("Draw", "Image")]
+    [SecurityCritical]
     public class DrawImageCmdlet : PSCmdlet
     {
         private Playfield pf;

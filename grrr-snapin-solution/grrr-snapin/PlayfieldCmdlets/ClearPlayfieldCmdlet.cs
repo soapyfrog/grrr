@@ -4,11 +4,13 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.PlayfieldCmdlets
 {
 
     [Cmdlet("Clear", "Playfield")]
+    [SecurityCritical]
     public class ClearPlayfieldCmdlet : PSCmdlet
     {
         private Playfield pf;

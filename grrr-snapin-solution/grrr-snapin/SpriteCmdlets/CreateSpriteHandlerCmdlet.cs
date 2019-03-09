@@ -4,6 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.SpriteCmdlets
 {
@@ -12,6 +13,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
     /// handlers that are used to control the behavious of a sprite.
     /// </summary>
     [Cmdlet("Create", "SpriteHandler")]
+    [SecurityCritical]
     public class CreateSpriteHandlerCmdlet : PSCmdlet
     {
         private ScriptBlock didInit;

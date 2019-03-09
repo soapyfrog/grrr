@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.ImageCmdlets
 {
@@ -15,6 +16,7 @@ namespace Soapyfrog.Grrr.ImageCmdlets
     /// TODO: update it!
     /// </summary>
     [Cmdlet("Get", "Image")]
+    [SecurityCritical]
     public class GetImageCmdlet : PSCmdlet
     {
         private Hashtable images = new Hashtable();

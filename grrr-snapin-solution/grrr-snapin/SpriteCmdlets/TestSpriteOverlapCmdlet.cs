@@ -4,6 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.SpriteCmdlets
 {
@@ -18,6 +19,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
     /// TODO: add option for cell-level overlap
     /// </summary>
     [Cmdlet("Test", "SpriteOverlap")]
+    [SecurityCritical]
     public class TestSpriteOverlapCmdlet : PSCmdlet
     {
         private Sprite[] spritesA;

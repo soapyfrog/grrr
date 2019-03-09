@@ -4,6 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.SpriteCmdlets
 {
@@ -12,6 +13,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
     /// inactive sprites too.
     /// </summary>
     [Cmdlet("Draw", "Sprite")]
+    [SecurityCritical]
     public class DrawSpriteCmdlet : PSCmdlet
     {
         private Playfield pf;

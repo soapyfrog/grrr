@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Management.Automation;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.MiscCmdlets
 {
     [Cmdlet("Out","Banner")]
+    [SecurityCritical]
     public class OutBannerCmdlet : Cmdlet
     {
         private string[] text;

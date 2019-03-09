@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.ImageCmdlets
 {
@@ -14,6 +15,7 @@ namespace Soapyfrog.Grrr.ImageCmdlets
     /// Scan an image from an existing playfield.
     /// </summary>
     [Cmdlet("Scan", "Image")]
+    [SecurityCritical]
     public class ScanImageCmdlet : PSCmdlet
     {
         private Playfield pf;

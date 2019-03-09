@@ -4,6 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.DrawingCmdlets
 {
@@ -13,6 +14,7 @@ namespace Soapyfrog.Grrr.DrawingCmdlets
     /// Draw a line in the playfield using an image as the rendering tool.
     /// </summary>
     [Cmdlet("Draw", "Line")]
+    [SecurityCritical]
     public class DrawLineCmdlet : PSCmdlet
     {
         private Playfield pf;

@@ -4,6 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.EventCmdlets
 {
@@ -11,6 +12,7 @@ namespace Soapyfrog.Grrr.EventCmdlets
     /// Create an event map.
     /// </summary>
     [Cmdlet("Process","EventMap")]
+    [SecurityCritical]
     public class ProcessEventMapCmdlet : PSCmdlet
     {
         private EventMap eventmap;

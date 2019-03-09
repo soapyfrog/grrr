@@ -4,6 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.TilemapCmdlets
 {
@@ -11,6 +12,7 @@ namespace Soapyfrog.Grrr.TilemapCmdlets
     /// This commandlet draws a tilemap onto the playfield.
     /// </summary>
     [Cmdlet("Draw", "Tilemap")]
+    [SecurityCritical]
     public class DrawTilemapCmdlet : PSCmdlet
     {
 

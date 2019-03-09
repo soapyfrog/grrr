@@ -4,11 +4,13 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.PlayfieldCmdlets
 {
 
     [Cmdlet("Create", "Playfield")]
+    [SecurityCritical]
     public class CreatePlayfieldCmdlet : PSCmdlet
     {
         private int x, y, w, h;

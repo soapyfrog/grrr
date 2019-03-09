@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
+using System.Security;
 
 namespace Soapyfrog.Grrr.MiscCmdlets
 {
@@ -12,6 +13,7 @@ namespace Soapyfrog.Grrr.MiscCmdlets
     /// Will throw an exception if you try to exceed the physical bounds of the screen.
     /// </summary>
     [Cmdlet("Init","Console")]
+    [SecurityCritical]
     public class InitConsoleCmdlet : PSCmdlet
     {
         private int w=120, h=50;

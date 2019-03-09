@@ -4,11 +4,13 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.SpriteCmdlets
 {
 
     [Cmdlet("Create", "Sprite")]
+    [SecurityCritical]
     public class CreateSpriteCmdlet : PSCmdlet
     {
         private Image[] images;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
+using System.Security;
 
 namespace Soapyfrog.Grrr.Core
 {
@@ -19,11 +20,13 @@ namespace Soapyfrog.Grrr.Core
 
         private int eventNum = 0; // used for "after" events
 
+        [SecurityCritical]
         protected internal EventMap(bool allowAutoRepeat)
         {
             this.allowAutoRepeat = allowAutoRepeat;
         }
 
+        [SecurityCritical]
         public void ProcessEvents(PSHostRawUserInterface ui)
         {
             // key events first
@@ -59,16 +62,19 @@ namespace Soapyfrog.Grrr.Core
         }
 
 
+        [SecurityCritical]
         internal void RegisterKeyDownEvent(int keyDown, ScriptBlock sb,object context)
         {
             keyDownScripts.Add(keyDown, new Tuple<ScriptBlock, object>(sb, context));
         }
 
+        [SecurityCritical]
         internal void RegisterKeyUpEvent(int keyUp, ScriptBlock sb, object context)
         {
             keyUpScripts.Add(keyUp, new Tuple<ScriptBlock, object>(sb, context));
         }
 
+        [SecurityCritical]
         internal void RegisterAfterEvent(int after, ScriptBlock sb, object context)
         {
             afterScripts.Add(new Tuple<int, ScriptBlock, object>(eventNum + after, sb, context));

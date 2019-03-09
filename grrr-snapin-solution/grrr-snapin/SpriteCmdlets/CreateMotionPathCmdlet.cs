@@ -4,6 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.SpriteCmdlets
 {
@@ -14,6 +15,7 @@ namespace Soapyfrog.Grrr.SpriteCmdlets
     /// (bring it back to the beginning twice as fast).
     /// </summary>
     [Cmdlet("Create", "MotionPath")]
+    [SecurityCritical]
     public class CreateMotionPathCmdlet : PSCmdlet
     {
         private string mps;

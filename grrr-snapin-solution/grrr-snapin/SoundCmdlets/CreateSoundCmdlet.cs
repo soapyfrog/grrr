@@ -4,6 +4,7 @@ using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Host;
 using Soapyfrog.Grrr.Core;
+using System.Security;
 
 namespace Soapyfrog.Grrr.SoundCmdlets
 {
@@ -12,6 +13,7 @@ namespace Soapyfrog.Grrr.SoundCmdlets
     /// Returns one for each filename supplied.
     /// </summary>
     [Cmdlet("Create", "Sound")]
+    [SecurityCritical]
     public class CreateSoundCmdlet : PSCmdlet
     {
         private string[] soundfiles;
